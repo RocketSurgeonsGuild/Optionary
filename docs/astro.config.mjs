@@ -62,7 +62,29 @@ export default defineConfig({
                             label: "Getting Started",
                             link: "/",
                             icon: "open-book",
-                            items: [{ label: "Overview", link: "/" }],
+                            items: [
+                                { label: "Overview", link: "/" },
+                                { label: "Getting started", link: "/getting-started/" },
+                                {
+                                    label: "Guides",
+                                    items: [
+                                        { label: "Declarations", link: "/guides/declarations/" },
+                                        { label: "Key styles", link: "/guides/key-styles/" },
+                                        { label: "Binding and validation", link: "/guides/binding/" },
+                                        { label: "Schema and editors", link: "/guides/schema-and-editors/" },
+                                        { label: "Registering from a library", link: "/guides/registering-from-a-library/" },
+                                        { label: "YAML provider", link: "/guides/yaml/" },
+                                    ],
+                                },
+                                {
+                                    label: "Reference",
+                                    items: [
+                                        { label: "MSBuild properties", link: "/reference/msbuild-properties/" },
+                                        { label: "Diagnostics", link: "/reference/diagnostics/" },
+                                    ],
+                                },
+                                { label: "Troubleshooting", link: "/troubleshooting/" },
+                            ],
                         },
                         {
                             label: "API Reference",
