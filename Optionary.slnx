@@ -65,6 +65,7 @@
     <Project Path="test/Optionary.Analyzers.Tests/Optionary.Analyzers.Tests.csproj" />
     <Project Path="test/Optionary.Aot.Tests/Optionary.Aot.Tests.csproj" />
     <Project Path="test/Optionary.Build.Tasks.Tests/Optionary.Build.Tasks.Tests.csproj" />
+    <Project Path="test/Optionary.Configuration.Yaml.Tests/Optionary.Configuration.Yaml.Tests.csproj" />
     <Project Path="test/Optionary.Parity.Tests/Optionary.Parity.Tests.csproj" />
     <Project Path="test/Optionary.Runtime.Tests/Optionary.Runtime.Tests.csproj" />
   </Folder>
