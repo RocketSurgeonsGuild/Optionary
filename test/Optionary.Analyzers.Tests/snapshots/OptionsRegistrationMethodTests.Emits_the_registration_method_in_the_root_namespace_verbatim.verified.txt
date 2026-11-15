@@ -1,0 +1,28 @@
+﻿{
+  FinalDiagnostics: [],
+  GeneratorDiagnostics: {
+    Optionary.Analyzers.ConfigurationGenerator: []
+  },
+  GlobalOptions: {
+    build_property.RootNamespace: Contoso.Shipping_Service.V2
+  },
+  References: [
+    Microsoft.Extensions.Configuration.Abstractions.dll,
+    Microsoft.Extensions.Configuration.dll,
+    Microsoft.Extensions.DependencyInjection.Abstractions.dll,
+    Microsoft.Extensions.DependencyInjection.Abstractions.dll,
+    Microsoft.Extensions.DependencyInjection.Abstractions.dll,
+    Microsoft.Extensions.Options.dll,
+    Microsoft.Extensions.Options.dll,
+    mscorlib.dll,
+    netstandard.dll,
+    Optionary.dll,
+    System.Collections.dll,
+    System.ComponentModel.dll,
+    System.Core.dll,
+    System.dll,
+    System.Linq.dll,
+    System.Private.CoreLib.dll,
+    System.Runtime.dll
+  ]
+}

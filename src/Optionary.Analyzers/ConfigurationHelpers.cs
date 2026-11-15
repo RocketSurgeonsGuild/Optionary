@@ -36,23 +36,33 @@ internal static class ConfigurationHelpers
     public static bool IsOpenGenericType(this INamedTypeSymbol type) =>
         type.IsGenericType && ( type.IsUnboundGenericType || type.TypeArguments.All(z => z.TypeKind == TypeKind.TypeParameter) );
 
+    /// <summary>
+    ///     The tool name in <c>[GeneratedCode]</c>: the package, not the generator assembly. Part of the registration method's
+    ///     contract (plan section 4.2).
+    /// </summary>
+    internal const string GeneratedCodeTool = "Optionary";
+
+    /// <summary>
+    ///     <c>[GeneratedCode("Optionary", version)]</c>, <c>[CompilerGenerated]</c> and <c>[ExcludeFromCodeCoverage]</c>, qualified with
+    ///     <c>global::</c> because the code they mark sits in the project's <c>RootNamespace</c>, which may itself contain a <c>System</c>.
+    /// </summary>
     internal static readonly AttributeListSyntax CompilerGeneratedAttributes =
         AttributeList(
             SeparatedList(
                 [
-                    Attribute(ParseName("System.CodeDom.Compiler.GeneratedCode"))
+                    Attribute(ParseName("global::System.CodeDom.Compiler.GeneratedCode"))
                        .WithArgumentList(
                             AttributeArgumentList(
                                 SeparatedList(
                                     [
-                                        AttributeArgument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(AssemblyInfo.Project.AssemblyName))),
+                                        AttributeArgument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(GeneratedCodeTool))),
                                         AttributeArgument(LiteralExpression(SyntaxKind.StringLiteralExpression, Literal(AssemblyInfo.Attributes.FileVersion))),
                                     ]
                                 )
                             )
                         ),
-                    Attribute(ParseName("System.Runtime.CompilerServices.CompilerGenerated")),
-                    Attribute(ParseName("System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage")),
+                    Attribute(ParseName("global::System.Runtime.CompilerServices.CompilerGenerated")),
+                    Attribute(ParseName("global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage")),
                 ]
             )
         );
