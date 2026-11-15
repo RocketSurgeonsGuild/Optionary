@@ -1,0 +1,53 @@
+[tools]
+dotnet = [
+  { version = "11.0.100" },
+  # The base runtime the net10.0 test targets run on.
+  { version = "10.0.15", runtime = "dotnet" },
+]
+"github:microsoft/apm" = { version = "v0.35.1", bin = "apm" }
+"github:eljulians/skillfile" = { version = "v1.9.2", bin = "skillfile" }
+hk = "2.12.0"
+pkl = "0.33.0"
+node = "26.13.0"
+actionlint = "1.7.12"
+biome = "2.5.2"
+
+"dotnet:gitversion.tool" = "6.6.0"
+"dotnet:dotnet-reportgenerator-globaltool" = "5.5.3"
+"dotnet:codecov.tool" = "1.13.0"
+"dotnet:jetbrains.resharper.globaltools" = "2025.3.3"
+"dotnet:jetbrains.dotcover.commandlinetools" = "2025.3.3"
+"dotnet:jetbrains.dottrace.globaltools" = "2025.3.3"
+"dotnet:dotnet-coverage" = "18.5.1"
+"dotnet:dotnet-outdated-tool" = "4.7.0"
+"dotnet:verify.tool" = "0.7.0"
+"dotnet:gitreleasemanager.tool" = "0.20.0"
+"dotnet:NuGet.Mcp.Server" = "1.4.3"
+tombi = "1.11.2"
+oxfmt = "0.75.0"
+
+[tasks]
+build = { run = "dotnet run build/Build.cs" }
+# The API reference tool is only needed by this task, so it is installed for it rather than with every tool (CI jobs
+# such as lint never run it).
+"docs:api" = { run = "api-reference --solution Optionary.slnx --output docs/src/data/api", tools = { "dotnet:Rocket.Surgery.ApiReference" = "0.1.14" }, description = "Generate the C# API reference JSON (docs/src/data/api) from the Release build output: build first (mise run build, or dotnet build Optionary.slnx -c Release)" }
+docs = { run = [
+  "dotnet build Optionary.slnx -c Release",
+  "mise run docs:api",
+  "npm run dev --workspace docs",
+], description = "Build the solution, generate the API reference and start the Astro/Starlight dev server" }
+"docs:preview" = { run = "npm run preview --workspace docs", description = "Preview built Starlight site" }
+"docs:build" = { run = "npm run build --workspace docs", depends = [
+  "docs:api",
+], description = "Build the Starlight site (the API reference JSON comes from the docs:api task, so build the solution first)" }
+
+[settings]
+experimental = true
+prereleases = true
+
+[env]
+HK_MISE = 1
+npm_config_cache = "{{env.HOME}}/.local/share/mise/npm-cache"
+
+[deps.npm]
+auto = true

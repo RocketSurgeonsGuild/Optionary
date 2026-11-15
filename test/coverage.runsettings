@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Code coverage settings for the CI build (build/appsettings.yaml points the pipeline's TestSolution module at this file).
+
+    Coverage is collected for Optionary's own assemblies only. Without an include list it also covers everything else
+    that has sources: the throwaway projects the build tests scaffold and referenced test helper packages, which pads
+    the report and slows report generation.
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="Code Coverage">
+        <Configuration>
+          <Format>Cobertura</Format>
+          <CodeCoverage>
+            <EnableStaticManagedInstrumentation>True</EnableStaticManagedInstrumentation>
+            <EnableDynamicManagedInstrumentation>True</EnableDynamicManagedInstrumentation>
+            <!--
+                The build tests start many `dotnet build`/`run`/`publish` processes. Collecting from them attaches the
+                coverage profiler to every MSBuild node and compiler run they start.
+            -->
+            <CollectFromChildProcesses>True</CollectFromChildProcesses>
+            <ModulePaths>
+              <Include>
+                <ModulePath>.*[\\/]Optionary(\.[^\\/]+)?\.dll$</ModulePath>
+              </Include>
+              <Exclude>
+                <ModulePath>.*\.Tests\.dll$</ModulePath>
+              </Exclude>
+            </ModulePaths>
+          </CodeCoverage>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

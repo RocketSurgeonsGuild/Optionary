@@ -1,0 +1,31 @@
+tags:
+    aot:
+        label: AOT
+        description: Content related to Native AOT and IL trimming compatibility.
+    source-generator:
+        label: Source Generator
+        description: Content related to the Roslyn incremental source generator.
+    getting-started:
+        label: Getting Started
+        description: Introductory guides and tutorials.
+    api:
+        label: API
+        description: API reference and public surface documentation.
+    di:
+        label: Dependency Injection
+        description: Dependency injection and service registration patterns.
+    architecture:
+        label: Architecture
+        description: Internal architecture and design documentation.
+    configuration:
+        label: Configuration
+        description: Options binding and configuration providers.
+    schema:
+        label: JSON Schema
+        description: The JSON Schema Optionary writes for appsettings files.
+    yaml:
+        label: YAML
+        description: The YAML configuration provider.
+    msbuild:
+        label: MSBuild
+        description: MSBuild items, properties and targets that Optionary reads.
