@@ -14,4 +14,11 @@
         -->
         <RollForward>Minor</RollForward>
     </PropertyGroup>
+    <PropertyGroup Condition="$(MSBuildProjectName.StartsWith('Optionary.Analyzers.'))">
+        <!--
+            The generator tests reference Optionary.dll and run the generator as a library, not as an analyzer, which is what
+            _OptionaryCheckGenerator (OPT1001) would otherwise report.
+        -->
+        <_OptionarySkipGeneratorCheck>true</_OptionarySkipGeneratorCheck>
+    </PropertyGroup>
 </Project>

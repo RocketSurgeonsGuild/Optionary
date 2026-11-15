@@ -5,6 +5,7 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
+OPT0001 | Optionary | Warning | C# version too old for Optionary source generation
 OPT0002 | Optionary | Error | Invalid configuration type
 OPT0003 | Optionary | Error | Invalid configuration section
 OPT0004 | Optionary | Warning | Unsupported configuration member
