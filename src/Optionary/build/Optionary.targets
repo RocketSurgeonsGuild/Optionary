@@ -4,4 +4,28 @@
       repository's own projects (src/Directory.Build.targets).
   -->
   <Import Project="$(MSBuildThisFileDirectory)Optionary.Schema.targets" Condition="'$(_OptionarySchemaTargetsImported)' != 'true'" />
+
+  <!--
+      OPT1001: Optionary.dll is referenced but Optionary's source generator isn't loaded. Without it, [Optionary] types get no
+      registration method, and a host framework that calls the method (Dovetail's exported joint, for one) fails to compile with
+      an error that doesn't point here. That happens when the package's analyzers are excluded (ExcludeAssets="analyzers", or
+      IncludeAssets without them), or when the compiler is older than Roslyn 5.0, the oldest the package has a generator for.
+      Part of the cross-repo contract (plan section 4.4).
+      _OptionarySkipGeneratorCheck is for this repository's generator tests, which reference Optionary.dll and run the generator
+      as a library.
+  -->
+  <Target Name="_OptionaryCheckGenerator" BeforeTargets="CoreCompile" Condition="'$(_OptionarySkipGeneratorCheck)' != 'true'">
+    <ItemGroup>
+      <_OptionaryRuntimeReference Include="@(ReferencePath)" Condition="'%(Filename)%(Extension)' == 'Optionary.dll'" />
+      <_OptionaryGeneratorAnalyzer Include="@(Analyzer)" Condition="'%(Filename)' == 'Optionary.Analyzers'" />
+    </ItemGroup>
+    <Error
+      Code="OPT1001"
+      Condition="'@(_OptionaryRuntimeReference)' != '' and '@(_OptionaryGeneratorAnalyzer)' == ''"
+      Text="$(MSBuildProjectName) references Optionary.dll, but Optionary's source generator (Optionary.Analyzers) isn't loaded, so its [Optionary] types get no AddOptionaryConfigurationOptions registration method or configuration schema. Don't exclude the Optionary package's analyzers (remove ExcludeAssets=&quot;analyzers&quot;, or add analyzers to IncludeAssets), and build with the .NET 10 SDK or later, whose compiler (Roslyn 5.0 or later) Optionary's generator supports." />
+    <ItemGroup>
+      <_OptionaryRuntimeReference Remove="@(_OptionaryRuntimeReference)" />
+      <_OptionaryGeneratorAnalyzer Remove="@(_OptionaryGeneratorAnalyzer)" />
+    </ItemGroup>
+  </Target>
 </Project>

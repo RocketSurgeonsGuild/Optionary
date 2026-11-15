@@ -5,6 +5,19 @@ namespace Optionary.Analyzers;
 /// <summary>The diagnostics <see cref="ConfigurationGenerator" /> reports. Each has an OPT ID and the Optionary category.</summary>
 internal static class ConfigurationDiagnostics
 {
+    /// <summary>
+    ///     Below C# 12 the registration method is still emitted, so its callers compile, but it registers nothing: the binder it
+    ///     calls uses C# 12 syntax.
+    /// </summary>
+    public static readonly DiagnosticDescriptor UnsupportedLanguageVersion = new(
+        "OPT0001",
+        "C# version too old for Optionary source generation",
+        "Optionary's source generator needs C# 12 or later, but this project uses C# {0}, so AddOptionaryConfigurationOptions registers nothing and no configuration schema is generated; set LangVersion to 12 or later to enable it",
+        "Optionary",
+        DiagnosticSeverity.Warning,
+        true
+    );
+
     public static readonly DiagnosticDescriptor InvalidConfigurationType = new(
         "OPT0002",
         "Invalid configuration type",
