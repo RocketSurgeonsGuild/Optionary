@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace Joinery.Dovetail.Infrastructure;
+namespace Optionary.Infrastructure;
 
 /// <summary>
 ///     Creates <typeparamref name="TOptions" /> from its section of the application's configuration. The base class then runs
@@ -9,7 +9,7 @@ namespace Joinery.Dovetail.Infrastructure;
 /// </summary>
 /// <typeparam name="TOptions">The options type. <see cref="OptionsFactory{TOptions}" /> is annotated as needing its public parameterless constructor, so this is too.</typeparam>
 /// <remarks>
-///     Initializes a new instance of the <see cref="DovetailOptionsFactory{TOptions}" /> class.
+///     Initializes a new instance of the <see cref="OptionaryOptionsFactory{TOptions}" /> class.
 /// </remarks>
 /// <param name="configuration">The application's configuration.</param>
 /// <param name="path">The path of the section to create from.</param>
@@ -17,7 +17,7 @@ namespace Joinery.Dovetail.Infrastructure;
 /// <param name="setups">The configuration actions to run.</param>
 /// <param name="postConfigures">The initialization actions to run.</param>
 /// <param name="validations">The validations to run.</param>
-internal sealed class DovetailOptionsFactory<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(
+internal sealed class OptionaryOptionsFactory<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(
     IConfiguration configuration,
     string path,
     Func<IConfiguration, TOptions> create,
@@ -42,6 +42,6 @@ internal sealed class DovetailOptionsFactory<[DynamicallyAccessedMembers(Dynamic
         name == Options.DefaultName
             ? _create(_configuration.GetSection(_path))
             : throw new InvalidOperationException(
-                $"Dovetail creates only the default (unnamed) {typeof(TOptions).Name} options, but options named '{name}' were requested. Named options aren't supported for types Dovetail registers."
+                $"Optionary creates only the default (unnamed) {typeof(TOptions).Name} options, but options named '{name}' were requested. Named options aren't supported for types Optionary registers."
             );
 }

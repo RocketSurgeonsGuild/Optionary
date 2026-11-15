@@ -1,4 +1,4 @@
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     What <see cref="EditorSettingsScaffold.Run" /> did. <see cref="Warning" /> is set when the file was left alone.
@@ -15,7 +15,7 @@ internal readonly struct EditorSettingsScaffoldOutcome(string settingsFile, Edit
 }
 
 /// <summary>
-///     Finds the settings file for a host and brings Dovetail's mappings in it up to date (the work behind
+///     Finds the settings file for a host and brings Optionary's mappings in it up to date (the work behind
 ///     <see cref="ScaffoldEditorSettings" />, apart from the MSBuild logging).
 /// </summary>
 internal static class EditorSettingsScaffold
@@ -40,7 +40,7 @@ internal static class EditorSettingsScaffold
                 file,
                 null,
                 EditorSettingsStatus.Unsafe,
-                $"Dovetail: can't map this project's configuration schema in {file}: {error}. Set DovetailEditorSettingsDirectory to a folder that contains the project, or DovetailScaffoldEditorSettings to false."
+                $"Optionary: can't map this project's configuration schema in {file}: {error}. Set OptionaryEditorSettingsDirectory to a folder that contains the project, or OptionaryScaffoldEditorSettings to false."
             );
         }
 
@@ -50,7 +50,7 @@ internal static class EditorSettingsScaffold
             mappings,
             status,
             status == EditorSettingsStatus.Unsafe
-                ? $"Dovetail: left {file} as it is ({reason}). Add these entries to it to get completion and validation for this project's configuration, or set DovetailScaffoldEditorSettings to false to stop this warning:\n{mappings!.ToSnippet().TrimEnd()}"
+                ? $"Optionary: left {file} as it is ({reason}). Add these entries to it to get completion and validation for this project's configuration, or set OptionaryScaffoldEditorSettings to false to stop this warning:\n{mappings!.ToSnippet().TrimEnd()}"
                 : null
         );
     }

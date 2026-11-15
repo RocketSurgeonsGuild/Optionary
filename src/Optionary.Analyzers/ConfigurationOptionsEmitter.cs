@@ -1,11 +1,11 @@
 using System.Globalization;
-using Joinery.Dovetail.Support.Configuration.Binding;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Optionary.Analyzers.Binding;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
-/// <summary>What one <c>[DovetailConfiguration]</c> section registers with the options pipeline, and the types its binder needs.</summary>
+/// <summary>What one <c>[Optionary]</c> section registers with the options pipeline, and the types its binder needs.</summary>
 /// <param name="ValidateWithZeroAlloc">Whether ZeroAlloc.Validation.Options generates a <c>ValidateWithZeroAlloc()</c> overload for the type.</param>
 internal sealed record ConfigurationOptions(
     string Path,
@@ -21,15 +21,15 @@ internal sealed record ConfigurationValidator(string TypeName, EquatableArray<st
 
 /// <summary>
 ///     Emits <c>OptionaryConfigurationOptions.AddOptionaryConfigurationOptions(services)</c>, which registers this assembly's
-///     <c>[DovetailConfiguration]</c> types with the options pipeline, and the reflection-free binder it uses. The class is
+///     <c>[Optionary]</c> types with the options pipeline, and the reflection-free binder it uses. The class is
 ///     internal and lives in the project's <c>RootNamespace</c> (the global namespace when that is empty), so a library can call
-///     it from its own extension method and Dovetail's exported joint can call it by a name it knows without reading this output.
+///     it from its own extension method and a host framework (Dovetail's exported joint, for one) can call it by a name it knows without reading this output.
 /// </summary>
 internal static class ConfigurationOptionsEmitter
 {
     public const string ClassName = "OptionaryConfigurationOptions";
     public const string MethodName = "AddOptionaryConfigurationOptions";
-    private const string BinderClassName = "DovetailConfigurationBinder";
+    private const string BinderClassName = "OptionaryBinder";
 
     /// <summary>The generated file. The method is there even when no section registers options, so that its callers always compile.</summary>
     /// <param name="rootNamespace">The <c>RootNamespace</c> build property, used verbatim; empty or whitespace is the global namespace.</param>
@@ -37,7 +37,7 @@ internal static class ConfigurationOptionsEmitter
     /// <param name="validators">The assembly's <c>[OptionsValidator]</c> classes.</param>
     /// <param name="zeroAllocExtensions">
     ///     The class ZeroAlloc.Validation.Options generates <c>ValidateWithZeroAlloc()</c> into, or <see langword="null" /> when
-    ///     Dovetail leaves ZeroAlloc.Validation's registrations to the project.
+    ///     Optionary leaves ZeroAlloc.Validation's registrations to the project.
     /// </param>
     public static string Emit(
         string? rootNamespace,
@@ -86,14 +86,14 @@ internal static class ConfigurationOptionsEmitter
         writer.WriteLine(
             $$"""
             /// <summary>
-            ///     Registers this assembly's <c>[DovetailConfiguration]</c> types with the options pipeline, bound from configuration
+            ///     Registers this assembly's <c>[Optionary]</c> types with the options pipeline, bound from configuration
             ///     without reflection.
             /// </summary>
             {{attributes}}
             internal static class {{ClassName}}
             {
                 /// <summary>
-                ///     Registers this assembly's <c>[DovetailConfiguration]</c> types with the options pipeline. Every registration is a
+                ///     Registers this assembly's <c>[Optionary]</c> types with the options pipeline. Every registration is a
                 ///     <c>TryAdd</c>, so calling it more than once is harmless.
                 /// </summary>
                 internal static global::Microsoft.Extensions.DependencyInjection.IServiceCollection {{MethodName}}(this global::Microsoft.Extensions.DependencyInjection.IServiceCollection services)
@@ -151,7 +151,7 @@ internal static class ConfigurationOptionsEmitter
     {
         writer.WriteLine(
             $"""
-            /// <summary>Binds configuration to this assembly's <c>[DovetailConfiguration]</c> types the way Microsoft's configuration binding source generator (version {( (int)version ).ToString(CultureInfo.InvariantCulture)}) does.</summary>
+            /// <summary>Binds configuration to this assembly's <c>[Optionary]</c> types the way Microsoft's configuration binding source generator (version {( (int)version ).ToString(CultureInfo.InvariantCulture)}) does.</summary>
             {attributes}
             file static class {BinderClassName}
             {"{"}
@@ -177,7 +177,7 @@ internal static class ConfigurationOptionsEmitter
     {
         // Every root is created by its generated Create entry point, which also binds types the options pipeline could create.
         var create = $"static configuration => {BinderClassName}.{BindingEmitter.CreateMethodName(root)}(configuration)";
-        var call = "global::Joinery.Dovetail.DovetailConfigurationOptionsExtensions.AddDovetailConfigurationOptions<"
+        var call = "global::Optionary.OptionaryServiceCollectionExtensions.AddOptionaryOptions<"
           + registration.Type.FullyQualifiedName
           + ">(services, "
           + SymbolDisplay.FormatLiteral(registration.Path, quote: true)

@@ -4,13 +4,13 @@ using Draft7Schema = Corvus.Json.JsonSchema.Draft7.Schema;
 using ValidationContext = Corvus.Json.ValidationContext;
 using ValidationLevel = Corvus.Json.ValidationLevel;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 internal static class SchemaAssert
 {
     /// <summary>
     ///     What every file the tasks write has to be: a valid draft-07 schema (checked against the meta-schema), whose local
-    ///     <c>$ref</c>s all resolve, that references nothing remote, and whose Dovetail patterns are valid ECMA-262.
+    ///     <c>$ref</c>s all resolve, that references nothing remote, and whose Optionary patterns are valid ECMA-262.
     /// </summary>
     public static async Task<JsonObject> ShouldBeWellFormed(string json)
     {
@@ -22,7 +22,7 @@ internal static class SchemaAssert
             await Resolve(document, reference).Should().NotBeNull().Because($"{reference} doesn't resolve");
         }
 
-        foreach (var pattern in DovetailPatterns(document))
+        foreach (var pattern in OptionaryPatterns(document))
         {
             await Assert.That(() => new Regex(pattern, RegexOptions.ECMAScript)).ThrowsNothing().Because($"{pattern} isn't an ECMA-262 pattern");
         }
@@ -33,7 +33,7 @@ internal static class SchemaAssert
     public static async Task ShouldBeValidDraft07(string json)
     {
         // Corvus checks "format": "regex" for a pattern with a stricter dialect than ECMA-262 and rejects valid ones (\d in
-        // Dovetail's own, named groups in SchemaStore's), failing the schemas around them too. Every pattern of Dovetail's is
+        // Optionary's own, named groups in SchemaStore's), failing the schemas around them too. Every pattern of Optionary's is
         // checked as an ECMAScript regular expression by ShouldBeWellFormed instead, so neutralize them here.
         var result = Draft7Schema.Parse(NeutralizePatterns(json)).Validate(ValidationContext.ValidContext, ValidationLevel.Detailed);
         var failures = result.Results.Where(z => !z.Valid).Select(z => $"{z.Location}: {z.Message}").ToArray();
@@ -100,17 +100,17 @@ internal static class SchemaAssert
         Objects(node).Select(z => z["$ref"]).OfType<JsonValue>().Select(z => z.GetValue<string>());
 
     /// <summary>
-    ///     The Dovetail part of an application schema: the root without SchemaStore, or the second <c>allOf</c> member.
+    ///     The Optionary part of an application schema: the root without SchemaStore, or the second <c>allOf</c> member.
     /// </summary>
-    public static JsonObject DovetailPart(JsonObject document) => document["allOf"] is JsonArray allOf ? allOf[1]!.AsObject() : document;
+    public static JsonObject OptionaryPart(JsonObject document) => document["allOf"] is JsonArray allOf ? allOf[1]!.AsObject() : document;
 
     /// <summary>
     ///     The schema of the value at <paramref name="path" /> (section path segments and property keys), following
-    ///     <c>properties</c> from the Dovetail part and resolving <c>$ref</c>s on the way.
+    ///     <c>properties</c> from the Optionary part and resolving <c>$ref</c>s on the way.
     /// </summary>
     public static JsonObject Section(JsonObject document, params string[] path)
     {
-        var node = DovetailPart(document);
+        var node = OptionaryPart(document);
         foreach (var segment in path)
         {
             node = Dereference(document, node["properties"]![segment]!.AsObject());
@@ -133,14 +133,14 @@ internal static class SchemaAssert
     }
 
     /// <summary>
-    ///     Dovetail's definitions: every one but SchemaStore's.
+    ///     Optionary's definitions: every one but SchemaStore's.
     /// </summary>
-    public static IEnumerable<KeyValuePair<string, JsonNode?>> DovetailDefinitions(JsonObject document) =>
+    public static IEnumerable<KeyValuePair<string, JsonNode?>> OptionaryDefinitions(JsonObject document) =>
         document["definitions"] is JsonObject definitions ? definitions.Where(z => z.Key != SchemaStoreAppSettings.DefinitionName) : [];
 
-    private static IEnumerable<string> DovetailPatterns(JsonObject document) =>
-        Objects(DovetailPart(document))
-           .Concat(DovetailDefinitions(document).SelectMany(z => Objects(z.Value)))
+    private static IEnumerable<string> OptionaryPatterns(JsonObject document) =>
+        Objects(OptionaryPart(document))
+           .Concat(OptionaryDefinitions(document).SelectMany(z => Objects(z.Value)))
            .SelectMany(
                 z => ( z["patternProperties"] is JsonObject patternProperties ? patternProperties.Select(p => p.Key) : [] )
                    .Concat(z["pattern"] is JsonValue keyword && keyword.TryGetValue<string>(out var text) ? [text] : [])

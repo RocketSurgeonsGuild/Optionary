@@ -4,11 +4,11 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace Joinery.Dovetail.Configuration.Runtime.Tests;
+namespace Optionary.Runtime.Tests;
 
 /// <summary>
-///     Covers <see cref="DovetailConfigurationOptionsExtensions" /> for a mutable type the options pipeline could create itself,
-///     which generated configuration joints register the same way as any other type. <see cref="GreetingsOptions.Create" />
+///     Covers <see cref="OptionaryServiceCollectionExtensions" /> for a mutable type the options pipeline could create itself,
+///     which the generated registration method registers the same way as any other type. <see cref="GreetingsOptions.Create" />
 ///     stands in for the generated <c>Create…</c> method.
 /// </summary>
 public sealed class MutableOptionsRegistrationTests
@@ -20,7 +20,7 @@ public sealed class MutableOptionsRegistrationTests
                       .AddSingleton<IConfiguration>(
                            TestConfiguration.Build(("Greetings:Message", "Hello"), ("Greetings:Recipients:0", "Ada"), ("Greetings:Recipients:1", "Grace"))
                        );
-        services.AddDovetailConfigurationOptions("Greetings", GreetingsOptions.Create);
+        services.AddOptionaryOptions("Greetings", GreetingsOptions.Create);
 
         await using var provider = services.BuildServiceProvider();
 
@@ -33,7 +33,7 @@ public sealed class MutableOptionsRegistrationTests
     public async Task Create_ResolvesConfiguration_FromTheServiceProvider()
     {
         var services = new ServiceCollection().AddSingleton<IConfiguration>(TestConfiguration.Build(("Greetings:Message", "replaced")));
-        services.AddDovetailConfigurationOptions("Greetings", GreetingsOptions.Create);
+        services.AddOptionaryOptions("Greetings", GreetingsOptions.Create);
         // Registered after the section: the configuration in effect is the one the provider resolves when the options are created.
         services.AddSingleton<IConfiguration>(TestConfiguration.Build(("Greetings:Message", "from the provider")));
 
@@ -47,7 +47,7 @@ public sealed class MutableOptionsRegistrationTests
     {
         var configuration = TestConfiguration.Build(("Greetings:Message", "initial"), ("Greetings:Recipients:0", "Ada"));
         var services = new ServiceCollection().AddSingleton<IConfiguration>(configuration);
-        services.AddDovetailConfigurationOptions("Greetings", GreetingsOptions.Create);
+        services.AddOptionaryOptions("Greetings", GreetingsOptions.Create);
 
         await using var provider = services.BuildServiceProvider();
 
@@ -74,7 +74,7 @@ public sealed class MutableOptionsRegistrationTests
     {
         var services = new ServiceCollection().AddSingleton<IConfiguration>(TestConfiguration.Build(("Greetings:Recipients:0", "Ada")));
         services.Configure<GreetingsOptions>(options => options.Recipients.Add("configured before"));
-        services.AddDovetailConfigurationOptions("Greetings", GreetingsOptions.Create);
+        services.AddOptionaryOptions("Greetings", GreetingsOptions.Create);
         services.Configure<GreetingsOptions>(options => options.Recipients.Add("configured after"));
         services.PostConfigure<GreetingsOptions>(options => options.Message = "post-configured");
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<GreetingsOptions>, MessageValidator>());
@@ -98,7 +98,7 @@ public sealed class MutableOptionsRegistrationTests
         var builder = Host.CreateEmptyApplicationBuilder(new());
         builder.Configuration.AddInMemoryCollection([new("Greetings:Message", "")]);
         builder
-           .Services.AddDovetailConfigurationOptions("Greetings", GreetingsOptions.Create)
+           .Services.AddOptionaryOptions("Greetings", GreetingsOptions.Create)
            .Validate(options => options.Message.Length > 0, "A greeting needs a message.")
            .ValidateOnStart();
 
@@ -113,7 +113,7 @@ public sealed class MutableOptionsRegistrationTests
     {
         var services = new ServiceCollection();
 
-        await ( (Action)( () => services.AddDovetailConfigurationOptions("", GreetingsOptions.Create) ) ).Should().Throw<ArgumentException>();
+        await ( (Action)( () => services.AddOptionaryOptions("", GreetingsOptions.Create) ) ).Should().Throw<ArgumentException>();
     }
 
     private static GreetingsOptions ReadSnapshot(IServiceProvider provider)

@@ -6,7 +6,7 @@ using Microsoft.Extensions.FileProviders;
 
 using YamlDotNet.Core;
 
-namespace Joinery.Dovetail.Configuration.Yaml;
+namespace Optionary.Configuration.Yaml;
 
 /// <summary>
 ///     Extension methods for adding YAML configuration sources to an <see cref="IConfigurationBuilder" />.

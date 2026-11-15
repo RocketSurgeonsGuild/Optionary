@@ -1,4 +1,4 @@
-namespace Joinery.Dovetail.Analyzers.Tests;
+namespace Optionary.Analyzers.Tests;
 
 /// <summary>Option types declared in one key style, shared by the schema and the binder tests.</summary>
 internal static class ConfigurationKeyStyleSources
@@ -10,11 +10,11 @@ internal static class ConfigurationKeyStyleSources
     public const string LowerCaseNames = """
         using System;
         using System.Collections.Generic;
-        using Joinery.Dovetail.Attributes;
+        using Optionary;
 
         namespace Sample;
 
-        [DovetailConfiguration("Declared")]
+        [Optionary("Declared")]
         public class DeclaredOptions
         {
             public string? myKey { get; set; }
@@ -28,10 +28,10 @@ internal static class ConfigurationKeyStyleSources
 
         public class DeclaredItem { public string? itemName { get; set; } }
 
-        [DovetailConfiguration("DeclaredRecord")]
+        [Optionary("DeclaredRecord")]
         public record DeclaredRecord(string hostName, int portNumber = 80);
 
-        [DovetailConfiguration("Pascal", KeyStyle = ConfigurationKeyStyle.Pascal)]
+        [Optionary("Pascal", KeyStyle = ConfigurationKeyStyle.Pascal)]
         public class PascalOptions
         {
             public string? myKey { get; set; }
@@ -45,7 +45,7 @@ internal static class ConfigurationKeyStyleSources
 
         public class PascalItem { public string? itemName { get; set; } }
 
-        [DovetailConfiguration("PascalRecord", KeyStyle = ConfigurationKeyStyle.Pascal)]
+        [Optionary("PascalRecord", KeyStyle = ConfigurationKeyStyle.Pascal)]
         public record PascalRecord(string hostName, int portNumber = 80);
         """;
 
@@ -57,14 +57,14 @@ internal static class ConfigurationKeyStyleSources
         $$"""
           using System;
           using System.Collections.Generic;
-          using Joinery.Dovetail.Attributes;
+          using Optionary;
           using Microsoft.Extensions.Configuration;
 
           namespace Sample;
 
           public enum RetryMode { ExponentialBackoff, FixedDelay }
 
-          [DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.{{style}})]
+          [Optionary(KeyStyle = ConfigurationKeyStyle.{{style}})]
           public class HttpClientOptions
           {
               public string BaseAddress { get; set; } = "";
@@ -93,7 +93,7 @@ internal static class ConfigurationKeyStyleSources
               public int PortNumber { get; set; } = 80;
           }
 
-          [DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.{{style}})]
+          [Optionary(KeyStyle = ConfigurationKeyStyle.{{style}})]
           public record ServerSettings(string HostName, int PortNumber = 80, bool UseTls = false)
           {
               public List<string> AliasNames { get; init; } = [];
@@ -105,7 +105,7 @@ internal static class ConfigurationKeyStyleSources
               public int MaxConnections { get; set; } = 100;
           }
 
-          [DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.{{style}})]
+          [Optionary(KeyStyle = ConfigurationKeyStyle.{{style}})]
           public class InitOnlyConfig
           {
               public required string DisplayName { get; set; }

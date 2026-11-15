@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
-namespace Joinery.Dovetail.Configuration.Aot.Tests;
+namespace Optionary.Aot.Tests;
 
 /// <summary>
 ///     Compiles registrations shaped like the generated registration method's under the trimming and AOT analyzers (this project
@@ -45,13 +45,13 @@ public sealed class GeneratedShapeRegistrationTests
     private static void Register(IServiceCollection services)
     {
         OptionsBuilderExtensions.ValidateOnStart(
-            DovetailConfigurationOptionsExtensions.AddDovetailConfigurationOptions(
+            OptionaryServiceCollectionExtensions.AddOptionaryOptions(
                 services,
                 "Greetings",
                 static configuration => Binder.CreateGreetings(configuration)
             )
         );
-        DovetailConfigurationOptionsExtensions.AddDovetailConfigurationOptions(
+        OptionaryServiceCollectionExtensions.AddOptionaryOptions(
             services,
             "Server",
             static configuration => Binder.CreateServer(configuration)

@@ -1,105 +1,105 @@
 using Microsoft.CodeAnalysis;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
-/// <summary>The diagnostics <see cref="ConfigurationGenerator" /> reports. The joint generator's live in <c>Diagnostics</c>.</summary>
+/// <summary>The diagnostics <see cref="ConfigurationGenerator" /> reports. Each has an OPT ID and the Optionary category.</summary>
 internal static class ConfigurationDiagnostics
 {
     public static readonly DiagnosticDescriptor InvalidConfigurationType = new(
-        "DT0007",
+        "OPT0002",
         "Invalid configuration type",
         "'{0}' can't be described as configuration: {1}",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Error,
         true
     );
 
     public static readonly DiagnosticDescriptor InvalidConfigurationSection = new(
-        "DT0008",
+        "OPT0003",
         "Invalid configuration section",
         "'{0}' isn't a valid configuration section for '{1}': {2}",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Error,
         true
     );
 
     public static readonly DiagnosticDescriptor UnsupportedConfigurationMember = new(
-        "DT0009",
+        "OPT0004",
         "Unsupported configuration member",
         "'{0}' has type '{1}', which configuration binding doesn't support, so it's left out of the schema",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Warning,
         true
     );
 
     public static readonly DiagnosticDescriptor ConfigurationKeyCollision = new(
-        "DT0010",
+        "OPT0005",
         "Configuration key collision",
         "'{0}' and '{1}' both bind the key '{2}' (configuration keys are case-insensitive), so only '{0}' is described",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Warning,
         true
     );
 
     public static readonly DiagnosticDescriptor UnsupportedConfigurationConstructor = new(
-        "DT0011",
+        "OPT0006",
         "Configuration type can't be constructed",
         "'{0}' can't be created from configuration because {1}",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Error,
         true
     );
 
     public static readonly DiagnosticDescriptor ConfigurationTypeTooLarge = new(
-        "DT0012",
+        "OPT0007",
         "Configuration type too large",
         "'{0}' uses more than {1} distinct types, so the schema stops describing them at '{2}'",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Warning,
         true
     );
 
     public static readonly DiagnosticDescriptor InexpressibleConfigurationAnnotation = new(
-        "DT0013",
+        "OPT0008",
         "Annotation not expressible in JSON Schema",
         "'{0}' on '{1}' is left out of the schema because {2}",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Warning,
         true
     );
 
     public static readonly DiagnosticDescriptor ConfigurationTypeDeclaredTwice = new(
-        "DT0015",
+        "OPT0010",
         "Configuration type declared more than once",
-        "'{0}' is configured more than once; a type can have only one [DovetailConfiguration]",
-        "Dovetail",
+        "'{0}' is configured more than once; a type can have only one [Optionary]",
+        "Optionary",
         DiagnosticSeverity.Error,
         true
     );
 
     public static readonly DiagnosticDescriptor ConfigurationSchemaFailed = new(
-        "DT0014",
+        "OPT0009",
         "Configuration schema generation failed",
-        "Dovetail couldn't describe '{0}' as configuration ({1}), so it has no schema; please report this",
-        "Dovetail",
+        "Optionary couldn't describe '{0}' as configuration ({1}), so it has no schema; please report this",
+        "Optionary",
         DiagnosticSeverity.Warning,
         true
     );
 
     public static readonly DiagnosticDescriptor ConfigurationKeyStyleConflict = new(
-        "DT0016",
+        "OPT0011",
         "Configuration key style conflict",
         "'{0}' is bound with more than one key style; use the same KeyStyle for every section that reaches it, or give the shared type [ConfigurationKeyName] attributes",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Error,
         true
     );
 
     public static readonly DiagnosticDescriptor ZeroAllocAsyncOptionsValidation = new(
-        "DT0018",
+        "OPT0012",
         "ZeroAlloc options validation skipped",
         "'{0}' isn't validated with ZeroAlloc.Validation when its options are read, because '{1}' has an asynchronous rule and options validation is synchronous",
-        "Dovetail",
+        "Optionary",
         DiagnosticSeverity.Warning,
         true
     );

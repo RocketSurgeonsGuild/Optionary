@@ -1,10 +1,9 @@
-using Joinery.Dovetail.Attributes;
 using Microsoft.Extensions.Configuration;
 
-namespace Joinery.Dovetail.Configuration.Parity.Tests;
+namespace Optionary.Parity.Tests;
 
 /// <summary>A section in camel case: a nested object, a record and a list of objects, all keyed in camel case.</summary>
-[DovetailConfiguration("Styled:Camel", KeyStyle = ConfigurationKeyStyle.Camel)]
+[Optionary("Styled:Camel", KeyStyle = ConfigurationKeyStyle.Camel)]
 public class CamelStyled
 {
     public string? DisplayName { get; set; }
@@ -32,7 +31,7 @@ public class CamelItem
 }
 
 /// <summary>A section in dash case: the same shapes as <see cref="CamelStyled" />, keyed with dashes.</summary>
-[DovetailConfiguration("Styled:Dash", KeyStyle = ConfigurationKeyStyle.Dash)]
+[Optionary("Styled:Dash", KeyStyle = ConfigurationKeyStyle.Dash)]
 public class DashStyled
 {
     public string? DisplayName { get; set; }
@@ -60,7 +59,7 @@ public class DashItem
 }
 
 /// <summary>A section in underscore case: the same shapes as <see cref="CamelStyled" />, keyed with underscores.</summary>
-[DovetailConfiguration("Styled:Underscore", KeyStyle = ConfigurationKeyStyle.Underscore)]
+[Optionary("Styled:Underscore", KeyStyle = ConfigurationKeyStyle.Underscore)]
 public class UnderscoreStyled
 {
     public string? DisplayName { get; set; }
@@ -88,7 +87,7 @@ public class UnderscoreItem
 }
 
 /// <summary>Declared names that start in lower case, kept as written: <see cref="ConfigurationKeyStyle.Undefined" /> is the default.</summary>
-[DovetailConfiguration("Styled:Undefined")]
+[Optionary("Styled:Undefined")]
 public class UndefinedLower
 {
     public string? myKey { get; set; }
@@ -106,11 +105,11 @@ public class UndefinedLowerItem
     public string? itemName { get; set; }
 }
 
-[DovetailConfiguration("Styled:UndefinedRecord")]
+[Optionary("Styled:UndefinedRecord")]
 public record UndefinedLowerRecord(string hostName, int portNumber = 80);
 
 /// <summary>The same declared names, with their first letter upper-cased by <see cref="ConfigurationKeyStyle.Pascal" />.</summary>
-[DovetailConfiguration("Styled:Pascal", KeyStyle = ConfigurationKeyStyle.Pascal)]
+[Optionary("Styled:Pascal", KeyStyle = ConfigurationKeyStyle.Pascal)]
 public class PascalLower
 {
     public string? myKey { get; set; }
@@ -128,18 +127,18 @@ public class PascalLowerItem
     public string? itemName { get; set; }
 }
 
-[DovetailConfiguration("Styled:PascalRecord", KeyStyle = ConfigurationKeyStyle.Pascal)]
+[Optionary("Styled:PascalRecord", KeyStyle = ConfigurationKeyStyle.Pascal)]
 public record PascalLowerRecord(string hostName, int portNumber = 80);
 
 /// <summary>The default section name follows the key style: <c>derived-dash</c>, not <c>DerivedDash</c>.</summary>
-[DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.Dash)]
+[Optionary(KeyStyle = ConfigurationKeyStyle.Dash)]
 public class DerivedDashSettings
 {
     public int MaxConnections { get; set; }
 }
 
 /// <summary>The default section name follows the key style: <c>derived_underscore</c>, not <c>DerivedUnderscore</c>.</summary>
-[DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.Underscore)]
+[Optionary(KeyStyle = ConfigurationKeyStyle.Underscore)]
 public class DerivedUnderscoreSettings
 {
     public int MaxConnections { get; set; }
@@ -168,7 +167,7 @@ public class KeyStyleTests
             ("Styled:Camel:Legacy_Name", "legacy")
         );
 
-        var bound = Binders.Dovetail<CamelStyled>(configuration);
+        var bound = Binders.Optionary<CamelStyled>(configuration);
 
         await bound.DisplayName.Should().BeEqualTo("shown");
         await bound.InnerObject.RetryCount.Should().BeEqualTo(4);
@@ -200,7 +199,7 @@ public class KeyStyleTests
             ("Styled:Dash:Legacy_Name", "legacy")
         );
 
-        var bound = Binders.Dovetail<DashStyled>(configuration);
+        var bound = Binders.Optionary<DashStyled>(configuration);
 
         await bound.DisplayName.Should().BeEqualTo("shown");
         await bound.InnerObject.RetryCount.Should().BeEqualTo(4);
@@ -227,7 +226,7 @@ public class KeyStyleTests
             ("Styled:Camel:ItemList:0:ItemWeight", "1")
         );
 
-        var bound = Binders.Dovetail<CamelStyled>(configuration);
+        var bound = Binders.Optionary<CamelStyled>(configuration);
 
         await bound.DisplayName.Should().BeEqualTo("shown");
         await bound.InnerObject.RetryCount.Should().BeEqualTo(4);
@@ -249,7 +248,7 @@ public class KeyStyleTests
             ("Styled:Dash:legacy-name", "not the explicit key")
         );
 
-        var bound = Binders.Dovetail<DashStyled>(configuration);
+        var bound = Binders.Optionary<DashStyled>(configuration);
 
         await bound.DisplayName.Should().BeNull();
         await bound.InnerObject.RetryCount.Should().BeEqualTo(0);
@@ -278,7 +277,7 @@ public class KeyStyleTests
             ("Styled:Underscore:Legacy-Name", "legacy")
         );
 
-        var bound = Binders.Dovetail<UnderscoreStyled>(configuration);
+        var bound = Binders.Optionary<UnderscoreStyled>(configuration);
 
         await bound.DisplayName.Should().BeEqualTo("shown");
         await bound.InnerObject.RetryCount.Should().BeEqualTo(4);
@@ -308,7 +307,7 @@ public class KeyStyleTests
             ("Styled:Underscore:legacy_name", "not the explicit key")
         );
 
-        var bound = Binders.Dovetail<UnderscoreStyled>(configuration);
+        var bound = Binders.Optionary<UnderscoreStyled>(configuration);
 
         await bound.DisplayName.Should().BeNull();
         await bound.InnerObject.RetryCount.Should().BeEqualTo(0);
@@ -338,15 +337,15 @@ public class KeyStyleTests
 
             if (style == "Undefined")
             {
-                var bound = Binders.Dovetail<UndefinedLower>(configuration);
+                var bound = Binders.Optionary<UndefinedLower>(configuration);
                 await (bound.myKey, bound.inner.waitTime, bound.itemList.Count, bound.itemList[0].itemName).Should().BeEqualTo(("value", 7, 1, "first")).Because($"casing {index}");
-                await Binders.Dovetail<UndefinedLowerRecord>(configuration).Should().BeEqualTo(new UndefinedLowerRecord("record-host", 8080)).Because($"casing {index}");
+                await Binders.Optionary<UndefinedLowerRecord>(configuration).Should().BeEqualTo(new UndefinedLowerRecord("record-host", 8080)).Because($"casing {index}");
             }
             else
             {
-                var bound = Binders.Dovetail<PascalLower>(configuration);
+                var bound = Binders.Optionary<PascalLower>(configuration);
                 await (bound.myKey, bound.inner.waitTime, bound.itemList.Count, bound.itemList[0].itemName).Should().BeEqualTo(("value", 7, 1, "first")).Because($"casing {index}");
-                await Binders.Dovetail<PascalLowerRecord>(configuration).Should().BeEqualTo(new PascalLowerRecord("record-host", 8080)).Because($"casing {index}");
+                await Binders.Optionary<PascalLowerRecord>(configuration).Should().BeEqualTo(new PascalLowerRecord("record-host", 8080)).Because($"casing {index}");
             }
         }
 
@@ -358,7 +357,7 @@ public class KeyStyleTests
     {
         var configuration = Build(("DerivedUnderscore:max_connections", "7"), ("derived_underscore:max_connections", "5"), ("derived-underscore:max_connections", "9"));
 
-        await Binders.Dovetail<DerivedUnderscoreSettings>(configuration).MaxConnections.Should().BeEqualTo(5);
+        await Binders.Optionary<DerivedUnderscoreSettings>(configuration).MaxConnections.Should().BeEqualTo(5);
         await Task.CompletedTask;
     }
 
@@ -368,7 +367,7 @@ public class KeyStyleTests
         // The suffix is removed first: DerivedDashSettings -> DerivedDash -> derived-dash, so the Pascal-case section is another one.
         var configuration = Build(("DerivedDash:max-connections", "7"), ("derived-dash:max-connections", "5"));
 
-        await Binders.Dovetail<DerivedDashSettings>(configuration).MaxConnections.Should().BeEqualTo(5);
+        await Binders.Optionary<DerivedDashSettings>(configuration).MaxConnections.Should().BeEqualTo(5);
         await Task.CompletedTask;
     }
 

@@ -1,10 +1,10 @@
 using Microsoft.CodeAnalysis;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
 /// <summary>
-///     Describes every <c>[DovetailConfiguration]</c> section as a JSON Schema fragment and generates the reflection-free options
-///     registration for it. It runs apart from the joint generator and shares no helpers, diagnostics or build properties with it.
+///     Describes every <c>[Optionary]</c> section as a JSON Schema fragment and generates the reflection-free options
+///     registration for it.
 /// </summary>
 [Generator]
 public sealed class ConfigurationGenerator : IIncrementalGenerator

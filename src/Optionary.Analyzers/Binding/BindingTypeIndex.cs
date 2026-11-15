@@ -1,6 +1,6 @@
 // Ported from dotnet/runtime (MIT): TypeIndex and BindingHelperInfo.Builder. See BindingModel.cs.
 
-namespace Joinery.Dovetail.Support.Configuration.Binding;
+namespace Optionary.Analyzers.Binding;
 
 /// <summary>Answers what can be bound, created and generated, over a set of type specs.</summary>
 internal sealed class BindingTypeIndex

@@ -1,10 +1,10 @@
 using Microsoft.Build.Framework;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     Merges the configuration schema fragments of an application (or test project) and every assembly it references into its
-///     appsettings.schema.json, closing Dovetail's sections strictly and embedding SchemaStore's appsettings schema.
+///     appsettings.schema.json, closing Optionary's sections strictly and embedding SchemaStore's appsettings schema.
 /// </summary>
 /// <remarks>
 ///     Fragments are read from assembly metadata, so nothing is loaded. Unreadable assemblies, unknown fragment versions and
@@ -31,7 +31,7 @@ public sealed class MergeConfigurationSchema : Microsoft.Build.Utilities.Task
     public string OutputFile { get; set; } = "";
 
     /// <summary>
-    ///     Whether to close Dovetail's sections with case-insensitive <c>propertyNames</c> patterns. Defaults to <see langword="true" />.
+    ///     Whether to close Optionary's sections with case-insensitive <c>propertyNames</c> patterns. Defaults to <see langword="true" />.
     /// </summary>
     public bool Strict { get; set; } = true;
 
@@ -51,7 +51,7 @@ public sealed class MergeConfigurationSchema : Microsoft.Build.Utilities.Task
     {
         if (!Path.IsPathRooted(OutputFile))
         {
-            Log.LogError("Dovetail: MergeConfigurationSchema needs an absolute OutputFile, not \"{0}\".", OutputFile);
+            Log.LogError("Optionary: MergeConfigurationSchema needs an absolute OutputFile, not \"{0}\".", OutputFile);
             return false;
         }
 
@@ -65,7 +65,7 @@ public sealed class MergeConfigurationSchema : Microsoft.Build.Utilities.Task
             var written = ConfigurationSchemaDocument.Write(OutputFile, ConfigurationSchemaDocument.Serialize(document));
             Log.LogMessage(
                 MessageImportance.Normal,
-                "Dovetail: {0} {1} ({2} configuration schema fragments from {3} assemblies)",
+                "Optionary: {0} {1} ({2} configuration schema fragments from {3} assemblies)",
                 written ? "wrote" : "kept the unchanged",
                 OutputFile,
                 fragments.Count,
@@ -76,7 +76,7 @@ public sealed class MergeConfigurationSchema : Microsoft.Build.Utilities.Task
         {
             // Two builds of the same project (other target frameworks or runtime identifiers) may race for the file; it's only an
             // editor aid, so don't fail the build over it.
-            Log.LogWarning("Dovetail: couldn't write the configuration schema {0}: {1}", OutputFile, exception.Message);
+            Log.LogWarning("Optionary: couldn't write the configuration schema {0}: {1}", OutputFile, exception.Message);
         }
 
         return !Log.HasLoggedErrors;

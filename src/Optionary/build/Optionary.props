@@ -1,7 +1,12 @@
 <Project>
   <!--
-      Optionary's compiler-visible properties and defaults. Imported by package consumers (build/, buildTransitive/ and
-      buildMultiTargeting/) and by this repository's own projects (src/Directory.Build.props). The real content arrives with
-      the code import (RocketSurgeonsGuild/Optionary#4).
+      Optionary's compiler-visible properties. Imported by package consumers (build/, buildTransitive/ and buildMultiTargeting/)
+      and by this repository's own projects (src/Directory.Build.props).
   -->
+  <ItemGroup>
+    <!-- The registration method is emitted in the project's RootNamespace (the global namespace when that is empty). -->
+    <CompilerVisibleProperty Include="RootNamespace" />
+    <!-- OptionaryZeroAllocValidation=false leaves ZeroAlloc.Validation's registrations to the project. -->
+    <CompilerVisibleProperty Include="OptionaryZeroAllocValidation" />
+  </ItemGroup>
 </Project>

@@ -1,26 +1,24 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using Joinery.Dovetail.Support.Configuration;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Options;
 using Rocket.Surgery.Extensions.Testing.SourceGenerators;
 
-namespace Joinery.Dovetail.Analyzers.Tests;
+namespace Optionary.Analyzers.Tests;
 
 /// <summary>
-///     The options registration <c>[DovetailConfiguration]</c> produces: <c>AddOptionaryConfigurationOptions</c> and the
+///     The options registration <c>[Optionary]</c> produces: <c>AddOptionaryConfigurationOptions</c> and the
 ///     reflection-free binder it uses, generated with the rules of the configuration binding source generator version the compilation's
 ///     Microsoft.Extensions.Configuration.Binder reference asks for. The configuration generator runs alone; each snapshot shows
-///     the generated options file, and the generated code must compile. The joint that calls the method is covered by
-///     <see cref="OptionsJointTests" />.
+///     the generated options file, and the generated code must compile.
 /// </summary>
 public class ConfigurationOptionsTests() : GeneratorTest()
 {
     private const string Usings = """
         using System;
         using System.Collections.Generic;
-        using Joinery.Dovetail.Attributes;
+        using Optionary;
         using Microsoft.Extensions.Configuration;
         using Microsoft.Extensions.Options;
 
@@ -32,7 +30,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
         public enum Mode { Off, On }
 
-        [DovetailConfiguration]
+        [Optionary]
         public class GreetingsOptions
         {
             public string Message { get; set; } = "Hello";
@@ -69,13 +67,13 @@ public class ConfigurationOptionsTests() : GeneratorTest()
       + """
         namespace Sample;
 
-        [DovetailConfiguration]
+        [Optionary]
         public record ServerOptions(string Host, int Port = 80, int? Weight = null)
         {
             public List<string> Aliases { get; init; } = [];
         }
 
-        [DovetailConfiguration]
+        [Optionary]
         public class InitOptions
         {
             public string Name { get; init; } = "fallback";
@@ -85,7 +83,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
             public required Action? Callback { get; set; }
         }
 
-        [DovetailConfiguration]
+        [Optionary]
         public class CtorOptions
         {
             public CtorOptions(string name, int port)
@@ -158,7 +156,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
         );
 
         var steps = driver.GetRunResult().Results.Single().TrackedSteps;
-        foreach (var name in new[] { "dovetail:configuration_classes", "dovetail:configuration_options", "dovetail:configuration_sections" })
+        foreach (var name in new[] { "optionary:classes", "optionary:options", "optionary:sections" })
         {
             var reasons = new List<IncrementalStepRunReason>();
             foreach (var step in steps[name])
@@ -199,7 +197,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
                                public class Tree { public string? Name { get; set; } public Dictionary<string, Tree> Children { get; set; } = []; }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class KitchenSinkOptions
                                {
                                    public sbyte A { get; set; }
@@ -245,7 +243,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                                    public string? @class { get; set; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public record ShapedRecord(List<string> Names, Endpoint Primary, Point Origin, Dictionary<string, int> Weights, string[] Tags, Size? Box = null);
                                """
                            )
@@ -253,7 +251,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                           .GenerateAsync(TestContext.CancellationToken);
 
         await result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error).Should().BeEmpty();
-        await result.Results[typeof(ConfigurationGenerator)].SyntaxTrees.Select(z => Path.GetFileName(z.FilePath)).Should().Contain("Dovetail_ConfigurationOptions.g.cs");
+        await result.Results[typeof(ConfigurationGenerator)].SyntaxTrees.Select(z => Path.GetFileName(z.FilePath)).Should().Contain("Optionary.Options.g.cs");
     }
 
     [Test]
@@ -265,19 +263,19 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration("Shared:B", ValidateOnStart = true)]
+                               [Optionary("Shared:B", ValidateOnStart = true)]
                                public class SharedOptions
                                {
                                    public string? Value { get; set; }
                                }
 
-                               [DovetailConfiguration("Shared:A")]
+                               [Optionary("Shared:A")]
                                public class FirstOptions
                                {
                                    public string? Value { get; set; }
                                }
 
-                               [DovetailConfiguration("Shared:C", RegisterOptions = false)]
+                               [Optionary("Shared:C", RegisterOptions = false)]
                                public class DescribedOnlyOptions
                                {
                                    public string? Value { get; set; }
@@ -323,7 +321,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
                                namespace Sample
                                {
-                                   [DovetailConfiguration]
+                                   [Optionary]
                                    public class SecretOptions
                                    {
                                        public string? Name { get; set; }
@@ -339,10 +337,10 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
         await result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error).Should().BeEmpty();
         var binderSource = result.Results[typeof(ConfigurationGenerator)]
-                                 .SyntaxTrees.Single(z => Path.GetFileName(z.FilePath) == "Dovetail_ConfigurationOptions.g.cs")
+                                 .SyntaxTrees.Single(z => Path.GetFileName(z.FilePath) == "Optionary.Options.g.cs")
                                  .ToString();
         var schema = result.FinalCompilation.Assembly.GetAttributes()
-                           .Single(z => z.ConstructorArguments is [{ Value: "Dovetail.ConfigurationSchema.v1:Secret" }, _])
+                           .Single(z => z.ConstructorArguments is [{ Value: "Optionary.Schema.v1:Secret" }, _])
                            .ConstructorArguments[1]
                            .Value as string;
         await binderSource.Contains("key: \"Hidden\"", StringComparison.Ordinal).Should().BeEqualTo(!ignored);
@@ -359,7 +357,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class RefOptions
                                {
                                    public RefOptions(ref int value) => Value = value;
@@ -372,7 +370,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                           .GenerateAsync(TestContext.CancellationToken);
 
         await result.Results[typeof(ConfigurationGenerator)]
-              .Diagnostics.Select(z => $"{z.Id}: {z.GetMessage(System.Globalization.CultureInfo.InvariantCulture)}").Should().BeEquivalentTo(["DT0011: 'Sample.RefOptions' can't be created from configuration because its constructor parameters can't be in, out or ref ('value')"], CollectionOrdering.Matching);
+              .Diagnostics.Select(z => $"{z.Id}: {z.GetMessage(System.Globalization.CultureInfo.InvariantCulture)}").Should().BeEquivalentTo(["OPT0006: 'Sample.RefOptions' can't be created from configuration because its constructor parameters can't be in, out or ref ('value')"], CollectionOrdering.Matching);
     }
 
     [Test]
@@ -394,7 +392,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
         );
 
         var steps = driver.GetRunResult().Results.Single().TrackedSteps;
-        await steps["dovetail:configuration_options"]
+        await steps["optionary:options"]
            .SelectMany(z => z.Outputs)
            .Select(z => z.Reason).Should().All(z => z is IncrementalStepRunReason.Cached or IncrementalStepRunReason.Unchanged);
     }
@@ -432,7 +430,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
     }
 
     /// <summary>
-    ///     Without ZeroAlloc.Validation.Options there is no overload to call, and <c>DovetailEnableZeroAllocValidation=false</c>
+    ///     Without ZeroAlloc.Validation.Options there is no overload to call, and <c>OptionaryZeroAllocValidation=false</c>
     ///     leaves ZeroAlloc.Validation's registrations to the project.
     /// </summary>
     [Test]
@@ -448,7 +446,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
         if (enabled is not null)
         {
-            builder = builder.AddGlobalOption("build_property.DovetailEnableZeroAllocValidation", enabled);
+            builder = builder.AddGlobalOption("build_property.OptionaryZeroAllocValidation", enabled);
         }
 
         var result = await builder.Build().GenerateAsync(TestContext.CancellationToken);
@@ -459,7 +457,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
     /// <summary>
     ///     Options validation is synchronous, so calling <c>ValidateWithZeroAlloc()</c> for a model with an asynchronous rule, its
-    ///     own or one of a nested or collection model's, is an error (ZV0034). Dovetail reports DT0018 and leaves the call out.
+    ///     own or one of a nested or collection model's, is an error (ZV0034). Optionary reports OPT0012 and leaves the call out.
     /// </summary>
     [Test]
     public async Task Reports_ZeroAlloc_models_with_asynchronous_rules()
@@ -481,7 +479,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                                    public override ValueTask<bool> IsValidAsync(string value, CancellationToken ct) => new(true);
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class TenantsOptions
                                {
                                    public string? Region { get; set; }
@@ -502,7 +500,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                                }
 
                                // Only the type's own members are validated, so the base type's asynchronous rule doesn't count.
-                               [DovetailConfiguration, Validate(IncludeBaseProperties = false)]
+                               [Optionary, Validate(IncludeBaseProperties = false)]
                                public class DerivedOptions : BaseOptions
                                {
                                    public string? Other { get; set; }
@@ -525,15 +523,15 @@ public class ConfigurationOptionsTests() : GeneratorTest()
         await result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error).Should().BeEmpty();
         await result.Results[typeof(ConfigurationGenerator)]
               .Diagnostics.Select(z => $"{z.Id}: {z.GetMessage(System.Globalization.CultureInfo.InvariantCulture)}").Should().BeEquivalentTo([
-                       "DT0018: 'Sample.TenantsOptions' isn't validated with ZeroAlloc.Validation when its options are read, because 'Sample.TenantOptions.Name' has an asynchronous rule and options validation is synchronous",
+                       "OPT0012: 'Sample.TenantsOptions' isn't validated with ZeroAlloc.Validation when its options are read, because 'Sample.TenantOptions.Name' has an asynchronous rule and options validation is synchronous",
                    ], CollectionOrdering.Matching);
         var generated = GeneratedOptions(result);
-        await generated.Should().Contain("ValidateWithZeroAlloc(global::Joinery.Dovetail.DovetailConfigurationOptionsExtensions.AddDovetailConfigurationOptions<global::Sample.DerivedOptions>");
-        await generated.Should().NotContain("ValidateWithZeroAlloc(global::Joinery.Dovetail.DovetailConfigurationOptionsExtensions.AddDovetailConfigurationOptions<global::Sample.TenantsOptions>");
+        await generated.Should().Contain("ValidateWithZeroAlloc(global::Optionary.OptionaryServiceCollectionExtensions.AddOptionaryOptions<global::Sample.DerivedOptions>");
+        await generated.Should().NotContain("ValidateWithZeroAlloc(global::Optionary.OptionaryServiceCollectionExtensions.AddOptionaryOptions<global::Sample.TenantsOptions>");
     }
 
     /// <summary>
-    ///     Which <c>[DovetailConfiguration]</c> types call <c>ValidateWithZeroAlloc()</c>: the <c>[Validate]</c> classes (records
+    ///     Which <c>[Optionary]</c> types call <c>ValidateWithZeroAlloc()</c>: the <c>[Validate]</c> classes (records
     ///     included) of this assembly that the generated code can see, nested or not, whatever their accessibility. A type
     ///     without <c>[Validate]</c> and an options type from another assembly get no overload from ZeroAlloc.Validation.Options,
     ///     so they register without one. The overload stand-ins only cover the types that should call them, so a call the generator
@@ -569,17 +567,17 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                              + """
                                using ZeroAlloc.Validation;
 
-                               [assembly: DovetailConfiguration<ThirdParty.ExternalOptions>("External")]
+                               [assembly: Optionary<ThirdParty.ExternalOptions>("External")]
 
                                namespace Sample;
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class PublicOptions
                                {
                                    public string? Value { get; set; }
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                internal class InternalOptions
                                {
                                    public string? Value { get; set; }
@@ -587,26 +585,26 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
                                public class Outer
                                {
-                                   [DovetailConfiguration, Validate]
+                                   [Optionary, Validate]
                                    public class NestedOptions
                                    {
                                        public string? Value { get; set; }
                                    }
 
-                                   [DovetailConfiguration, Validate]
+                                   [Optionary, Validate]
                                    protected internal class ProtectedInternalOptions
                                    {
                                        public string? Value { get; set; }
                                    }
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public record RecordOptions
                                {
                                    public string? Value { get; init; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class UnvalidatedOptions
                                {
                                    public string? Value { get; set; }
@@ -635,7 +633,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
     }
 
     /// <summary>
-    ///     Every way a <c>[Validate]</c> options type reaches an asynchronous rule, each reported with DT0018 and registered without
+    ///     Every way a <c>[Validate]</c> options type reaches an asynchronous rule, each reported with OPT0012 and registered without
     ///     <c>ValidateWithZeroAlloc()</c>: a rule on its own property, on the type itself, on a nested model, on the items of an
     ///     array or a list, or on an inherited property. Rules ZeroAlloc.Validation doesn't run don't count: base properties under
     ///     <c>IncludeBaseProperties = false</c>, and members of a nested type without <c>[Validate]</c>. A model that reaches itself
@@ -683,53 +681,53 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                                    public string Name { get; set; } = "";
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class OwnRuleOptions
                                {
                                    [UniqueName]
                                    public string Name { get; set; } = "";
                                }
 
-                               [DovetailConfiguration, Validate, Reachable]
+                               [Optionary, Validate, Reachable]
                                public class TypeRuleOptions
                                {
                                    public string? Endpoint { get; set; }
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class NestedRuleOptions
                                {
                                    public TenantOptions Tenant { get; set; } = new();
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class ArrayRuleOptions
                                {
                                    public TenantOptions[] Tenants { get; set; } = [];
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class ListRuleOptions
                                {
                                    public IReadOnlyList<TenantOptions> Tenants { get; set; } = [];
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class InheritedRuleOptions : NamedOptions;
 
-                               [DovetailConfiguration, Validate(IncludeBaseProperties = false)]
+                               [Optionary, Validate(IncludeBaseProperties = false)]
                                public class OwnPropertiesOnlyOptions : NamedOptions
                                {
                                    public string? Other { get; set; }
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class UnvalidatedModelOptions
                                {
                                    public NamedOptions Named { get; set; } = new();
                                }
 
-                               [DovetailConfiguration, Validate]
+                               [Optionary, Validate]
                                public class TreeOptions
                                {
                                    public string? Name { get; set; }
@@ -789,19 +787,19 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
         namespace Sample;
 
-        [DovetailConfiguration(ValidateOnStart = true), Validate]
+        [Optionary(ValidateOnStart = true), Validate]
         public class DatabaseOptions
         {
             public string ConnectionString { get; set; } = "";
         }
 
-        [DovetailConfiguration, Validate]
+        [Optionary, Validate]
         public class CacheOptions
         {
             public int Size { get; set; }
         }
 
-        [DovetailConfiguration]
+        [Optionary]
         public class PlainOptions
         {
             public string? Value { get; set; }
@@ -822,7 +820,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
         """;
 
     private static string GeneratedOptions(GeneratorTestResults result) =>
-        result.Results[typeof(ConfigurationGenerator)].SyntaxTrees.Single(z => Path.GetFileName(z.FilePath) == "Dovetail_ConfigurationOptions.g.cs").ToString();
+        result.Results[typeof(ConfigurationGenerator)].SyntaxTrees.Single(z => Path.GetFileName(z.FilePath) == "Optionary.Options.g.cs").ToString();
 
     /// <summary>
     ///     The test compilation, referencing the assemblies the generated code uses, and a stand-in for
@@ -844,7 +842,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
             )
            .ToMetadataReference();
 
-    /// <summary>The generated options file and the exports that list the joint calling it; the generated code must compile.</summary>
+    /// <summary>The generated options file and the diagnostics; the generated code must compile.</summary>
     private static string Describe(GeneratorTestResults result)
     {
         var compileErrors = result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error && z.Id.StartsWith("CS", StringComparison.Ordinal)).ToArray();
@@ -852,7 +850,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
 
         var generated = result.Results[typeof(ConfigurationGenerator)];
         var text = new StringBuilder();
-        const string name = "Dovetail_ConfigurationOptions.g.cs";
+        const string name = "Optionary.Options.g.cs";
         text.AppendLine("## " + name);
         text.AppendLine(generated.SyntaxTrees.SingleOrDefault(z => Path.GetFileName(z.FilePath) == name)?.ToString() ?? "(none)");
 

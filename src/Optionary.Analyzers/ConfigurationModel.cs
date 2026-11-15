@@ -1,4 +1,4 @@
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
 /// <summary>The JSON Schema type a configuration value maps to.</summary>
 internal enum SchemaKind
@@ -101,7 +101,7 @@ internal sealed record SchemaProperty(string Key, SchemaNode Schema, bool Requir
 /// <summary>An object type's schema, referred to by name from every use of it.</summary>
 internal sealed record SchemaDefinition(string Name, SchemaNode Schema);
 
-/// <summary>One <c>[DovetailConfiguration]</c> declaration that produced a schema.</summary>
+/// <summary>One <c>[Optionary]</c> declaration that produced a schema.</summary>
 /// <param name="Schema">The section's own (inline) schema.</param>
 /// <param name="Definitions">The object types the section uses, including its own type when something refers back to it.</param>
 internal sealed record ConfigurationSection(

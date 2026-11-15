@@ -1,6 +1,6 @@
-using static Joinery.Dovetail.Build.Tasks.Tests.Fragments;
+using static Optionary.Build.Tasks.Tests.Fragments;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
 ///     The ConfigurationSchema.json a library writes and packs: its own fragments, permissive, rooted at the configuration root.

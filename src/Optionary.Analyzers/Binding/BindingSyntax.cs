@@ -6,7 +6,7 @@ using System.Text;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Joinery.Dovetail.Support.Configuration.Binding;
+namespace Optionary.Analyzers.Binding;
 
 internal static class BindingSyntax
 {

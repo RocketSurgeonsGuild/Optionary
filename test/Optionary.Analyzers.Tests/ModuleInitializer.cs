@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using DiffEngine;
 using Rocket.Surgery.Extensions.Testing.SourceGenerators;
 
-namespace Joinery.Dovetail.Analyzers.Tests;
+namespace Optionary.Analyzers.Tests;
 
 public static class ModuleInitializer
 {
@@ -29,27 +29,16 @@ public static class ModuleInitializer
 
         VerifierSettings.SortJsonObjects();
         VerifierSettings.ScrubInlineGuids();
-        VerifierSettings.ScrubLinesWithReplace(
-            s =>
-            {
-                return s.Contains(
-                        "DovetailConfigurationData.AssemblyProvider.",
-                        StringComparison.OrdinalIgnoreCase
-                    )
-                    ? s[..( s.IndexOf('"', s.IndexOf('"') + 1) + 2 )] + "\"\")]"
-                    : s;
-            }
-        );
         VerifierSettings.AddScrubber(
             (builder, counter) =>
             {
                 // The generator's versions, read from the typed dependency information rather than its assembly.
-                if (AssemblyInfo.Dependencies.Joinery_Dovetail_Analyzers.Attributes.FileVersion is { Length: > 0, } version)
+                if (AssemblyInfo.Dependencies.Optionary_Analyzers.Attributes.FileVersion is { Length: > 0, } version)
                 {
                     builder.Replace(version, "version");
                 }
 
-                if (AssemblyInfo.Dependencies.Joinery_Dovetail_Analyzers.Attributes.Version is { Length: > 0, } version2)
+                if (AssemblyInfo.Dependencies.Optionary_Analyzers.Attributes.Version is { Length: > 0, } version2)
                 {
                     builder.Replace(version2, "version");
                 }

@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
 ///     How the files are written: the same bytes for the same document on every machine, and untouched when nothing changed.
@@ -18,7 +18,7 @@ public class SchemaFileTests
     [Test]
     public async Task Write_LeavesAnUnchangedFileAlone()
     {
-        var path = Path.Combine(Directory.CreateTempSubdirectory("dovetail-build-tasks-").FullName, "obj", "appsettings.schema.json");
+        var path = Path.Combine(Directory.CreateTempSubdirectory("optionary-build-tasks-").FullName, "obj", "appsettings.schema.json");
         try
         {
             await ConfigurationSchemaDocument.Write(path, "{}\n").Should().BeTrue();

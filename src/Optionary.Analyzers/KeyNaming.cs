@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
-/// <summary>The analyzer's copy of <c>Joinery.Dovetail.Attributes.ConfigurationKeyStyle</c>; the values are the same.</summary>
+/// <summary>The analyzer's copy of <c>Optionary.ConfigurationKeyStyle</c>; the values are the same.</summary>
 internal enum KeyStyle
 {
     Undefined = 0,

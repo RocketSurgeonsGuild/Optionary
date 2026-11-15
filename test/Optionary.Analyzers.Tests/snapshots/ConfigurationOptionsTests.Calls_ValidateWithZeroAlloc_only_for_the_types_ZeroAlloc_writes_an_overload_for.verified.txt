@@ -1,12 +1,10 @@
 ﻿{
   FinalDiagnostics: [],
   GeneratorDiagnostics: {
-    Joinery.Dovetail.Support.Configuration.ConfigurationGenerator: []
+    Optionary.Analyzers.ConfigurationGenerator: []
   },
   References: [
     <in-memory assembly>,
-    FluentValidation.dll,
-    Joinery.Dovetail.dll,
     Microsoft.Extensions.Configuration.Abstractions.dll,
     Microsoft.Extensions.Configuration.Binder,
     Microsoft.Extensions.Configuration.dll,
@@ -17,6 +15,7 @@
     Microsoft.Extensions.Options.dll,
     mscorlib.dll,
     netstandard.dll,
+    Optionary.dll,
     System.Collections.dll,
     System.ComponentModel.Annotations.dll,
     System.ComponentModel.dll,

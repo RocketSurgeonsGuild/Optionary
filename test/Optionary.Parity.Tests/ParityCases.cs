@@ -3,18 +3,18 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.Configuration.Memory;
 
-namespace Joinery.Dovetail.Configuration.Parity.Tests;
+namespace Optionary.Parity.Tests;
 
 /// <summary>
-///     One parity case: configuration data, how Microsoft's generated binder binds it, and how Dovetail's does. The P0 binder spike's
-///     catalogue (minus <c>BinderOptions</c>, which Dovetail never passes, and the scalar <c>Get</c>/<c>GetValue</c> calls).
+///     One parity case: configuration data, how Microsoft's generated binder binds it, and how Optionary's does. The P0 binder spike's
+///     catalogue (minus <c>BinderOptions</c>, which Optionary never passes, and the scalar <c>Get</c>/<c>GetValue</c> calls).
 /// </summary>
 public sealed record ParityCase(
     string Id,
     IReadOnlyDictionary<string, string?>? Data,
     string? Json,
     Func<IConfiguration, object?> Microsoft,
-    Func<IConfiguration, object?> Dovetail
+    Func<IConfiguration, object?> Optionary
 )
 {
     public IConfigurationRoot Build()
@@ -42,8 +42,8 @@ internal static class ParityCases
         EmptyStrings().Concat(Nullables()).Concat(Constructors()).Concat(ValueAndChildren()).Concat(Collections()).Concat(Scalars()).Concat(UnknownKeys());
 
     /// <summary>
-    ///     <paramref name="microsoft" /> binds the section; Dovetail binds the type's own section through <c>IOptions</c>.
-    ///     <c>Get&lt;T&gt;()</c> returns null for a section without values, which a case avoids: Dovetail always creates the options.
+    ///     <paramref name="microsoft" /> binds the section; Optionary binds the type's own section through <c>IOptions</c>.
+    ///     <c>Get&lt;T&gt;()</c> returns null for a section without values, which a case avoids: Optionary always creates the options.
     /// </summary>
     private static ParityCase Case<T>(
         string id,
@@ -58,7 +58,7 @@ internal static class ParityCases
             data,
             json,
             configuration => microsoft(configuration.GetSection(section)) is { } value ? select(value) : "<Get returned null>",
-            configuration => select(Binders.Dovetail<T>(configuration))
+            configuration => select(Binders.Optionary<T>(configuration))
         );
 
     private static Dictionary<string, string?> D(params (string Key, string? Value)[] pairs)

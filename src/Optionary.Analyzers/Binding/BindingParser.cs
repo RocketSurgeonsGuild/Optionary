@@ -1,10 +1,10 @@
 // Ported from dotnet/runtime (MIT): ConfigurationBindingGenerator.Parser and KnownTypeSymbols, minus the call-site
-// interception; the roots here are the [DovetailConfiguration] types. See BindingModel.cs.
+// interception; the roots here are the [Optionary] types. See BindingModel.cs.
 
 using System.Globalization;
 using Microsoft.CodeAnalysis;
 
-namespace Joinery.Dovetail.Support.Configuration.Binding;
+namespace Optionary.Analyzers.Binding;
 
 /// <summary>Analyses an options type and every type reachable from it, the way Microsoft's binding generator does.</summary>
 internal sealed class BindingParser(Compilation compilation, BinderVersion version, KeyStyle keyStyle = KeyStyle.Undefined)
@@ -524,7 +524,7 @@ internal sealed class BindingParser(Compilation compilation, BinderVersion versi
             }
         }
 
-        // Dovetail: a type that can only be created through an object initializer (see ObjectSpec.InitializerOnly).
+        // Optionary: a type that can only be created through an object initializer (see ObjectSpec.InitializerOnly).
         var initializerOnly = strategy is ObjectInstantiationStrategy.ParameterlessConstructor
          && ( requiredMembers.Count > 0 || properties.Values.Any(z => z is { SetOnInit: true, IsIgnored: false, IsStatic: false }) );
         if (initializerOnly)

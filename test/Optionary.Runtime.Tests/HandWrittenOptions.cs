@@ -2,7 +2,7 @@ using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace Joinery.Dovetail.Configuration.Runtime.Tests;
+namespace Optionary.Runtime.Tests;
 
 /// <summary>
 ///     Stand-in for a mutable configuration type with a public parameterless constructor: <see cref="Create" /> stands in for the

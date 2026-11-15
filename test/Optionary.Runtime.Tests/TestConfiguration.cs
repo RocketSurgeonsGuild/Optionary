@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 
-namespace Joinery.Dovetail.Configuration.Runtime.Tests;
+namespace Optionary.Runtime.Tests;
 
 internal static class TestConfiguration
 {

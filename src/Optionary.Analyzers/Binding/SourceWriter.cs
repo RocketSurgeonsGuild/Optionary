@@ -2,7 +2,7 @@
 
 using System.Text;
 
-namespace Joinery.Dovetail.Support.Configuration.Binding;
+namespace Optionary.Analyzers.Binding;
 
 /// <summary>Writes indented source text.</summary>
 internal sealed class SourceWriter

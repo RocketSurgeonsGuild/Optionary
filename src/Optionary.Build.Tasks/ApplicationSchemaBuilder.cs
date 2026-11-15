@@ -1,9 +1,9 @@
 using System.Text.Json.Nodes;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
-///     Builds the Dovetail part of an application's appsettings.schema.json from the section tree, hoisting the fragments'
+///     Builds the Optionary part of an application's appsettings.schema.json from the section tree, hoisting the fragments'
 ///     definitions into a <see cref="DefinitionRegistry" />.
 /// </summary>
 /// <remarks>

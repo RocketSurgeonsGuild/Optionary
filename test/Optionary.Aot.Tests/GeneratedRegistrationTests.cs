@@ -1,9 +1,8 @@
-using Joinery.Dovetail.Attributes;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Joinery.Dovetail.Configuration.Aot.Tests;
+namespace Optionary.Aot.Tests;
 
 /// <summary>
 ///     The registration method and binder generated for these types (<c>AddOptionaryConfigurationOptions</c>) compile under the
@@ -52,7 +51,7 @@ public class GeneratedChild
     public string? Value { get; set; }
 }
 
-[DovetailConfiguration("Mutable")]
+[Optionary("Mutable")]
 public class GeneratedMutableOptions
 {
     public string? Name { get; set; }
@@ -61,10 +60,10 @@ public class GeneratedMutableOptions
     public GeneratedChild Child { get; set; } = new();
 }
 
-[DovetailConfiguration("Positional")]
+[Optionary("Positional")]
 public record GeneratedPositionalOptions(string Host, int Port = 80);
 
-[DovetailConfiguration("Initialized")]
+[Optionary("Initialized")]
 public class GeneratedInitializedOptions
 {
     public string Name { get; init; } = "none";

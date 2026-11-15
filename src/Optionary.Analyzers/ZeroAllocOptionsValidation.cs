@@ -1,23 +1,23 @@
 using Microsoft.CodeAnalysis;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
 /// <summary>
 ///     ZeroAlloc.Validation.Options (https://validation.zeroalloc.net/docs/options): its source generator writes a
 ///     <c>ValidateWithZeroAlloc()</c> overload of <c>OptionsBuilder&lt;T&gt;</c> for each <c>[Validate]</c> class of the assembly,
-///     which registers the class's generated validator as the options type's <c>IValidateOptions&lt;T&gt;</c>. The options joint
-///     calls it for the <c>[DovetailConfiguration]</c> types that get one.
+///     which registers the class's generated validator as the options type's <c>IValidateOptions&lt;T&gt;</c>. The generated registration method
+///     calls it for the <c>[Optionary]</c> types that get one.
 /// </summary>
 /// <remarks>
 ///     The overloads are another generator's output, which this generator can't see, so whether one exists is worked out from the
 ///     rules that generator follows: the package is referenced, the type is a class of this assembly marked <c>[Validate]</c>, and
 ///     neither it nor a type it's nested in is private or protected (ZV0025). A model with asynchronous rules gets an overload, but
-///     calling it is an error (ZV0034), since options validation is synchronous; those types are reported with DT0018 instead.
+///     calling it is an error (ZV0034), since options validation is synchronous; those types are reported with OPT0012 instead.
 /// </remarks>
 internal static class ZeroAllocOptionsValidation
 {
-    /// <summary>Set to <c>false</c>, Dovetail leaves ZeroAlloc.Validation's registrations to the project (as Joinery.Dovetail.ZeroAlloc.targets does).</summary>
-    public const string EnableProperty = "DovetailEnableZeroAllocValidation";
+    /// <summary>Set to <c>false</c>, Optionary leaves ZeroAlloc.Validation's registrations to the project.</summary>
+    public const string EnableProperty = "OptionaryZeroAllocValidation";
 
     /// <summary>ZeroAlloc.Validation's own property: <c>Internal</c> makes the generated types, the overloads' class among them, internal.</summary>
     public const string AccessibilityProperty = "ZeroAllocGeneratedAccessibility";
@@ -34,7 +34,7 @@ internal static class ZeroAllocOptionsValidation
         ? "global::ZeroAlloc.Validation.Options.InternalZeroAllocOptionsValidationExtensions"
         : "global::ZeroAlloc.Validation.Options.ZeroAllocOptionsValidationExtensions";
 
-    /// <summary>Whether ZeroAlloc.Validation.Options generates a <c>ValidateWithZeroAlloc()</c> overload the joint can call for <paramref name="type" />.</summary>
+    /// <summary>Whether ZeroAlloc.Validation.Options generates a <c>ValidateWithZeroAlloc()</c> overload the registration method can call for <paramref name="type" />.</summary>
     /// <param name="type">The options type.</param>
     /// <param name="compilation">The compilation.</param>
     /// <param name="asyncRule">The member with an asynchronous rule, when that is what rules it out.</param>

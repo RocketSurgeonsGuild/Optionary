@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 
-namespace Joinery.Dovetail.Configuration.Parity.Tests;
+namespace Optionary.Parity.Tests;
 
 /// <summary>
 ///     Renders a bound value, or the exception binding threw, deterministically: strings quoted, collections with their runtime

@@ -2,23 +2,23 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Joinery.Dovetail.Configuration.Parity.Tests;
+namespace Optionary.Parity.Tests;
 
-/// <summary>The three binders compared: Dovetail's generated one, Microsoft's generated one, and the reflection binder.</summary>
+/// <summary>The three binders compared: Optionary's generated one, Microsoft's generated one, and the reflection binder.</summary>
 internal static class Binders
 {
     /// <summary>
     ///     Binds through the registration method generated for this assembly (<c>AddOptionaryConfigurationOptions</c>), as an
-    ///     application does: every <c>[DovetailConfiguration]</c> section is registered, and <typeparamref name="T" /> is read from
+    ///     application does: every <c>[Optionary]</c> section is registered, and <typeparamref name="T" /> is read from
     ///     <see cref="IOptions{TOptions}" />.
     /// </summary>
-    public static T Dovetail<T>(IConfiguration configuration) where T : class
+    public static T Optionary<T>(IConfiguration configuration) where T : class
     {
-        using var provider = DovetailServices(configuration).BuildServiceProvider();
+        using var provider = OptionaryServices(configuration).BuildServiceProvider();
         return provider.GetRequiredService<IOptions<T>>().Value;
     }
 
-    public static ServiceCollection DovetailServices(IConfiguration configuration)
+    public static ServiceCollection OptionaryServices(IConfiguration configuration)
     {
         var services = new ServiceCollection();
         services.AddSingleton(configuration);

@@ -1,6 +1,6 @@
 using Microsoft.Build.Framework;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     Writes a library's own configuration schema fragments as its <c>ConfigurationSchema.json</c>, permissive and rooted at the
@@ -37,7 +37,7 @@ public sealed class WriteConfigurationSchemaSegment : Microsoft.Build.Utilities.
     {
         if (!Path.IsPathRooted(OutputFile))
         {
-            Log.LogError("Dovetail: WriteConfigurationSchemaSegment needs an absolute OutputFile, not \"{0}\".", OutputFile);
+            Log.LogError("Optionary: WriteConfigurationSchemaSegment needs an absolute OutputFile, not \"{0}\".", OutputFile);
             return false;
         }
 
@@ -50,17 +50,17 @@ public sealed class WriteConfigurationSchemaSegment : Microsoft.Build.Utilities.
             if (ConfigurationSchemaDocument.CreateLibrarySchema(fragments) is { } document)
             {
                 var written = ConfigurationSchemaDocument.Write(OutputFile, ConfigurationSchemaDocument.Serialize(document));
-                Log.LogMessage(MessageImportance.Normal, "Dovetail: {0} {1} ({2} configuration schema fragments)", written ? "wrote" : "kept the unchanged", OutputFile, fragments.Count);
+                Log.LogMessage(MessageImportance.Normal, "Optionary: {0} {1} ({2} configuration schema fragments)", written ? "wrote" : "kept the unchanged", OutputFile, fragments.Count);
             }
             else if (File.Exists(OutputFile))
             {
                 File.Delete(OutputFile);
-                Log.LogMessage(MessageImportance.Normal, "Dovetail: deleted {0}: the project declares no configuration sections any more", OutputFile);
+                Log.LogMessage(MessageImportance.Normal, "Optionary: deleted {0}: the project declares no configuration sections any more", OutputFile);
             }
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            Log.LogWarning("Dovetail: couldn't update the configuration schema {0}: {1}", OutputFile, exception.Message);
+            Log.LogWarning("Optionary: couldn't update the configuration schema {0}: {1}", OutputFile, exception.Message);
         }
 
         return !Log.HasLoggedErrors;

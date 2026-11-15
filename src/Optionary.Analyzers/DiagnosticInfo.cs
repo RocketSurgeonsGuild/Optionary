@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
 /// <summary>
 ///     A diagnostic as plain data: unlike <see cref="Diagnostic" /> and <see cref="Location" /> it compares by content, so it can

@@ -1,7 +1,7 @@
 <Project>
   <!--
-      Optionary's targets: the generator check, the reference-docs target and the schema targets. Imported by package consumers
-      and by this repository's own projects (src/Directory.Build.targets). The real content arrives with the code import
-      (RocketSurgeonsGuild/Optionary#4).
+      Optionary's targets: the schema targets and the reference-docs target they hold. Imported by package consumers and by this
+      repository's own projects (src/Directory.Build.targets).
   -->
+  <Import Project="$(MSBuildThisFileDirectory)Optionary.Schema.targets" Condition="'$(_OptionarySchemaTargetsImported)' != 'true'" />
 </Project>

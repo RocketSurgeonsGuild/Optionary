@@ -1,7 +1,7 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
 ///     A hand-written fragment: a schema a library writes itself (as an <c>AssemblyMetadata</c> attribute) rather than one the
@@ -98,10 +98,10 @@ public class HandWrittenFragmentTests
         var json = ConfigurationSchemaDocument.Serialize(ConfigurationSchemaDocument.CreateApplicationSchema(ReadFragments(), strict: true, includeSchemaStore: false));
 
         var document = await SchemaAssert.ShouldBeWellFormed(json);
-        var closed = SchemaAssert.DovetailDefinitions(document).Where(z => z.Value!["propertyNames"] is not null).Select(z => z.Key).ToArray();
+        var closed = SchemaAssert.OptionaryDefinitions(document).Where(z => z.Value!["propertyNames"] is not null).Select(z => z.Key).ToArray();
 
         // The section's own keys: the one it reads.
-        var section = SchemaAssert.DovetailDefinitions(document).Single(z => z.Key == "Serilog.Settings").Value!.AsObject();
+        var section = SchemaAssert.OptionaryDefinitions(document).Single(z => z.Key == "Serilog.Settings").Value!.AsObject();
         await section["properties"]!.AsObject().Select(z => z.Key).Should().BeEquivalentTo(["MinimumLevel"], CollectionOrdering.Matching);
         await section["propertyNames"].Should().NotBeNull();
         await closed.Should().Contain("Serilog.MinimumLevelObject");
@@ -152,7 +152,7 @@ public class HandWrittenFragmentTests
         {
             var document = await ApplicationSchema(includeSchemaStore: includeSchemaStore);
 
-            await SchemaAssert.DovetailPart(document)["properties"]!.AsObject().ContainsKey("Serilog").Should().BeTrue();
+            await SchemaAssert.OptionaryPart(document)["properties"]!.AsObject().ContainsKey("Serilog").Should().BeTrue();
             var settings = document["definitions"]!["Serilog.Settings"];
             await settings.Should().NotBeNull();
             await settings!["properties"]!["MinimumLevel"]!["oneOf"].Should().NotBeNull();
@@ -211,7 +211,7 @@ public class HandWrittenFragmentTests
         var host = HostValidator().Validate(instance);
 
         await ( schemaStore.Count == 0 ).Should().BeEqualTo(valid).Because($"{name}, SchemaStore's schema: {string.Join("; ", schemaStore)}");
-        await ( ours.Count == 0 ).Should().BeEqualTo(valid).Because($"{name}, Dovetail's fragment: {string.Join("; ", ours)}");
+        await ( ours.Count == 0 ).Should().BeEqualTo(valid).Because($"{name}, Optionary's fragment: {string.Join("; ", ours)}");
         await ( host.Count == 0 ).Should().BeEqualTo(valid).Because($"{name}, the host schema: {string.Join("; ", host)}");
     }
 
@@ -251,7 +251,7 @@ public class HandWrittenFragmentTests
         var instance = Config(section);
 
         await SchemaStoreValidator().Validate(instance).Should().BeEmpty().Because($"{name}, SchemaStore's schema");
-        await Validator().IsValid(instance).Should().BeFalse().Because($"{name}, Dovetail's fragment");
+        await Validator().IsValid(instance).Should().BeFalse().Because($"{name}, Optionary's fragment");
         await HostValidator().IsValid(instance).Should().BeFalse().Because($"{name}, the host schema");
     }
 
@@ -270,7 +270,7 @@ public class HandWrittenFragmentTests
     }
 
     [Test]
-    public async Task FlatKeys_AreAcceptedBySchemaStore_ButClosedOutByDovetailsStrictness()
+    public async Task FlatKeys_AreAcceptedBySchemaStore_ButClosedOutByOptionaryStrictness()
     {
         // "WriteTo:Async" and "Enrich:0" are documented Serilog syntax and SchemaStore lists patterns for them. The strict
         // merge closes the section with the names it knows, so they are flagged unless strictness is off.

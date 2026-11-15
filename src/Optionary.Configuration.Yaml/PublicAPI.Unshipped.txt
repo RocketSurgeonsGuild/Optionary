@@ -1,1 +1,14 @@
 #nullable enable
+Optionary.Configuration.Yaml.YamlConfigurationExtensions
+Optionary.Configuration.Yaml.YamlConfigurationProvider
+Optionary.Configuration.Yaml.YamlConfigurationProvider.YamlConfigurationProvider(Optionary.Configuration.Yaml.YamlConfigurationSource! source) -> void
+Optionary.Configuration.Yaml.YamlConfigurationSource
+Optionary.Configuration.Yaml.YamlConfigurationSource.YamlConfigurationSource() -> void
+override Optionary.Configuration.Yaml.YamlConfigurationProvider.Load(System.IO.Stream! stream) -> void
+override Optionary.Configuration.Yaml.YamlConfigurationSource.Build(Microsoft.Extensions.Configuration.IConfigurationBuilder! builder) -> Microsoft.Extensions.Configuration.IConfigurationProvider!
+static Optionary.Configuration.Yaml.YamlConfigurationExtensions.AddYamlFile(this Microsoft.Extensions.Configuration.IConfigurationBuilder! builder, Microsoft.Extensions.FileProviders.IFileProvider? provider, string! path, bool optional, bool reloadOnChange) -> Microsoft.Extensions.Configuration.IConfigurationBuilder!
+static Optionary.Configuration.Yaml.YamlConfigurationExtensions.AddYamlFile(this Microsoft.Extensions.Configuration.IConfigurationBuilder! builder, string! path) -> Microsoft.Extensions.Configuration.IConfigurationBuilder!
+static Optionary.Configuration.Yaml.YamlConfigurationExtensions.AddYamlFile(this Microsoft.Extensions.Configuration.IConfigurationBuilder! builder, string! path, bool optional) -> Microsoft.Extensions.Configuration.IConfigurationBuilder!
+static Optionary.Configuration.Yaml.YamlConfigurationExtensions.AddYamlFile(this Microsoft.Extensions.Configuration.IConfigurationBuilder! builder, string! path, bool optional, bool reloadOnChange) -> Microsoft.Extensions.Configuration.IConfigurationBuilder!
+static Optionary.Configuration.Yaml.YamlConfigurationExtensions.AddYamlFile(this Microsoft.Extensions.Configuration.IConfigurationBuilder! builder, System.Action<Optionary.Configuration.Yaml.YamlConfigurationSource!>! configureSource) -> Microsoft.Extensions.Configuration.IConfigurationBuilder!
+static Optionary.Configuration.Yaml.YamlConfigurationExtensions.AddYamlStream(this Microsoft.Extensions.Configuration.IConfigurationBuilder! builder, System.IO.Stream! stream) -> Microsoft.Extensions.Configuration.IConfigurationBuilder!

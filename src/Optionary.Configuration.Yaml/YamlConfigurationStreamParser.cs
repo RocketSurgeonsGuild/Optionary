@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 using YamlDotNet.Core;
 using YamlDotNet.RepresentationModel;
 
-namespace Joinery.Dovetail.Configuration.Yaml;
+namespace Optionary.Configuration.Yaml;
 
 internal class YamlConfigurationStreamParser
 {

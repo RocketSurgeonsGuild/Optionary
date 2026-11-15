@@ -62,6 +62,17 @@
     <File Path="test/coverage.runsettings" />
     <File Path="test/Directory.Build.props" />
     <File Path="test/Directory.Build.targets" />
+    <Project Path="test/Optionary.Analyzers.Tests/Optionary.Analyzers.Tests.csproj" />
+    <Project Path="test/Optionary.Aot.Tests/Optionary.Aot.Tests.csproj" />
+    <Project Path="test/Optionary.Build.Tasks.Tests/Optionary.Build.Tasks.Tests.csproj" />
+    <Project Path="test/Optionary.Parity.Tests/Optionary.Parity.Tests.csproj" />
     <Project Path="test/Optionary.Runtime.Tests/Optionary.Runtime.Tests.csproj" />
+  </Folder>
+  <Folder Name="/test/Optionary.Analyzers.Tests.supports/">
+    <File Path="test/Optionary.Analyzers.Tests.supports/Directory.Build.props" />
+    <File Path="test/Optionary.Analyzers.Tests.supports/Directory.Build.targets" />
+    <Project Path="test/Optionary.Analyzers.Tests.supports/Optionary.Analyzers.Tests.roslyn5.0.csproj" />
+    <Project Path="test/Optionary.Analyzers.Tests.supports/Optionary.Analyzers.Tests.roslyn5.3.csproj" />
+    <Project Path="test/Optionary.Analyzers.Tests.supports/Optionary.Analyzers.Tests.roslyn5.6.csproj" />
   </Folder>
 </Solution>

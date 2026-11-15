@@ -2,7 +2,7 @@ using Microsoft.Extensions.Configuration;
 
 using YamlDotNet.Core;
 
-namespace Joinery.Dovetail.Configuration.Yaml;
+namespace Optionary.Configuration.Yaml;
 
 /// <summary>
 ///     A YAML file based <see cref="FileConfigurationProvider" />.

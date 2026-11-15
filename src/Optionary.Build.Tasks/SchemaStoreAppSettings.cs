@@ -1,6 +1,6 @@
 using System.Text.Json.Nodes;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     SchemaStore's appsettings.json schema (Apache-2.0, see THIRD-PARTY-NOTICES.txt), pinned in this assembly. Application
@@ -24,7 +24,7 @@ internal static class SchemaStoreAppSettings
     /// </summary>
     public const string SourceUrl = "https://json.schemastore.org/appsettings.json";
 
-    private const string ResourceName = "Joinery.Dovetail.Build.Tasks.SchemaStore.appsettings.json";
+    private const string ResourceName = "Optionary.Build.Tasks.SchemaStore.appsettings.json";
 
     /// <summary>
     ///     The schema, ready to embed under <c>definitions/SchemaStoreAppSettings</c>: without <c>$schema</c>, <c>$id</c> and

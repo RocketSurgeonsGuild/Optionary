@@ -1,9 +1,9 @@
 using System.Text.Json.Nodes;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
-///     Builds configuration schema fragments in the shape Dovetail's generator emits: an inline section object whose keys each
+///     Builds configuration schema fragments in the shape Optionary's generator emits: an inline section object whose keys each
 ///     have a case-insensitive <c>patternProperties</c> twin, object types in the fragment's <c>definitions</c> (no <c>type</c>),
 ///     used through <c>allOf</c> + <c>$ref</c> wrappers.
 /// </summary>

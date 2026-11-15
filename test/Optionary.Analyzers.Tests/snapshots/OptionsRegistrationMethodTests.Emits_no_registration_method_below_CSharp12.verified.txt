@@ -1,14 +1,12 @@
 ﻿{
   FinalDiagnostics: [],
   GeneratorDiagnostics: {
-    Joinery.Dovetail.Support.Configuration.ConfigurationGenerator: []
+    Optionary.Analyzers.ConfigurationGenerator: []
   },
   GlobalOptions: {
     build_property.RootNamespace: Sample
   },
   References: [
-    FluentValidation.dll,
-    Joinery.Dovetail.dll,
     Microsoft.Extensions.Configuration.Abstractions.dll,
     Microsoft.Extensions.Configuration.dll,
     Microsoft.Extensions.DependencyInjection.Abstractions.dll,
@@ -18,6 +16,7 @@
     Microsoft.Extensions.Options.dll,
     mscorlib.dll,
     netstandard.dll,
+    Optionary.dll,
     System.Collections.dll,
     System.ComponentModel.dll,
     System.Core.dll,

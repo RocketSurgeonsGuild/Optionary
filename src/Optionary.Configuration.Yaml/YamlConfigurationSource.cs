@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Configuration;
 
-namespace Joinery.Dovetail.Configuration.Yaml;
+namespace Optionary.Configuration.Yaml;
 
 /// <summary>
 ///     A YAML file based <see cref="FileConfigurationSource" />.

@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json.Nodes;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     Hoists fragments' <c>definitions</c> into the output document's root <c>definitions</c>. Each definition is renamed so

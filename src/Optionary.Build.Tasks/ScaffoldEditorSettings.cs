@@ -1,9 +1,9 @@
 using Microsoft.Build.Framework;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
-///     Creates or updates Dovetail's own mappings for a host in a VS Code <c>.vscode/settings.json</c>, namely <c>json.schemas</c>,
+///     Creates or updates Optionary's own mappings for a host in a VS Code <c>.vscode/settings.json</c>, namely <c>json.schemas</c>,
 ///     <c>yaml.schemas</c> and <c>evenBetterToml.schema.associations</c>, each pointing at the host's merged
 ///     <c>appsettings.schema.json</c>. Everything else in the file is left as it is (see <see cref="VsCodeSettingsEditor" />).
 /// </summary>
@@ -50,7 +50,7 @@ public sealed class ScaffoldEditorSettings : Microsoft.Build.Utilities.Task
     {
         if (!Path.IsPathRooted(ProjectDirectory) || !Path.IsPathRooted(SchemaFile) || ( SettingsDirectory.Length > 0 && !Path.IsPathRooted(SettingsDirectory) ))
         {
-            Log.LogError("Dovetail: ScaffoldEditorSettings needs absolute paths, not \"{0}\", \"{1}\" and \"{2}\".", ProjectDirectory, SchemaFile, SettingsDirectory);
+            Log.LogError("Optionary: ScaffoldEditorSettings needs absolute paths, not \"{0}\", \"{1}\" and \"{2}\".", ProjectDirectory, SchemaFile, SettingsDirectory);
             return false;
         }
 
@@ -63,10 +63,10 @@ public sealed class ScaffoldEditorSettings : Microsoft.Build.Utilities.Task
                 break;
             case EditorSettingsStatus.Updated:
                 Updated = true;
-                Log.LogMessage(MessageImportance.Normal, "Dovetail: mapped {0} in {1}", outcome.Mappings!.SchemaUrl, outcome.SettingsFile);
+                Log.LogMessage(MessageImportance.Normal, "Optionary: mapped {0} in {1}", outcome.Mappings!.SchemaUrl, outcome.SettingsFile);
                 break;
             case EditorSettingsStatus.Unchanged:
-                Log.LogMessage(MessageImportance.Low, "Dovetail: {0} already maps {1}", outcome.SettingsFile, outcome.Mappings!.SchemaUrl);
+                Log.LogMessage(MessageImportance.Low, "Optionary: {0} already maps {1}", outcome.SettingsFile, outcome.Mappings!.SchemaUrl);
                 break;
             default:
                 break;

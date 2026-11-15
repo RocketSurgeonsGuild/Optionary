@@ -2,10 +2,10 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
-///     Validates a JSON instance against a draft-07 schema document, for the keywords Dovetail's schemas use: local <c>$ref</c>,
+///     Validates a JSON instance against a draft-07 schema document, for the keywords Optionary's schemas use: local <c>$ref</c>,
 ///     <c>type</c>, <c>enum</c>, <c>const</c>, <c>pattern</c>, <c>minLength</c>, <c>minItems</c>, <c>uniqueItems</c>, <c>required</c>, <c>properties</c>, <c>patternProperties</c>,
 ///     <c>additionalProperties</c>, <c>propertyNames</c>, <c>items</c>, <c>allOf</c>, <c>anyOf</c>, <c>oneOf</c>, <c>not</c> and
 ///     <c>if</c>/<c>then</c>/<c>else</c>. The test project's Corvus package only checks schemas against the meta-schema, and

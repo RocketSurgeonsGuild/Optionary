@@ -4,10 +4,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace Joinery.Dovetail.Configuration.Runtime.Tests;
+namespace Optionary.Runtime.Tests;
 
 /// <summary>
-///     Covers <see cref="DovetailConfigurationOptionsExtensions" /> for types the options pipeline can't create itself (no
+///     Covers <see cref="OptionaryServiceCollectionExtensions" /> for types the options pipeline can't create itself (no
 ///     parameterless constructor, or init-only members). <see cref="ServerRecord.Create" /> and
 ///     <see cref="EndpointOptions.Create" /> stand in for the generated <c>Create…</c> methods.
 /// </summary>
@@ -18,7 +18,7 @@ public sealed class FactoryRegistrationTests
     {
         var services = new ServiceCollection()
                       .AddSingleton<IConfiguration>(TestConfiguration.Build(("Server:Host", "example.org"), ("Server:Port", "8080")));
-        services.AddDovetailConfigurationOptions("Server", ServerRecord.Create);
+        services.AddOptionaryOptions("Server", ServerRecord.Create);
 
         await using var provider = services.BuildServiceProvider();
 
@@ -39,8 +39,8 @@ public sealed class FactoryRegistrationTests
                                ("Server:Tags:0", "c")
                            )
                        );
-        services.AddDovetailConfigurationOptions("Server", Noted(ServerRecord.Create, "created by Server"));
-        services.AddDovetailConfigurationOptions("Defaults:Server", Noted(ServerRecord.Create, "created by Defaults:Server"));
+        services.AddOptionaryOptions("Server", Noted(ServerRecord.Create, "created by Server"));
+        services.AddOptionaryOptions("Defaults:Server", Noted(ServerRecord.Create, "created by Defaults:Server"));
 
         await services.Count(descriptor => descriptor.ServiceType == typeof(IOptionsFactory<ServerRecord>)).Should().BeEqualTo(1);
         await using var provider = services.BuildServiceProvider();
@@ -58,7 +58,7 @@ public sealed class FactoryRegistrationTests
     {
         var configuration = TestConfiguration.Build(("Server:Host", "example.org"), ("Server:Port", "8080"));
         var services = new ServiceCollection().AddSingleton<IConfiguration>(configuration);
-        services.AddDovetailConfigurationOptions("Server", ServerRecord.Create);
+        services.AddOptionaryOptions("Server", ServerRecord.Create);
         services.Configure<ServerRecord>(server => server.Tags.Add("configured"));
         services.PostConfigure<ServerRecord>(server => server.Note = "post-configured");
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IValidateOptions<ServerRecord>, ServerRecordValidator>());
@@ -79,7 +79,7 @@ public sealed class FactoryRegistrationTests
     public async Task Create_ForANonDefaultName_Throws_NamingTheTypeAndTheName()
     {
         var services = new ServiceCollection().AddSingleton<IConfiguration>(TestConfiguration.Build(("Server:Host", "example.org")));
-        services.AddDovetailConfigurationOptions("Server", ServerRecord.Create);
+        services.AddOptionaryOptions("Server", ServerRecord.Create);
 
         await using var provider = services.BuildServiceProvider();
 
@@ -94,7 +94,7 @@ public sealed class FactoryRegistrationTests
     {
         var configuration = TestConfiguration.Build(("Server:Host", "example.org"), ("Server:Port", "8080"));
         var services = new ServiceCollection().AddSingleton<IConfiguration>(configuration);
-        services.AddDovetailConfigurationOptions("Server", ServerRecord.Create);
+        services.AddOptionaryOptions("Server", ServerRecord.Create);
 
         await using var provider = services.BuildServiceProvider();
 
@@ -120,7 +120,7 @@ public sealed class FactoryRegistrationTests
         var registered = new ServerRecord("registered", 1);
         var services = new ServiceCollection().AddSingleton<IConfiguration>(TestConfiguration.Build(("Server:Host", "example.org")));
         services.AddSingleton<IOptionsFactory<ServerRecord>>(new FixedFactory(registered));
-        services.AddDovetailConfigurationOptions("Server", ServerRecord.Create);
+        services.AddOptionaryOptions("Server", ServerRecord.Create);
 
         await using var provider = services.BuildServiceProvider();
 
@@ -132,7 +132,7 @@ public sealed class FactoryRegistrationTests
     {
         var registered = new ServerRecord("registered", 1);
         var services = new ServiceCollection().AddSingleton<IConfiguration>(TestConfiguration.Build(("Server:Host", "example.org")));
-        services.AddDovetailConfigurationOptions("Server", ServerRecord.Create);
+        services.AddOptionaryOptions("Server", ServerRecord.Create);
         services.AddSingleton<IOptionsFactory<ServerRecord>>(new FixedFactory(registered));
 
         await using var provider = services.BuildServiceProvider();
@@ -146,7 +146,7 @@ public sealed class FactoryRegistrationTests
         var builder = Host.CreateEmptyApplicationBuilder(new());
         builder.Configuration.AddInMemoryCollection([new("Server:Port", "0")]);
         builder
-           .Services.AddDovetailConfigurationOptions("Server", ServerRecord.Create)
+           .Services.AddOptionaryOptions("Server", ServerRecord.Create)
            .Validate(server => server.Port > 0, "A server needs a port.")
            .ValidateOnStart();
 

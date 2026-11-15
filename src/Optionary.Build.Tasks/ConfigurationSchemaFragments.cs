@@ -1,4 +1,4 @@
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     Collects the configuration schema fragments of a set of assemblies.
@@ -22,7 +22,7 @@ internal static class ConfigurationSchemaFragments
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException or BadImageFormatException)
             {
-                log($"Dovetail: skipped {path} when reading configuration schema fragments: {exception.Message}");
+                log($"Optionary: skipped {path} when reading configuration schema fragments: {exception.Message}");
                 continue;
             }
 
@@ -31,12 +31,12 @@ internal static class ConfigurationSchemaFragments
             {
                 if (ConfigurationSchemaFragment.TryParse(entry.Key, entry.Value, source, out var problem) is { } fragment)
                 {
-                    log($"Dovetail: configuration schema fragment \"{string.Join(":", fragment.Path)}\" from {source}");
+                    log($"Optionary: configuration schema fragment \"{string.Join(":", fragment.Path)}\" from {source}");
                     fragments.Add(fragment);
                 }
                 else
                 {
-                    log($"Dovetail: skipped configuration schema fragment \"{entry.Key}\" in {source}: {problem}");
+                    log($"Optionary: skipped configuration schema fragment \"{entry.Key}\" in {source}: {problem}");
                 }
             }
         }

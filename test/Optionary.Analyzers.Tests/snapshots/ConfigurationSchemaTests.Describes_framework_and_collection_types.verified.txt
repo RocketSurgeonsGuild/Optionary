@@ -180,5 +180,5 @@
   }
 }
 ## Diagnostics
-DT0009 Warning line 31: 'TypesOptions.Address' has type 'System.Net.IPAddress?', which configuration binding doesn't support, so it's left out of the schema
-DT0009 Warning line 32: 'TypesOptions.Pending' has type 'System.Collections.Generic.Queue<int>', which configuration binding doesn't support, so it's left out of the schema
+OPT0004 Warning line 31: 'TypesOptions.Address' has type 'System.Net.IPAddress?', which configuration binding doesn't support, so it's left out of the schema
+OPT0004 Warning line 32: 'TypesOptions.Pending' has type 'System.Collections.Generic.Queue<int>', which configuration binding doesn't support, so it's left out of the schema

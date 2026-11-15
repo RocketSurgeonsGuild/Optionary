@@ -1,7 +1,7 @@
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     Reads <c>[assembly: AssemblyMetadata(key, value)]</c> attributes straight from an assembly's metadata, without loading it.

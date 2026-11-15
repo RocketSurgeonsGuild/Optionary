@@ -1,4 +1,4 @@
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
 ///     The work around the editor (<see cref="ScaffoldEditorSettings" /> minus the MSBuild logging): where the settings file goes,
@@ -13,7 +13,7 @@ public class ScaffoldEditorSettingsTests
     {
         public Repository(bool git = true)
         {
-            Root = Directory.CreateTempSubdirectory("dovetail-scaffold-").FullName;
+            Root = Directory.CreateTempSubdirectory("optionary-scaffold-").FullName;
             if (git) Directory.CreateDirectory(Path.Combine(Root, ".git"));
 
             Project = Path.Combine(Root, "src", "Host");
@@ -199,7 +199,7 @@ public class ScaffoldEditorSettingsTests
     public async Task AProjectOutsideTheSettingsDirectory_WarnsInsteadOfWritingAnUnusablePath()
     {
         using var repository = new Repository();
-        var elsewhere = Directory.CreateTempSubdirectory("dovetail-scaffold-other-").FullName;
+        var elsewhere = Directory.CreateTempSubdirectory("optionary-scaffold-other-").FullName;
         try
         {
             var outcome = repository.Run(elsewhere);

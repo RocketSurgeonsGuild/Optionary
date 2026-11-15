@@ -1,11 +1,11 @@
 // The binding model and the rules in this folder are ported from the configuration binding source generator in
 // dotnet/runtime (src/libraries/Microsoft.Extensions.Configuration.Binder/gen), Copyright (c) .NET Foundation and
-// Contributors, licensed under the MIT license. Dovetail emits its own binder because a generator can't see another
-// generator's output, so Microsoft's generator never intercepts calls in Dovetail's generated code.
+// Contributors, licensed under the MIT license. Optionary emits its own binder because a generator can't see another
+// generator's output, so Microsoft's generator never intercepts calls in Optionary's generated code.
 
 using Microsoft.CodeAnalysis;
 
-namespace Joinery.Dovetail.Support.Configuration.Binding;
+namespace Optionary.Analyzers.Binding;
 
 /// <summary>The binder rules to follow: Microsoft's generator changed them between versions 10 and 11.</summary>
 internal enum BinderVersion
@@ -139,8 +139,8 @@ internal sealed record ObjectSpec : ComplexTypeSpec
     public string? InitFailureReason { get; }
 
     /// <summary>
-    ///     Dovetail's addition: a class with a parameterless constructor and init-only or <c>required</c> members. Microsoft's
-    ///     generator never sets those (and can't create a type with required members at all), so Dovetail creates it with an
+    ///     Optionary's addition: a class with a parameterless constructor and init-only or <c>required</c> members. Microsoft's
+    ///     generator never sets those (and can't create a type with required members at all), so Optionary creates it with an
     ///     object initializer, as if through a constructor without parameters, and a missing key keeps the member's own
     ///     initial value, as the reflection binder does.
     /// </summary>

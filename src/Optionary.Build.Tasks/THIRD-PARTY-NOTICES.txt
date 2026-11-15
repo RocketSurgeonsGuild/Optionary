@@ -1,7 +1,7 @@
-Dovetail third-party notices
-============================
+Optionary third-party notices
+=============================
 
-Joinery.Dovetail.Build.Tasks.dll (packed in the Dovetail package under build/tasks/) embeds the following third-party work.
+Optionary.Build.Tasks.dll (packed in the Optionary package under build/tasks/) embeds the following third-party work.
 
 SchemaStore: appsettings.json schema
 ------------------------------------
@@ -11,7 +11,7 @@ Source:   https://json.schemastore.org/appsettings.json
           commit 4dd722547c2d8e4b3e28c9a12418eaa901ad3733, retrieved 2026-10-24)
 License:  Apache License, Version 2.0 (below)
 
-The copy is embedded unmodified. When Dovetail writes an application's appsettings.schema.json, it places that schema under
+The copy is embedded unmodified. When Optionary writes an application's appsettings.schema.json, it places that schema under
 definitions/SchemaStoreAppSettings, drops its $schema, $id and title, and rewrites its local $refs to point into that
 definition.
 

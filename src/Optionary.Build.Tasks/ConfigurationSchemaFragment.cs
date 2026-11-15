@@ -2,11 +2,11 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
-///     One configuration section's schema, as Dovetail's generator embeds it:
-///     <c>[assembly: AssemblyMetadata("Dovetail.ConfigurationSchema.v1:&lt;Section path&gt;", "&lt;draft-07 schema of the value&gt;")]</c>.
+///     One configuration section's schema, as Optionary's generator embeds it:
+///     <c>[assembly: AssemblyMetadata("Optionary.Schema.v1:&lt;Section path&gt;", "&lt;draft-07 schema of the value&gt;")]</c>.
 /// </summary>
 /// <remarks>
 ///     The section's own object is inline. Object types used inside it live in the fragment's root <c>definitions</c> (names
@@ -19,7 +19,7 @@ internal sealed class ConfigurationSchemaFragment
     /// <summary>
     ///     The prefix of every configuration schema metadata key, whatever its version.
     /// </summary>
-    public const string KeyPrefix = "Dovetail.ConfigurationSchema.";
+    public const string KeyPrefix = "Optionary.Schema.";
 
     /// <summary>
     ///     The prefix of the keys this version understands; the section path follows it.
@@ -69,7 +69,7 @@ internal sealed class ConfigurationSchemaFragment
     {
         if (!key.StartsWith(VersionPrefix, StringComparison.Ordinal))
         {
-            problem = $"unknown version (this Dovetail reads \"{VersionPrefix}\" keys)";
+            problem = $"unknown version (this Optionary reads \"{VersionPrefix}\" keys)";
             return null;
         }
 

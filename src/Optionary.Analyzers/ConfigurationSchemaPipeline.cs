@@ -1,37 +1,36 @@
 using System.Collections.Immutable;
 using System.Text;
-using Joinery.Dovetail.Support.Configuration.Binding;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Optionary.Analyzers.Binding;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
 /// <summary>
-///     Describes every <c>[DovetailConfiguration]</c> section as a JSON Schema fragment, emitted as
-///     <c>[assembly: AssemblyMetadata("Dovetail.ConfigurationSchema.v1:&lt;Section&gt;", json)]</c>. The build merges the fragments of an
+///     Describes every <c>[Optionary]</c> section as a JSON Schema fragment, emitted as
+///     <c>[assembly: AssemblyMetadata("Optionary.Schema.v1:&lt;Section&gt;", json)]</c>. The build merges the fragments of an
 ///     application and everything it references into the application's schema.
 /// </summary>
 internal static class ConfigurationSchemaPipeline
 {
-    public const string AttributeMetadataName = "Joinery.Dovetail.Attributes.DovetailConfigurationAttribute";
-    public const string GenericAttributeMetadataName = "Joinery.Dovetail.Attributes.DovetailConfigurationAttribute`1";
-    public const string MetadataPrefix = "Dovetail.ConfigurationSchema.v1:";
+    public const string AttributeMetadataName = "Optionary.OptionaryAttribute";
+    public const string GenericAttributeMetadataName = "Optionary.OptionaryAttribute`1";
+    public const string MetadataPrefix = "Optionary.Schema.v1:";
 
-    /// <summary>Marks the XML documentation files of package references, which Dovetail's targets pass in as additional files.</summary>
-    private const string ReferenceDocumentationMetadata = "build_metadata.AdditionalFiles.DovetailReferenceDocumentation";
+    /// <summary>Marks the XML documentation files of package references, which Optionary's targets pass in as additional files.</summary>
+    private const string ReferenceDocumentationMetadata = "build_metadata.AdditionalFiles.OptionaryReferenceDocumentation";
 
     /// <summary>Registers the schema and options outputs.</summary>
     public static void Register(IncrementalGeneratorInitializationContext context)
     {
-        // The generated code uses C# 12 syntax (collection expressions). Below it nothing is generated; the joint generator's
-        // DT0006 says why.
+        // The generated code uses C# 12 syntax (collection expressions). Below it nothing is generated.
         var supportedLanguageVersion = context.ParseOptionsProvider.Select(
             static (options, _) => options is not CSharpParseOptions csharp || csharp.LanguageVersion >= LanguageVersion.CSharp12
         );
 
-        // The registration method's namespace, verbatim; Dovetail's exported joint calls it there.
+        // The registration method's namespace, verbatim; callers (Dovetail's exported joint among them) find it there.
         var rootNamespace = context.AnalyzerConfigOptionsProvider.Select(static (options, _) => options.GlobalOptions.GetBuildProperty("RootNamespace", s => s));
 
         var declarations = Declarations(context);
@@ -41,9 +40,9 @@ internal static class ConfigurationSchemaPipeline
         var diagnostics = declarations.Select(static (declarations, _) => declarations.SelectMany(z => z.Diagnostics).Distinct().ToEquatableArray());
         var options = declarations
                      .Select(static (declarations, _) => declarations.Select(z => z.Options).OfType<ConfigurationOptions>().ToEquatableArray())
-                     .WithTrackingName("dovetail:configuration_options");
-        // The method is emitted for every declaration, even one that registers nothing, because Dovetail's joint generator
-        // exports a joint calling it whenever it finds a declaration, and doesn't read what this generator made of it.
+                     .WithTrackingName("optionary:options");
+        // The method is emitted for every declaration, even one that registers nothing, because callers such as
+        // Dovetail's joint generator call it whenever they find a declaration, and don't read what this generator made of it.
         var hasDeclarations = declarations.Select(static (declarations, _) => !declarations.IsEmpty);
 
         // [OptionsValidator] classes for the options types are registered with them.
@@ -72,10 +71,10 @@ internal static class ConfigurationSchemaPipeline
         var described = sections
                        .Combine(referenceDocumentation)
                        .Select(static (pair, cancellationToken) => ResolveDocumentation(pair.Left, pair.Right, cancellationToken))
-                       .WithTrackingName("dovetail:configuration_sections");
+                       .WithTrackingName("optionary:sections");
 
         var includeRequired = context.AnalyzerConfigOptionsProvider.Select(
-            static (options, _) => options.GlobalOptions.GetBuildProperty("DovetailConfigurationSchemaRequired", z => bool.TryParse(z, out var value) && value)
+            static (options, _) => options.GlobalOptions.GetBuildProperty("OptionarySchemaRequired", z => bool.TryParse(z, out var value) && value)
         );
 
         context.RegisterSourceOutput(
@@ -97,7 +96,7 @@ internal static class ConfigurationSchemaPipeline
                 var (((registrations, validators), zeroAllocExtensions), rootNamespace) = input.Left;
                 if (input.Right is (true, true))
                 {
-                    production.AddSource("Dovetail_ConfigurationOptions.g.cs", ConfigurationOptionsEmitter.Emit(rootNamespace, registrations, validators, zeroAllocExtensions));
+                    production.AddSource("Optionary.Options.g.cs", ConfigurationOptionsEmitter.Emit(rootNamespace, registrations, validators, zeroAllocExtensions));
                 }
             }
         );
@@ -135,9 +134,9 @@ internal static class ConfigurationSchemaPipeline
                                                                                 )
                                                                                .ToEquatableArray()
                                 )
-                               .WithTrackingName("dovetail:configuration_classes");
+                               .WithTrackingName("optionary:classes");
 
-        // Assembly attributes target the compilation unit: [assembly: DovetailConfiguration<T>("Section")].
+        // Assembly attributes target the compilation unit: [assembly: Optionary<T>("Section")].
         var assemblyDeclarations = context
                                   .SyntaxProvider
                                   .ForAttributeWithMetadataName(
@@ -148,7 +147,7 @@ internal static class ConfigurationSchemaPipeline
                                                                                   .Select(z => ModelBuilder.Build(z, null, syntaxContext.SemanticModel.Compilation, cancellationToken))
                                                                                   .ToEquatableArray()
                                    )
-                                  .WithTrackingName("dovetail:configuration_assembly");
+                                  .WithTrackingName("optionary:assembly");
 
         return classDeclarations
                           .Collect()
@@ -159,12 +158,12 @@ internal static class ConfigurationSchemaPipeline
     /// <summary>
     ///     A type has one section. The compiler already rejects the same attribute twice for one type; this catches the class form
     ///     and the assembly form naming the same type. The class declaration is kept, and the assembly one is replaced by a
-    ///     declaration that only reports DT0015, so it produces no section, registration or schema fragment.
+    ///     declaration that only reports OPT0010, so it produces no section, registration or schema fragment.
     /// </summary>
     /// <remarks>
     ///     The generated binder exists once for each type, so it can read only one set of keys for it. A later declaration whose
     ///     binder would read different keys for a type an earlier one already binds (the same nested type under another
-    ///     <c>KeyStyle</c>) is replaced the same way, by one that only reports DT0016.
+    ///     <c>KeyStyle</c>) is replaced the same way, by one that only reports OPT0011.
     /// </remarks>
     private static IEnumerable<ConfigurationDeclaration> RejectRepeatedTypes(IEnumerable<ConfigurationDeclaration> declarations)
     {
@@ -329,6 +328,6 @@ internal static class ConfigurationSchemaPipeline
         var unit = CompilationUnit()
                   .WithAttributeLists(List(ordered.Select(z => ConfigurationHelpers.AddAssemblyAttribute(MetadataPrefix + z.Path, JsonSchemaWriter.Write(z, includeRequired)))))
                   .AddSharedTrivia();
-        production.AddSource("Dovetail_ConfigurationSchema.g.cs", unit.NormalizeWhitespace().GetText(Encoding.UTF8));
+        production.AddSource("Optionary.Schema.g.cs", unit.NormalizeWhitespace().GetText(Encoding.UTF8));
     }
 }

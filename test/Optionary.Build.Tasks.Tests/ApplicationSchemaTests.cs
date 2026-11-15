@@ -1,8 +1,8 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using static Joinery.Dovetail.Build.Tasks.Tests.Fragments;
+using static Optionary.Build.Tasks.Tests.Fragments;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
 ///     The application schema MergeConfigurationSchema writes: the merge tree, strictness, overlaps, definition hoisting and the
@@ -42,11 +42,11 @@ public class ApplicationSchemaTests
     public async Task DefinitionsAreClosed_WhileTheRootWrappersAndDictionariesStayOpen()
     {
         var document = await SchemaAssert.ShouldBeWellFormed(Merge(GreetingsFragment()));
-        var dovetail = SchemaAssert.DovetailPart(document);
+        var optionary = SchemaAssert.OptionaryPart(document);
         var greetings = SchemaAssert.Section(document, "Greetings");
         var endpoint = document["definitions"]!["Greetings.Endpoint"]!;
 
-        await dovetail.ContainsKey("propertyNames").Should().BeFalse();
+        await optionary.ContainsKey("propertyNames").Should().BeFalse();
         await greetings["properties"]!["Endpoint"]!.AsObject().ContainsKey("propertyNames").Should().BeFalse();
         await greetings["properties"]!["Endpoint"]!["allOf"]![0]!["$ref"]!.GetValue<string>().Should().BeEqualTo("#/definitions/Greetings.Endpoint");
         await greetings["properties"]!["Headers"]!.AsObject().ContainsKey("propertyNames").Should().BeFalse();
@@ -67,9 +67,9 @@ public class ApplicationSchemaTests
         );
 
         var document = await SchemaAssert.ShouldBeWellFormed(json);
-        await SchemaAssert.DovetailDefinitions(document).Select(z => z.Key).Should().BeEquivalentTo(["Grpc", "Grpc.Retry", "Http", "Http.Retry", "Tree", "Tree.Node"], CollectionOrdering.Matching);
+        await SchemaAssert.OptionaryDefinitions(document).Select(z => z.Key).Should().BeEquivalentTo(["Grpc", "Grpc.Retry", "Http", "Http.Retry", "Tree", "Tree.Node"], CollectionOrdering.Matching);
         await document["definitions"]!["Tree.Node"]!["properties"]!["Children"]!["items"]!["allOf"]![0]!["$ref"]!.GetValue<string>().Should().BeEqualTo("#/definitions/Tree.Node");
-        await SchemaAssert.Objects(SchemaAssert.DovetailPart(document)["properties"]).Should().All(z => !z.ContainsKey("definitions"));
+        await SchemaAssert.Objects(SchemaAssert.OptionaryPart(document)["properties"]).Should().All(z => !z.ContainsKey("definitions"));
         await Verify(json, "json");
     }
 
@@ -143,7 +143,7 @@ public class ApplicationSchemaTests
         );
 
         var document = await SchemaAssert.ShouldBeWellFormed(json);
-        await SchemaAssert.DovetailPart(document).ContainsKey("propertyNames").Should().BeFalse();
+        await SchemaAssert.OptionaryPart(document).ContainsKey("propertyNames").Should().BeFalse();
         await SchemaAssert.Section(document, "Shared").ContainsKey("propertyNames").Should().BeFalse();
         await SchemaAssert.Section(document, "Shared", "Http")["propertyNames"].Should().NotBeNull();
         await Verify(json, "json");
@@ -171,7 +171,7 @@ public class ApplicationSchemaTests
             )
         );
 
-        var properties = SchemaAssert.DovetailPart(document)["properties"]!.AsObject();
+        var properties = SchemaAssert.OptionaryPart(document)["properties"]!.AsObject();
         await properties.Select(z => z.Key).Should().BeEquivalentTo(["Greetings"], CollectionOrdering.Matching);
         await SchemaAssert.Section(document, "Greetings")["propertyNames"]!["patternErrorMessage"]!.GetValue<string>().Should().EndWith("Known keys (case-insensitive): Message.");
     }
@@ -213,13 +213,13 @@ public class ApplicationSchemaTests
         );
 
         await SchemaAssert.Objects(document).Should().All(z => !z.ContainsKey("propertyNames"));
-        await SchemaAssert.DovetailDefinitions(document).Should().NotBeEmpty();
+        await SchemaAssert.OptionaryDefinitions(document).Should().NotBeEmpty();
     }
 
     [Test]
     public async Task FragmentTwinsSpelledDifferently_AreStillReplacedWhenTheirKeyIsMerged()
     {
-        // A twin pattern that isn't the one Dovetail builds itself is matched against the keys instead.
+        // A twin pattern that isn't the one Optionary builds itself is matched against the keys instead.
         var shared = """
                      {"type":"object","properties":{"Http":{"type":"object","properties":{"Timeout":{"type":"integer"}}}},
                       "patternProperties":{"^[Hh][Tt][Tt][Pp]$":{"type":"object","properties":{"Timeout":{"type":"integer"}}}}}
@@ -263,13 +263,13 @@ public class ApplicationSchemaTests
         await embedded["properties"]!["Logging"].Should().NotBeNull();
 
         // The same references as the pinned copy of SchemaStore's file, each pointing into the definition.
-        using var pinned = typeof(SchemaStoreAppSettings).Assembly.GetManifestResourceStream("Joinery.Dovetail.Build.Tasks.SchemaStore.appsettings.json")!;
+        using var pinned = typeof(SchemaStoreAppSettings).Assembly.GetManifestResourceStream("Optionary.Build.Tasks.SchemaStore.appsettings.json")!;
         var original = JsonNode.Parse(pinned)!;
         await SchemaAssert.References(embedded).Should().BeEquivalentTo(SchemaAssert.References(original).Select(z => "#/definitions/SchemaStoreAppSettings" + z[1..]), CollectionOrdering.Matching);
     }
 
     [Test]
-    public async Task WithoutFragments_TheSchemaIsSchemaStoreAndAnEmptyDovetailPart()
+    public async Task WithoutFragments_TheSchemaIsSchemaStoreAndAnEmptyOptionaryPart()
     {
         var json = ConfigurationSchemaDocument.Serialize(ConfigurationSchemaDocument.CreateApplicationSchema([], strict: true, includeSchemaStore: true));
 

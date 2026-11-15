@@ -2,11 +2,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Joinery.Dovetail.Configuration.Runtime.Tests;
+namespace Optionary.Runtime.Tests;
 
 /// <summary>
 ///     Checks that a change to a JSON file reaches options registered through
-///     <see cref="DovetailConfigurationOptionsExtensions" />, for a type the options pipeline could create and one it couldn't, through <see cref="IOptionsMonitor{TOptions}" /> and
+///     <see cref="OptionaryServiceCollectionExtensions" />, for a type the options pipeline could create and one it couldn't, through <see cref="IOptionsMonitor{TOptions}" /> and
 ///     <see cref="IOptionsSnapshot{TOptions}" />.
 /// </summary>
 public sealed class FileReloadRegistrationTests
@@ -14,7 +14,7 @@ public sealed class FileReloadRegistrationTests
     [Test]
     public async Task JsonFileChange_ReachesMonitorAndSnapshot_ForParameterlessAndParameterizedTypes()
     {
-        var directory = Path.Combine(Path.GetTempPath(), "dovetail-config-tests-" + Guid.NewGuid().ToString("N"));
+        var directory = Path.Combine(Path.GetTempPath(), "optionary-config-tests-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
         try
         {
@@ -28,8 +28,8 @@ public sealed class FileReloadRegistrationTests
             try
             {
                 var services = new ServiceCollection().AddSingleton<IConfiguration>(configuration);
-                services.AddDovetailConfigurationOptions("Greetings", GreetingsOptions.Create);
-                services.AddDovetailConfigurationOptions("Server", ServerRecord.Create);
+                services.AddOptionaryOptions("Greetings", GreetingsOptions.Create);
+                services.AddOptionaryOptions("Server", ServerRecord.Create);
 
                 await using var provider = services.BuildServiceProvider();
 

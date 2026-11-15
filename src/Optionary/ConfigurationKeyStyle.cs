@@ -1,7 +1,7 @@
-namespace Joinery.Dovetail.Attributes;
+namespace Optionary;
 
 /// <summary>
-///     How <see cref="DovetailConfigurationAttribute" /> spells the configuration keys of an options type and of every object type
+///     How <see cref="OptionaryAttribute" /> spells the configuration keys of an options type and of every object type
 ///     nested in it.
 /// </summary>
 /// <remarks>
@@ -19,7 +19,7 @@ namespace Joinery.Dovetail.Attributes;
 ///     </para>
 ///     <para>
 ///         The generated binder exists once for each type, so a type reached from sections of styles that spell its keys
-///         differently is reported as DT0016.
+///         differently is reported as OPT0011.
 ///     </para>
 /// </remarks>
 [PublicAPI]

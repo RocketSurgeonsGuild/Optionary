@@ -1,18 +1,18 @@
-using Joinery.Dovetail.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Optionary.Infrastructure;
 
-namespace Joinery.Dovetail;
+namespace Optionary;
 
 /// <summary>
 ///     Registers strongly-typed configuration classes with the standard <see cref="Microsoft.Extensions.Options" /> pipeline.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The configuration joint that Dovetail's source generator emits for <c>[DovetailConfiguration]</c> types calls
-///         <see cref="AddDovetailConfigurationOptions{TOptions}(IServiceCollection, string, Func{IConfiguration, TOptions})" />
+///         The registration method Optionary's source generator emits for <c>[Optionary]</c> types calls
+///         <see cref="AddOptionaryOptions{TOptions}(IServiceCollection, string, Func{IConfiguration, TOptions})" />
 ///         for every type, passing the <c>Create…</c> method it generated for it. That code creates the instance and binds the
 ///         section onto it without reflection, so the registration is trimming and AOT safe, and nothing here uses reflection.
 ///         A library registers only its own section, and reads it from the application's complete <see cref="IConfiguration" />,
@@ -20,7 +20,7 @@ namespace Joinery.Dovetail;
 ///     </para>
 /// </remarks>
 [PublicAPI]
-public static class DovetailConfigurationOptionsExtensions
+public static class OptionaryServiceCollectionExtensions
 {
     /// <summary>
     ///     Creates <typeparamref name="TOptions" /> from the configuration section at <paramref name="sectionPath" /> with
@@ -28,7 +28,7 @@ public static class DovetailConfigurationOptionsExtensions
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This is the one registration the generated configuration joint emits, for every <c>[DovetailConfiguration]</c> type.
+    ///         This is the one registration the generated registration method emits, for every <c>[Optionary]</c> type.
     ///         It registers an <see cref="IOptionsFactory{TOptions}" /> that creates each instance with
     ///         <paramref name="create" />, unless a factory is already registered for <typeparamref name="TOptions" />. That is a
     ///         <c>TryAdd</c>, so an <see cref="IOptionsFactory{TOptions}" /> the application registered itself wins over this one,
@@ -45,7 +45,7 @@ public static class DovetailConfigurationOptionsExtensions
     ///         The configuration is the application's <see cref="IConfiguration" />, which the service provider supplies when the
     ///         options are first created. <paramref name="create" /> is called with the section at <paramref name="sectionPath" />.
     ///         A change token source watches that configuration, so <see cref="IOptionsMonitor{TOptions}" /> and
-    ///         <see cref="IOptionsSnapshot{TOptions}" /> observe reloads. Dovetail only registers the default options: asking for
+    ///         <see cref="IOptionsSnapshot{TOptions}" /> observe reloads. Optionary only registers the default options: asking for
     ///         any other options name throws <see cref="InvalidOperationException" />.
     ///     </para>
     ///     <para>
@@ -64,7 +64,7 @@ public static class DovetailConfigurationOptionsExtensions
     /// </returns>
     /// <exception cref="ArgumentNullException"><paramref name="services" />, <paramref name="sectionPath" />, or <paramref name="create" /> is <see langword="null" />.</exception>
     /// <exception cref="ArgumentException"><paramref name="sectionPath" /> is empty.</exception>
-    public static OptionsBuilder<TOptions> AddDovetailConfigurationOptions<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(
+    public static OptionsBuilder<TOptions> AddOptionaryOptions<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TOptions>(
         this IServiceCollection services,
         string sectionPath,
         Func<IConfiguration, TOptions> create
@@ -86,7 +86,7 @@ public static class DovetailConfigurationOptionsExtensions
             )
         );
         services.TryAdd(
-            ServiceDescriptor.Transient<IOptionsFactory<TOptions>, DovetailOptionsFactory<TOptions>>(provider => new DovetailOptionsFactory<TOptions>(
+            ServiceDescriptor.Transient<IOptionsFactory<TOptions>, OptionaryOptionsFactory<TOptions>>(provider => new OptionaryOptionsFactory<TOptions>(
                     provider.GetRequiredService<IConfiguration>(),
                     sectionPath,
                     create,

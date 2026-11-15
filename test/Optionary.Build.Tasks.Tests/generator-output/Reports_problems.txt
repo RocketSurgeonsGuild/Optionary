@@ -211,15 +211,15 @@
   }
 }
 ## Diagnostics
-DT0007 Error line 9: 'Sample.AbstractOptions' can't be described as configuration: it's abstract
-DT0007 Error line 12: 'Sample.GenericOptions<T>' can't be described as configuration: it's an open generic type
-DT0008 Error line 15: '' isn't a valid configuration section for 'Sample.Options': the type name is only a suffix, so pass a section path
-DT0008 Error line 18: 'A::B' isn't a valid configuration section for 'Sample.BadPathOptions': section paths can't have empty segments
-DT0009 Warning line 26: 'UnsupportedOptions.Callback' has type 'System.Action?', which configuration binding doesn't support, so it's left out of the schema
-DT0010 Warning line 37: 'CollidingOptions.Name' and 'CollidingOptions.Other' both bind the key 'name' (configuration keys are case-insensitive), so only 'CollidingOptions.Name' is described
-DT0011 Error line 40: 'Sample.AmbiguousOptions' can't be created from configuration because it has several public constructors with parameters and no parameterless one
-DT0011 Error line 49: 'Sample.OrphanParameterOptions' can't be created from configuration because constructor parameter 'unmatched' has no matching property
-DT0013 Warning line 65: '[Range]' on 'AnnotationOptions.Text' is left out of the schema because ranges only apply to numbers
-DT0013 Warning line 68: '[RegularExpression]' on 'AnnotationOptions.Pattern' is left out of the schema because it uses regular expression syntax that JSON Schema (ECMA-262) doesn't support
-DT0013 Warning line 71: '[RegularExpression]' on 'AnnotationOptions.Consonants' is left out of the schema because it uses regular expression syntax that JSON Schema (ECMA-262) doesn't support
-DT0013 Warning line 74: '[MaxLength]' on 'AnnotationOptions.Number' is left out of the schema because lengths only apply to strings and collections
+OPT0002 Error line 9: 'Sample.AbstractOptions' can't be described as configuration: it's abstract
+OPT0002 Error line 12: 'Sample.GenericOptions<T>' can't be described as configuration: it's an open generic type
+OPT0003 Error line 15: '' isn't a valid configuration section for 'Sample.Options': the type name is only a suffix, so pass a section path
+OPT0003 Error line 18: 'A::B' isn't a valid configuration section for 'Sample.BadPathOptions': section paths can't have empty segments
+OPT0004 Warning line 26: 'UnsupportedOptions.Callback' has type 'System.Action?', which configuration binding doesn't support, so it's left out of the schema
+OPT0005 Warning line 37: 'CollidingOptions.Name' and 'CollidingOptions.Other' both bind the key 'name' (configuration keys are case-insensitive), so only 'CollidingOptions.Name' is described
+OPT0006 Error line 40: 'Sample.AmbiguousOptions' can't be created from configuration because it has several public constructors with parameters and no parameterless one
+OPT0006 Error line 49: 'Sample.OrphanParameterOptions' can't be created from configuration because constructor parameter 'unmatched' has no matching property
+OPT0008 Warning line 65: '[Range]' on 'AnnotationOptions.Text' is left out of the schema because ranges only apply to numbers
+OPT0008 Warning line 68: '[RegularExpression]' on 'AnnotationOptions.Pattern' is left out of the schema because it uses regular expression syntax that JSON Schema (ECMA-262) doesn't support
+OPT0008 Warning line 71: '[RegularExpression]' on 'AnnotationOptions.Consonants' is left out of the schema because it uses regular expression syntax that JSON Schema (ECMA-262) doesn't support
+OPT0008 Warning line 74: '[MaxLength]' on 'AnnotationOptions.Number' is left out of the schema because lengths only apply to strings and collections

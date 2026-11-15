@@ -1,11 +1,11 @@
 // Ported from dotnet/runtime (MIT): the configuration binding generator's CoreBindingHelpers emitter, at version 10 and
-// version 11 (switched by BinderVersion), without BinderOptions (Dovetail never passes any) and with entry points for the
+// version 11 (switched by BinderVersion), without BinderOptions (Optionary never passes any) and with entry points for the
 // options pipeline instead of intercepted calls. Framework types are fully qualified because the binder is emitted into
 // the consuming project's namespace. See BindingModel.cs.
 
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Joinery.Dovetail.Support.Configuration.Binding;
+namespace Optionary.Analyzers.Binding;
 
 /// <summary>Emits a static class that binds the given roots, and everything they reach, from configuration.</summary>
 internal sealed class BindingEmitter
@@ -197,7 +197,7 @@ internal sealed class BindingEmitter
         EmitStartBlock($"public static {type.TypeRef.FullyQualifiedName} {InitializeMethodName(type)}({IConfiguration} configuration)");
         _emitBlankLineBeforeNextStatement = false;
 
-        // Dovetail's object-initializer types keep a member's own initial value when its key is missing (as the reflection
+        // Optionary's object-initializer types keep a member's own initial value when its key is missing (as the reflection
         // binder does, as it binds after construction). Required members have none, and must be set to create the type.
         var defaultsInstance = type.InitializerOnly && initOnlyProperties.Any(z => !z.IsRequired);
         if (defaultsInstance)
@@ -662,7 +662,7 @@ internal sealed class BindingEmitter
     /// <summary>
     ///     Whether the type's BindCore takes a <c>boundThroughConstructor</c> argument: version 11 for types created through a
     ///     parameterized constructor that has a property bound there which BindCore would otherwise bind again. Version 10 binds
-    ///     those again; Dovetail's object-initializer types (<see cref="ObjectSpec.InitializerOnly" />) never do.
+    ///     those again; Optionary's object-initializer types (<see cref="ObjectSpec.InitializerOnly" />) never do.
     /// </summary>
     private bool ShouldEmitBoundThroughConstructorParameter(ComplexTypeSpec type) =>
         type is ObjectSpec objectType

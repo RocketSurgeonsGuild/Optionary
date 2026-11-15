@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     What <see cref="VsCodeSettingsEditor.Apply" /> decided.
@@ -9,7 +9,7 @@ namespace Joinery.Dovetail.Build.Tasks;
 internal enum EditorSettingsStatus
 {
     /// <summary>
-    ///     The settings already hold Dovetail's mappings; nothing to write.
+    ///     The settings already hold Optionary's mappings; nothing to write.
     /// </summary>
     Unchanged,
 
@@ -37,7 +37,7 @@ internal readonly struct EditorSettingsResult(EditorSettingsStatus status, byte[
 }
 
 /// <summary>
-///     Makes sure a VS Code <c>settings.json</c> holds Dovetail's mappings for a host (<see cref="EditorSettingsMappings" />) by
+///     Makes sure a VS Code <c>settings.json</c> holds Optionary's mappings for a host (<see cref="EditorSettingsMappings" />) by
 ///     splicing text into the original, so everything else stays byte for byte: comments, trailing commas, indentation, line
 ///     endings, the byte-order mark, other settings and other entries in the three maps. Only the host's own entries are looked
 ///     at: the <c>json.schemas</c> entry whose <c>url</c> is the host's schema, the <c>yaml.schemas</c> key that is the host's
@@ -50,12 +50,12 @@ internal static class VsCodeSettingsEditor
     private static readonly UTF8Encoding StrictUtf8 = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 
     /// <summary>
-    ///     Adds or completes Dovetail's mappings in <paramref name="original" /> (null or empty when the file doesn't exist).
+    ///     Adds or completes Optionary's mappings in <paramref name="original" /> (null or empty when the file doesn't exist).
     /// </summary>
     public static EditorSettingsResult Apply(byte[]? original, EditorSettingsMappings mappings) => ApplyCore(original, mappings, verify: true);
 
     /// <summary>
-    ///     A complete settings document holding only Dovetail's mappings.
+    ///     A complete settings document holding only Optionary's mappings.
     /// </summary>
     internal static string RenderDocument(EditorSettingsMappings mappings, string newLine, string indentUnit)
     {
@@ -182,7 +182,7 @@ internal static class VsCodeSettingsEditor
     }
 
     /// <summary>
-    ///     Renders Dovetail's JSON at a given indentation: multi-line (one line per property, matching the surrounding file) or
+    ///     Renders Optionary's JSON at a given indentation: multi-line (one line per property, matching the surrounding file) or
     ///     inline, for containers that sit on one line.
     /// </summary>
     private sealed class Renderer(string newLine, string unit, bool multiline)
@@ -302,7 +302,7 @@ internal static class VsCodeSettingsEditor
                 }
 
                 var fileMatch = entry.Members.Where(z => z.Name == "fileMatch").ToArray();
-                if (fileMatch.Length > 1) return "a Dovetail entry of \"json.schemas\" has two \"fileMatch\" properties";
+                if (fileMatch.Length > 1) return "a Optionary entry of \"json.schemas\" has two \"fileMatch\" properties";
 
                 if (fileMatch.Length == 0)
                 {
@@ -310,7 +310,7 @@ internal static class VsCodeSettingsEditor
                     return null;
                 }
 
-                if (fileMatch[0].Value is not JsoncArray patterns || patterns.Items.Any(z => z is not JsoncString)) return "a Dovetail entry of \"json.schemas\" has an unexpected \"fileMatch\"";
+                if (fileMatch[0].Value is not JsoncArray patterns || patterns.Items.Any(z => z is not JsoncString)) return "a Optionary entry of \"json.schemas\" has an unexpected \"fileMatch\"";
 
                 if (patterns.Items.Cast<JsoncString>().All(z => z.Value != mappings.JsonFileMatch))
                 {
@@ -329,7 +329,7 @@ internal static class VsCodeSettingsEditor
             if (value is not JsoncObject map) return "\"yaml.schemas\" isn't an object";
 
             var matches = map.Members.Where(z => EditorSettingsMappings.NormalizePath(z.Name) == EditorSettingsMappings.NormalizePath(mappings.SchemaUrl)).ToArray();
-            if (matches.Length > 1) return "\"yaml.schemas\" maps Dovetail's schema more than once";
+            if (matches.Length > 1) return "\"yaml.schemas\" maps Optionary's schema more than once";
 
             if (matches.Length == 0)
             {
@@ -361,7 +361,7 @@ internal static class VsCodeSettingsEditor
                         return null;
                     }
                 default:
-                    return "a Dovetail entry of \"yaml.schemas\" has an unexpected value";
+                    return "a Optionary entry of \"yaml.schemas\" has an unexpected value";
             }
         }
 
@@ -370,7 +370,7 @@ internal static class VsCodeSettingsEditor
             if (value is not JsoncObject map) return "\"evenBetterToml.schema.associations\" isn't an object";
 
             var matches = map.Members.Where(z => z.Name == mappings.TomlPattern).ToArray();
-            if (matches.Length > 1) return "\"evenBetterToml.schema.associations\" maps Dovetail's pattern more than once";
+            if (matches.Length > 1) return "\"evenBetterToml.schema.associations\" maps Optionary's pattern more than once";
 
             if (matches.Length == 0)
             {
@@ -378,7 +378,7 @@ internal static class VsCodeSettingsEditor
                 return null;
             }
 
-            if (matches[0].Value is not JsoncString schema) return "a Dovetail entry of \"evenBetterToml.schema.associations\" has an unexpected value";
+            if (matches[0].Value is not JsoncString schema) return "a Optionary entry of \"evenBetterToml.schema.associations\" has an unexpected value";
 
             if (EditorSettingsMappings.NormalizePath(schema.Value) != EditorSettingsMappings.NormalizePath(mappings.SchemaUrl))
             {

@@ -1,20 +1,18 @@
 using System.Globalization;
-using Joinery.Dovetail.Configuration.Yaml;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Optionary.Configuration.Yaml;
 
-namespace Joinery.Dovetail.Configuration.Runtime.Tests;
+namespace Optionary.Runtime.Tests;
 
 /// <summary>
 ///     Verifies the runtime integration surface that the generated registration method (<c>AddOptionaryConfigurationOptions</c>)
-///     (see <c>openspec/changes/dovetail-managed-configuration</c>) is expected to compose with:
-///     <see cref="DovetailConfigurationOptionsExtensions.AddDovetailConfigurationOptions{TOptions}(IServiceCollection, string, Func{IConfiguration, TOptions})" />
+/// is expected to compose with:
+///     <see cref="OptionaryServiceCollectionExtensions.AddOptionaryOptions{TOptions}(IServiceCollection, string, Func{IConfiguration, TOptions})" />
 ///     (with <c>CreateSample</c> standing in for the generated <c>Create…</c> method) plus the
 ///     JSON and YAML runtime <see cref="IConfigurationSource" />s, exercising <see cref="IOptions{TOptions}" />
 ///     resolution (task 6.3) and <see cref="IOptionsMonitor{TOptions}" /> reload-on-file-change (task 6.4).
-///     TOML, which stays in Dovetail, is covered by <c>Joinery.Dovetail.Configuration.Tests</c>.
 /// </summary>
 public sealed class ConfigurationOptionsBindingTests
 {
@@ -116,7 +114,7 @@ public sealed class ConfigurationOptionsBindingTests
             try
             {
                 var services = new ServiceCollection().AddSingleton<IConfiguration>(configuration);
-                services.AddDovetailConfigurationOptions("Sample", CreateSample);
+                services.AddOptionaryOptions("Sample", CreateSample);
 
                 await using var provider = services.BuildServiceProvider();
 
@@ -156,7 +154,7 @@ public sealed class ConfigurationOptionsBindingTests
             try
             {
                 var services = new ServiceCollection().AddSingleton<IConfiguration>(configuration);
-                services.AddDovetailConfigurationOptions("Sample", CreateSample);
+                services.AddOptionaryOptions("Sample", CreateSample);
 
                 await using var provider = services.BuildServiceProvider();
 
@@ -200,7 +198,7 @@ public sealed class ConfigurationOptionsBindingTests
 
     private static string CreateTempDirectory()
     {
-        var directory = Path.Combine(Path.GetTempPath(), "dovetail-config-tests-" + Guid.NewGuid().ToString("N"));
+        var directory = Path.Combine(Path.GetTempPath(), "optionary-config-tests-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(directory);
         return directory;
     }

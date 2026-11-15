@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
 ///     The case-insensitive key patterns: ECMA-262 character classes, with regex syntax characters escaped.

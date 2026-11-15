@@ -1,10 +1,10 @@
 using System.Text;
 using System.Text.Json;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
-///     The .vscode/settings.json editor: it adds or completes Dovetail's own mappings and leaves every other byte alone.
+///     The .vscode/settings.json editor: it adds or completes Optionary's own mappings and leaves every other byte alone.
 /// </summary>
 public class VsCodeSettingsEditorTests
 {
@@ -14,7 +14,7 @@ public class VsCodeSettingsEditorTests
 
     private static EditorSettingsMappings Mappings(string project)
     {
-        var root = Path.Combine(Path.GetTempPath(), "dovetail-repo");
+        var root = Path.Combine(Path.GetTempPath(), "optionary-repo");
         return EditorSettingsMappings.TryCreate(root, Path.Combine(root, project), Path.Combine(root, project, "obj", "appsettings.schema.json"), out var mappings, out var error)
             ? mappings!
             : throw new InvalidOperationException(error);
@@ -274,7 +274,7 @@ public class VsCodeSettingsEditorTests
     }
 
     [Test]
-    public async Task ExistingDovetailEntries_AreCompletedInPlace()
+    public async Task ExistingOptionaryEntries_AreCompletedInPlace()
     {
         const string original = """
             {
@@ -314,7 +314,7 @@ public class VsCodeSettingsEditorTests
     }
 
     [Test]
-    public async Task DovetailEntryWithoutFileMatch_GetsOne()
+    public async Task OptionaryEntryWithoutFileMatch_GetsOne()
     {
         var updated = Edit("""
             {
@@ -389,7 +389,7 @@ public class VsCodeSettingsEditorTests
     [Test]
     public async Task ProjectAtTheSettingsDirectory_MapsTheFilesNextToIt()
     {
-        var root = Path.Combine(Path.GetTempPath(), "dovetail-repo");
+        var root = Path.Combine(Path.GetTempPath(), "optionary-repo");
         await EditorSettingsMappings.TryCreate(root, root, Path.Combine(root, "obj", "appsettings.schema.json"), out var mappings, out _).Should().BeTrue();
 
         await mappings!.SchemaUrl.Should().BeEqualTo("./obj/appsettings.schema.json");
@@ -401,7 +401,7 @@ public class VsCodeSettingsEditorTests
     [Test]
     public async Task DotsAndMetacharactersInTheProjectPath_AreEscapedInTheTomlPattern()
     {
-        var root = Path.Combine(Path.GetTempPath(), "dovetail-repo");
+        var root = Path.Combine(Path.GetTempPath(), "optionary-repo");
         await EditorSettingsMappings.TryCreate(root, Path.Combine(root, "My.App+x"), Path.Combine(root, "My.App+x", "obj", "appsettings.schema.json"), out var mappings, out _).Should().BeTrue();
 
         await mappings!.TomlPattern.Should().BeEqualTo("^.+/My\\.App\\+x/appsettings.*\\.toml$");
@@ -410,8 +410,8 @@ public class VsCodeSettingsEditorTests
     [Test]
     public async Task PathsOutsideTheSettingsDirectory_CantBeMapped()
     {
-        var root = Path.Combine(Path.GetTempPath(), "dovetail-repo", "nested");
-        var outside = Path.Combine(Path.GetTempPath(), "dovetail-repo", "project");
+        var root = Path.Combine(Path.GetTempPath(), "optionary-repo", "nested");
+        var outside = Path.Combine(Path.GetTempPath(), "optionary-repo", "project");
 
         await EditorSettingsMappings.TryCreate(root, outside, Path.Combine(outside, "obj", "appsettings.schema.json"), out var mappings, out var error).Should().BeFalse();
 

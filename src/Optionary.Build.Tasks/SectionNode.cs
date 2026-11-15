@@ -1,4 +1,4 @@
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     A node of the configuration section tree: section paths split on <c>:</c>, compared ignoring case as the configuration

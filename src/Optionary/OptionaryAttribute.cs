@@ -1,9 +1,9 @@
 using System.Diagnostics;
 
-namespace Joinery.Dovetail.Attributes;
+namespace Optionary;
 
 /// <summary>
-///     Declares the configuration section of an options class. Dovetail's source generator describes the class as JSON Schema,
+///     Declares the configuration section of an options class. Optionary's source generator describes the class as JSON Schema,
 ///     which is merged into the application's <c>appsettings.schema.json</c> for editor completion and validation, and registers
 ///     it with the options pipeline.
 /// </summary>
@@ -15,12 +15,12 @@ namespace Joinery.Dovetail.Attributes;
 ///     </para>
 ///     <para>
 ///         A type has one section, so it can be declared once. For a type you don't own, use the assembly form,
-///         <see cref="DovetailConfigurationAttribute{T}" />.
+///         <see cref="OptionaryAttribute{T}" />.
 ///     </para>
 ///     <para>
 ///         <see cref="KeyStyle" /> picks how the keys of the type and of the types nested in it are spelled (as declared, Pascal,
 ///         camel, dash or underscore case). A type that several sections reach has to spell its keys the same way in all of them;
-///         DT0016 reports a mismatch.
+///         OPT0011 reports a mismatch.
 ///     </para>
 ///     <para>
 ///         The generated registration reads its own section from the application's complete <c>IConfiguration</c> and creates or
@@ -31,18 +31,18 @@ namespace Joinery.Dovetail.Attributes;
 [PublicAPI]
 [AttributeUsage(AttributeTargets.Class)]
 [Conditional("CodeGeneration")]
-public sealed class DovetailConfigurationAttribute : Attribute
+public sealed class OptionaryAttribute : Attribute
 {
     /// <summary>
     ///     Declares the attributed class under the section derived from its name.
     /// </summary>
-    public DovetailConfigurationAttribute() { }
+    public OptionaryAttribute() { }
 
     /// <summary>
     ///     Declares the attributed class under <paramref name="section" />.
     /// </summary>
     /// <param name="section">The section path, e.g. <c>"Greetings"</c> or <c>"Http:Retry"</c>.</param>
-    public DovetailConfigurationAttribute(string section) => Section = section;
+    public OptionaryAttribute(string section) => Section = section;
 
     /// <summary>
     ///     The section path, or <see langword="null" /> for the one derived from the type name.
@@ -74,11 +74,11 @@ public sealed class DovetailConfigurationAttribute : Attribute
 /// </summary>
 /// <remarks>
 ///     <para>
-///         For example, <c>[assembly: DovetailConfiguration&lt;HostOptions&gt;("Hosting")]</c>.
+///         For example, <c>[assembly: Optionary&lt;HostOptions&gt;("Hosting")]</c>.
 ///     </para>
 ///     <para>
-///         The section path follows the same rules as <see cref="DovetailConfigurationAttribute" />. Apply it once for each type you
-///         configure. A type has one section: naming it twice, or also declaring it with the class form, is reported as DT0015.
+///         The section path follows the same rules as <see cref="OptionaryAttribute" />. Apply it once for each type you
+///         configure. A type has one section: naming it twice, or also declaring it with the class form, is reported as OPT0010.
 ///         <see cref="KeyStyle" /> works as it does on the class form.
 ///     </para>
 ///     <para>Only works with source generators enabled.</para>
@@ -87,19 +87,19 @@ public sealed class DovetailConfigurationAttribute : Attribute
 [PublicAPI]
 [AttributeUsage(AttributeTargets.Assembly, AllowMultiple = true)]
 [Conditional("CodeGeneration")]
-public sealed class DovetailConfigurationAttribute<T> : Attribute
+public sealed class OptionaryAttribute<T> : Attribute
     where T : class
 {
     /// <summary>
     ///     Declares <typeparamref name="T" /> under the section derived from its name.
     /// </summary>
-    public DovetailConfigurationAttribute() { }
+    public OptionaryAttribute() { }
 
     /// <summary>
     ///     Declares <typeparamref name="T" /> under <paramref name="section" />.
     /// </summary>
     /// <param name="section">The section path, e.g. <c>"Greetings"</c> or <c>"Http:Retry"</c>.</param>
-    public DovetailConfigurationAttribute(string section) => Section = section;
+    public OptionaryAttribute(string section) => Section = section;
 
     /// <summary>
     ///     The section path, or <see langword="null" /> for the one derived from the type name.

@@ -1,15 +1,14 @@
 // The option types the parity cases bind (from the P0 binder spike). Initialisers are deliberate: they show whether binding
-// overwrites, resets, appends or replaces. Every root is a [DovetailConfiguration] section, so Dovetail's generator emits a binder
+// overwrites, resets, appends or replaces. Every root is a [Optionary] section, so Optionary's generator emits a binder
 // for it; Microsoft's generator binds the same types through the statically typed calls in MicrosoftBinder.
 using System.Globalization;
-using Joinery.Dovetail.Attributes;
 using Microsoft.Extensions.Configuration;
 
 // The fixtures keep the exact shapes the binders are compared on (an explicit constructor, `new List<string> { … }` behind an
 // interface), so the suggestions to use primary constructors and collection expressions don't apply.
 #pragma warning disable IDE0290, IDE0028
 
-namespace Joinery.Dovetail.Configuration.Parity.Tests;
+namespace Optionary.Parity.Tests;
 
 public enum Color { Red = 1, Green = 2, Blue = 3 }
 
@@ -21,7 +20,7 @@ public class Nested
     public string? Value { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class EmptyTarget
 {
     public string? Str { get; set; } = "init";
@@ -50,7 +49,7 @@ public class EmptyTarget
     public char Ch { get; set; } = 'x';
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class NullableTarget
 {
     public int? NInt { get; set; } = 7;
@@ -62,16 +61,16 @@ public class NullableTarget
     public DateTime? NDate { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public record PosRecord(string Name, int Port);
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public record PosRecordDefault(string Name, int Port = 8080);
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public record NullableParamRecord(string? Name, int? Port);
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class SingleCtorClass
 {
     public SingleCtorClass(string name, int port)
@@ -85,7 +84,7 @@ public class SingleCtorClass
     public string? Extra { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class BothCtorsClass
 {
     public BothCtorsClass() => Source = "parameterless";
@@ -100,7 +99,7 @@ public class BothCtorsClass
     public string Source { get; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class CtorThenSetter
 {
     public CtorThenSetter(string name) => Name = name + "+ctor";
@@ -108,20 +107,20 @@ public class CtorThenSetter
     public string Name { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public record TransformRecord(string Name)
 {
     public string Name { get; init; } = Name + "+ctor";
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public record RecordWithInitList(string Name)
 {
     public List<string> Aliases { get; init; } = ["init"];
 }
 
-/// <summary>Dovetail creates this with an object initializer; Microsoft's generator never sets its members.</summary>
-[DovetailConfiguration("S")]
+/// <summary>Optionary creates this with an object initializer; Microsoft's generator never sets its members.</summary>
+[Optionary("S")]
 public class InitOnlyClass
 {
     public string? Name { get; init; } = "init";
@@ -129,15 +128,15 @@ public class InitOnlyClass
     public List<string> Items { get; init; } = ["init"];
 }
 
-/// <summary>Dovetail creates this with an object initializer; Microsoft's generator can't create it (CS9035).</summary>
-[DovetailConfiguration("S")]
+/// <summary>Optionary creates this with an object initializer; Microsoft's generator can't create it (CS9035).</summary>
+[Optionary("S")]
 public class RequiredClass
 {
     public required string Name { get; set; }
     public int Port { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class GetOnlyCollections
 {
     public List<string> Items { get; } = ["init"];
@@ -153,7 +152,7 @@ public class GetOnlyCollections
     public Nested Nested { get; } = new() { Value = "init" };
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class CasingCtor
 {
     public CasingCtor(string NAME, int pORT)
@@ -166,10 +165,10 @@ public class CasingCtor
     public int Port { get; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public record KeyNameRecord([property: ConfigurationKeyName("custom_key")] string Value);
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class KeyNameClass
 {
     [ConfigurationKeyName("custom_key")]
@@ -185,7 +184,7 @@ public struct PlainStruct
 }
 
 /// <summary>Structs can't be options, so they're bound as members.</summary>
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HasStructs
 {
     public PosRecordStruct Rec { get; set; } = new("init", 1);
@@ -193,7 +192,7 @@ public class HasStructs
     public PlainStruct? NullablePlain { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HasRecordProp
 {
     public PosRecord? Rec { get; set; }
@@ -217,7 +216,7 @@ public class MultiCtor
     public int Port { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HasUncreatable
 {
     public MismatchCtor? Mismatch { get; set; }
@@ -246,7 +245,7 @@ public class DerivedOpts : BaseOpts
     public string? DerivedValue { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class Polymorphic
 {
     public IShape Shape { get; set; } = new Square();
@@ -255,49 +254,49 @@ public class Polymorphic
     public object? Obj { get; set; }
 }
 
-[DovetailConfiguration("S:Section")]
+[Optionary("S:Section")]
 public class Inner
 {
     public string? Child { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HolderPoco
 {
     public Inner? Section { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HolderString
 {
     public string? Section { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HolderInt
 {
     public int Section { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HolderList
 {
     public List<string>? Section { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HolderDictInner
 {
     public Dictionary<string, Inner>? Section { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class HolderObject
 {
     public object? Section { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class CollTarget
 {
     public List<string> List { get; set; } = ["a", "b"];
@@ -327,7 +326,7 @@ public class CollTarget
     public List<InitOnlyClass> InitOnlyList { get; set; } = [];
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class CollTargetNull
 {
     public List<string>? List { get; set; }
@@ -344,7 +343,7 @@ public class CollTargetNull
     public List<Nested>? NestedList { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class ScalarTarget
 {
     public int Int { get; set; }
@@ -370,7 +369,7 @@ public class ScalarTarget
     public Int128 Big { get; set; }
 }
 
-[DovetailConfiguration("S")]
+[Optionary("S")]
 public class UnknownTarget
 {
     public string? Name { get; set; }
@@ -385,7 +384,7 @@ public class UnknownTarget
     public Dictionary<string, string>? Dict { get; set; }
 }
 
-[DovetailConfiguration("Reload")]
+[Optionary("Reload")]
 public class ReloadOptions
 {
     public string? Name { get; set; }

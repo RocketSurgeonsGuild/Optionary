@@ -1,12 +1,12 @@
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
-using static Joinery.Dovetail.Build.Tasks.Tests.Fragments;
+using static Optionary.Build.Tasks.Tests.Fragments;
 
-namespace Joinery.Dovetail.Build.Tasks.Tests;
+namespace Optionary.Build.Tasks.Tests;
 
 /// <summary>
-///     The merge against what Dovetail's generator really emits: the fragments in <c>generator-output/</c> are copies of the
-///     snapshots in Joinery.Dovetail.Analyzers.Tests (sections as <c>## Path</c> headings followed by the fragment, then
+///     The merge against what Optionary's generator really emits: the fragments in <c>generator-output/</c> are copies of the
+///     snapshots in Optionary.Analyzers.Tests (sections as <c>## Path</c> headings followed by the fragment, then
 ///     <c>## Diagnostics</c>), covering definitions with dots in their names, recursive types, dictionaries with key patterns,
 ///     constructor-bound and required members.
 /// </summary>
@@ -27,8 +27,8 @@ public class GeneratorOutputTests
         );
         var library = await SchemaAssert.ShouldBeWellFormed(ConfigurationSchemaDocument.Serialize(ConfigurationSchemaDocument.CreateLibrarySchema(fragments)!));
 
-        // Every Dovetail object that lists properties is closed, however it is reached: sections and hoisted definitions.
-        foreach (var definition in SchemaAssert.DovetailDefinitions(application))
+        // Every Optionary object that lists properties is closed, however it is reached: sections and hoisted definitions.
+        foreach (var definition in SchemaAssert.OptionaryDefinitions(application))
         {
             foreach (var schema in SchemaAssert.Objects(definition.Value))
             {

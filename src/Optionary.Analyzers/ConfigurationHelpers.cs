@@ -5,11 +5,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
 /// <summary>
-///     The helpers <see cref="ConfigurationGenerator" /> uses, copied from the joint generator's <c>Helpers</c> and
-///     <c>MsBuildExtensions</c> so the configuration code depends on nothing outside this folder.
+///     The helpers <see cref="ConfigurationGenerator" /> uses, originally copied from Dovetail's joint generator
+///     (<c>Helpers</c> and <c>MsBuildExtensions</c>).
 /// </summary>
 internal static class ConfigurationHelpers
 {

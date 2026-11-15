@@ -4,15 +4,14 @@ using System.Globalization;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using Joinery.Dovetail.Support.Configuration;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Rocket.Surgery.Extensions.Testing.SourceGenerators;
 
-namespace Joinery.Dovetail.Analyzers.Tests;
+namespace Optionary.Analyzers.Tests;
 
 /// <summary>
-///     The JSON Schema fragments <c>[DovetailConfiguration]</c> produces. Each snapshot shows every fragment the compilation
+///     The JSON Schema fragments <c>[Optionary]</c> produces. Each snapshot shows every fragment the compilation
 ///     carries (read back from its <c>AssemblyMetadata</c>, pretty-printed) followed by the generator's diagnostics.
 /// </summary>
 public class ConfigurationSchemaTests() : GeneratorTest()
@@ -22,7 +21,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
         using System.Collections.Generic;
         using System.ComponentModel;
         using System.ComponentModel.DataAnnotations;
-        using Joinery.Dovetail.Attributes;
+        using Optionary;
         using Microsoft.Extensions.Configuration;
 
         """;
@@ -45,7 +44,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                public enum Channels { None = 0, Console = 1, Email = 2 }
 
                                /// <summary>Settings for the greeting service.</summary>
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class GreetingsOptions
                                {
                                    /// <summary>Text placed before the name.</summary>
@@ -121,16 +120,16 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class HostingSettings { public string? Name { get; set; } }
 
-                               [DovetailConfiguration("Http:Retry")]
+                               [Optionary("Http:Retry")]
                                public class RetryPolicy { public int Count { get; set; } }
 
-                               [DovetailConfiguration("Shared:A")]
+                               [Optionary("Shared:A")]
                                public class SharedAOptions { public string? Value { get; set; } }
 
-                               [DovetailConfiguration("Shared:B")]
+                               [Optionary("Shared:B")]
                                public class SharedBOptions { public string? Value { get; set; } }
                                """
                            )
@@ -152,14 +151,14 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                /// <summary>A server to connect to.</summary>
                                /// <param name="Host">The host name.</param>
                                /// <param name="Port">The port to connect on.</param>
-                               [DovetailConfiguration]
+                               [Optionary]
                                public record ServerOptions(string Host, int Port = 8080)
                                {
                                    /// <summary>Whether to use TLS.</summary>
                                    public bool Secure { get; init; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class ConnectionOptions(string server)
                                {
                                    /// <summary>The server's address.</summary>
@@ -185,19 +184,19 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public abstract class AbstractOptions { }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class GenericOptions<T> { }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class Options { }
 
-                               [DovetailConfiguration("A::B")]
+                               [Optionary("A::B")]
                                public class BadPathOptions { }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class UnsupportedOptions
                                {
                                    public object? Anything { get; set; }
@@ -207,7 +206,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                    public string? Kept { get; set; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class CollidingOptions
                                {
                                    public string? Name { get; set; }
@@ -216,7 +215,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                    public string? Other { get; set; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class AmbiguousOptions
                                {
                                    public AmbiguousOptions(int a) { }
@@ -225,20 +224,20 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                    public string? B { get; set; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class OrphanParameterOptions(string unmatched)
                                {
                                    public string? Name { get; set; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class TreeOptions
                                {
                                    public string? Name { get; set; }
                                    public TreeOptions? Child { get; set; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class AnnotationOptions
                                {
                                    [Range(1, 10)]
@@ -290,7 +289,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
         var result = await ConfigurationBuilder
                           .AddConfigurationOptionsReferences()
                           .AddCompilationReferences(thirdParty)
-                          .AddSources("[assembly: Joinery.Dovetail.Attributes.DovetailConfiguration<ThirdParty.ClientOptions>(\"Client\")]")
+                          .AddSources("[assembly: Optionary.Optionary<ThirdParty.ClientOptions>(\"Client\")]")
                           .AddAdditionalText(
                                documentationPath,
                                """
@@ -306,7 +305,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                </doc>
                                """
                            )
-                          .AddOption(documentationPath, "build_metadata.AdditionalFiles.DovetailReferenceDocumentation", "true")
+                          .AddOption(documentationPath, "build_metadata.AdditionalFiles.OptionaryReferenceDocumentation", "true")
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
@@ -317,13 +316,13 @@ public class ConfigurationSchemaTests() : GeneratorTest()
     public async Task Lists_required_members_when_asked()
     {
         var result = await WithAnnotations()
-                          .AddGlobalOption("build_property.DovetailConfigurationSchemaRequired", "true")
+                          .AddGlobalOption("build_property.OptionarySchemaRequired", "true")
                           .AddSources(
                                Usings
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public record DatabaseOptions(string ConnectionString, int Port, int? Timeout = null)
                                {
                                    [Required]
@@ -356,7 +355,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                [TypeConverter(typeof(TypeConverter))]
                                public class Money { public decimal Amount { get; set; } public string? Currency { get; set; } }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class TypesOptions
                                {
                                    public System.Globalization.CultureInfo? Culture { get; set; }
@@ -404,7 +403,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                    public int Value { get; set; } = seed;
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class ClientOptions
                                {
                                    public Limits Limits { get; } = new();
@@ -428,12 +427,12 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class Tags : List<string> { }
 
                                public class Outer<T>
                                {
-                                   [DovetailConfiguration]
+                                   [Optionary]
                                    public class InnerOptions { public string? Value { get; set; } }
                                }
                                """
@@ -453,7 +452,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class BlankOptions
                                {
                                    /// <summary>Who to greet.</summary>
@@ -462,7 +461,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                    public string Greeting { get; set; } = "Hi";
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public record BlankRecordOptions(string Name = "", string Greeting = "Hi");
                                """
                            )
@@ -489,12 +488,12 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                           .AddSources(
                                Usings
                              + """
-                               [assembly: DovetailConfiguration<Sample.TwiceOptions>("Second")]
-                               [assembly: DovetailConfiguration<Sample.AssemblyOnlyOptions>("Elsewhere")]
+                               [assembly: Optionary<Sample.TwiceOptions>("Second")]
+                               [assembly: Optionary<Sample.AssemblyOnlyOptions>("Elsewhere")]
 
                                namespace Sample;
 
-                               [DovetailConfiguration("First")]
+                               [Optionary("First")]
                                public class TwiceOptions { public string? Value { get; set; } }
 
                                public class AssemblyOnlyOptions { public string? Value { get; set; } }
@@ -506,8 +505,8 @@ public class ConfigurationSchemaTests() : GeneratorTest()
         // Two assembly attributes for different types must compile (the attribute has to allow several uses on the assembly).
         await result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error && z.Id.StartsWith("CS", StringComparison.Ordinal)).Should().BeEmpty();
         var diagnostics = result.Results[typeof(ConfigurationGenerator)].Diagnostics;
-        await diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["DT0015"], CollectionOrdering.Matching);
-        await diagnostics[0].GetMessage(CultureInfo.InvariantCulture).Should().BeEqualTo("'Sample.TwiceOptions' is configured more than once; a type can have only one [DovetailConfiguration]");
+        await diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["OPT0010"], CollectionOrdering.Matching);
+        await diagnostics[0].GetMessage(CultureInfo.InvariantCulture).Should().BeEqualTo("'Sample.TwiceOptions' is configured more than once; a type can have only one [Optionary]");
         // The assembly attribute is the one reported, and only the class declaration produces a fragment.
         await diagnostics[0].Location.SourceTree!.ToString().Substring(diagnostics[0].Location.SourceSpan.Start, diagnostics[0].Location.SourceSpan.Length).Should().Contain("\"Second\"");
         await Fragments(result).Keys.Should().BeEquivalentTo(["First", "Elsewhere"]);
@@ -520,8 +519,8 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                           .AddSources(
                                Usings
                              + """
-                               [assembly: DovetailConfiguration<Sample.RepeatedOptions>("First")]
-                               [assembly: DovetailConfiguration<Sample.RepeatedOptions>("Second")]
+                               [assembly: Optionary<Sample.RepeatedOptions>("First")]
+                               [assembly: Optionary<Sample.RepeatedOptions>("Second")]
 
                                namespace Sample;
 
@@ -533,7 +532,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
 
         await result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error && z.Id.StartsWith("CS", StringComparison.Ordinal)).Should().BeEmpty();
         var diagnostics = result.Results[typeof(ConfigurationGenerator)].Diagnostics;
-        await diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["DT0015"], CollectionOrdering.Matching);
+        await diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["OPT0010"], CollectionOrdering.Matching);
         // The first declaration wins and the repeat produces nothing.
         await Fragments(result).Keys.Should().BeEquivalentTo(["First"], CollectionOrdering.Matching);
     }
@@ -553,7 +552,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                    public virtual string? Name { get; set; }
                                }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class DerivedOptions : BaseOptions
                                {
                                    public override string? Name { get; set; }
@@ -587,7 +586,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                public abstract class Base { public string? Name { get; set; } }
                                public class Derived : Base { public string? Extra { get; set; } }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class ShapesOptions
                                {
                                    public IShape Shape { get; set; } = new Square();
@@ -617,7 +616,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                namespace Sample;
 
                                /**/
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class QuietOptions
                                {
                                    /**/
@@ -630,7 +629,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
 
         var text = Describe(result);
         await text.Should().Contain("## Quiet");
-        await text.Should().NotContain("DT0014");
+        await text.Should().NotContain("OPT0009");
     }
 
     [Test]
@@ -642,7 +641,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class CallbackOptions { public Action? Callback { get; set; } }
                                """
                            )
@@ -650,7 +649,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                           .GenerateAsync(TestContext.CancellationToken);
 
         var diagnostics = result.Results[typeof(ConfigurationGenerator)].Diagnostics;
-        await diagnostics.Should().Contain(z => z.Id == "DT0009");
+        await diagnostics.Should().Contain(z => z.Id == "OPT0004");
         await diagnostics.Should().All(z => z.Location.SourceTree != null);
     }
 
@@ -669,10 +668,10 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                           .AddSources(
                                Usings
                              + "namespace Sample;\n"
-                             + "[DovetailConfiguration] public class DeepOptions { public Level1 Root { get; set; } = new(); }\n"
+                             + "[Optionary] public class DeepOptions { public Level1 Root { get; set; } = new(); }\n"
                              + levels
                              + "\npublic class Level13 { public int Value { get; set; } }\npublic class Node<T> { public Node<Node<T>>? Next { get; set; } }\n"
-                             + "[DovetailConfiguration] public class EndlessOptions { public Node<int>? Start { get; set; } }\n"
+                             + "[Optionary] public class EndlessOptions { public Node<int>? Start { get; set; } }\n"
                            )
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
@@ -683,7 +682,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
         using var deep = JsonDocument.Parse(fragments["Deep"]);
         await deep.RootElement.GetProperty("definitions").EnumerateObject().Count().Should().BeEqualTo(13);
         await fragments["Deep"].Length.Should().BeLessThan(10_000);
-        await result.Results[typeof(ConfigurationGenerator)].Diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["DT0012"], CollectionOrdering.Matching);
+        await result.Results[typeof(ConfigurationGenerator)].Diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["OPT0007"], CollectionOrdering.Matching);
     }
 
     /// <summary>
@@ -700,7 +699,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                                namespace Sample;
 
                                /// <summary>Settings for the greeting service.</summary>
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class GreetingsOptions
                                {
                                    public string Message { get; set; } = "Hello";
@@ -727,7 +726,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
         );
 
         var steps = driver.GetRunResult().Results.Single().TrackedSteps;
-        foreach (var name in new[] { "dovetail:configuration_classes", "dovetail:configuration_sections" })
+        foreach (var name in new[] { "optionary:classes", "optionary:sections" })
         {
             var reasons = new List<IncrementalStepRunReason>();
             foreach (var step in steps[name])
@@ -765,25 +764,25 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class GreetingsOptions { public string? Message { get; set; } }
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class HttpClientOptions { public string? BaseAddress { get; set; } }
 
-                               [DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.Camel)]
+                               [Optionary(KeyStyle = ConfigurationKeyStyle.Camel)]
                                public class HttpClientSettings { public string? BaseAddress { get; set; } }
 
-                               [DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.Camel)]
+                               [Optionary(KeyStyle = ConfigurationKeyStyle.Camel)]
                                public class OpenAIConfig { public string? ApiKey { get; set; } }
 
-                               [DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.Dash)]
+                               [Optionary(KeyStyle = ConfigurationKeyStyle.Dash)]
                                public class HttpClientConfiguration { public string? BaseAddress { get; set; } }
 
-                               [DovetailConfiguration("Http:RetryPolicy", KeyStyle = ConfigurationKeyStyle.Dash)]
+                               [Optionary("Http:RetryPolicy", KeyStyle = ConfigurationKeyStyle.Dash)]
                                public class ExplicitSectionOptions { public int MaxAttempts { get; set; } }
 
-                               [DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.Dash)]
+                               [Optionary(KeyStyle = ConfigurationKeyStyle.Dash)]
                                public class OpenAIOptions { public string? ApiKey { get; set; } }
                                """
                            )
@@ -800,8 +799,8 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                           .AddSources(
                                Usings
                              + """
-                               [assembly: DovetailConfiguration<Sample.ThirdPartyOptions>(KeyStyle = ConfigurationKeyStyle.Dash)]
-                               [assembly: DovetailConfiguration<Sample.CamelThirdPartyOptions>("Third:Camel", KeyStyle = ConfigurationKeyStyle.Camel)]
+                               [assembly: Optionary<Sample.ThirdPartyOptions>(KeyStyle = ConfigurationKeyStyle.Dash)]
+                               [assembly: Optionary<Sample.CamelThirdPartyOptions>("Third:Camel", KeyStyle = ConfigurationKeyStyle.Camel)]
 
                                namespace Sample;
 
@@ -836,10 +835,10 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + $$"""
                                  namespace Sample;
 
-                                 [DovetailConfiguration("Default", KeyStyle = ConfigurationKeyStyle.Undefined)]
+                                 [Optionary("Default", KeyStyle = ConfigurationKeyStyle.Undefined)]
                                  public class DefaultOptions { {{members}} }
 
-                                 [DovetailConfiguration("Explicit", KeyStyle = ConfigurationKeyStyle.Pascal)]
+                                 [Optionary("Explicit", KeyStyle = ConfigurationKeyStyle.Pascal)]
                                  public class ExplicitOptions { {{members}} }
 
                                  public class Nested { public int WaitTime { get; set; } }
@@ -878,10 +877,10 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration("First")]
+                               [Optionary("First")]
                                public class FirstOptions { public LowerNested Inner { get; set; } = new(); }
 
-                               [DovetailConfiguration("Second", KeyStyle = ConfigurationKeyStyle.Pascal)]
+                               [Optionary("Second", KeyStyle = ConfigurationKeyStyle.Pascal)]
                                public class SecondOptions { public LowerNested Inner { get; set; } = new(); }
 
                                public class LowerNested { public int waitTime { get; set; } }
@@ -892,7 +891,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
 
         await result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error && z.Id.StartsWith("CS", StringComparison.Ordinal)).Should().BeEmpty();
         var diagnostics = result.Results[typeof(ConfigurationGenerator)].Diagnostics;
-        await diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["DT0016"], CollectionOrdering.Matching);
+        await diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["OPT0011"], CollectionOrdering.Matching);
         await Fragments(result).Keys.Should().BeEquivalentTo(["First"], CollectionOrdering.Matching);
     }
 
@@ -905,10 +904,10 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration(KeyStyle = ConfigurationKeyStyle.Underscore)]
+                               [Optionary(KeyStyle = ConfigurationKeyStyle.Underscore)]
                                public class HttpClientOptions { public int MaxConnections { get; set; } }
 
-                               [DovetailConfiguration("Explicit:Section", KeyStyle = ConfigurationKeyStyle.Underscore)]
+                               [Optionary("Explicit:Section", KeyStyle = ConfigurationKeyStyle.Underscore)]
                                public class ExplicitOptions { public int MaxConnections { get; set; } }
                                """
                            )
@@ -929,13 +928,13 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration("First", KeyStyle = ConfigurationKeyStyle.Camel)]
+                               [Optionary("First", KeyStyle = ConfigurationKeyStyle.Camel)]
                                public class FirstOptions { public RetryOptions Retry { get; set; } = new(); }
 
-                               [DovetailConfiguration("Second", KeyStyle = ConfigurationKeyStyle.Dash)]
+                               [Optionary("Second", KeyStyle = ConfigurationKeyStyle.Dash)]
                                public class SecondOptions { public RetryOptions Retry { get; set; } = new(); }
 
-                               [DovetailConfiguration("Third", KeyStyle = ConfigurationKeyStyle.Camel)]
+                               [Optionary("Third", KeyStyle = ConfigurationKeyStyle.Camel)]
                                public class ThirdOptions { public RetryOptions Retry { get; set; } = new(); }
 
                                public class RetryOptions { public int MaxAttempts { get; set; } }
@@ -946,13 +945,13 @@ public class ConfigurationSchemaTests() : GeneratorTest()
 
         await result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error && z.Id.StartsWith("CS", StringComparison.Ordinal)).Should().BeEmpty();
         var diagnostics = result.Results[typeof(ConfigurationGenerator)].Diagnostics;
-        await diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["DT0016"], CollectionOrdering.Matching);
+        await diagnostics.Select(z => z.Id).Should().BeEquivalentTo(["OPT0011"], CollectionOrdering.Matching);
         await diagnostics[0].Severity.Should().BeEqualTo(DiagnosticSeverity.Error);
         await diagnostics[0].GetMessage(CultureInfo.InvariantCulture).Should().BeEqualTo("'Sample.RetryOptions' is bound with more than one key style; use the same KeyStyle for every section that reaches it, or give the shared type [ConfigurationKeyName] attributes");
         // The later declaration is the one reported, and it produces nothing; the earlier ones, and a later one in the same style, still do.
         await diagnostics[0].Location.SourceTree!.ToString().Substring(diagnostics[0].Location.SourceSpan.Start, diagnostics[0].Location.SourceSpan.Length).Should().Contain("\"Second\"");
         await Fragments(result).Keys.Should().BeEquivalentTo(["First", "Third"]);
-        await result.Results[typeof(ConfigurationGenerator)].SyntaxTrees.Select(z => Path.GetFileName(z.FilePath)).Should().Contain("Dovetail_ConfigurationOptions.g.cs");
+        await result.Results[typeof(ConfigurationGenerator)].SyntaxTrees.Select(z => Path.GetFileName(z.FilePath)).Should().Contain("Optionary.Options.g.cs");
     }
 
     [Test]
@@ -964,14 +963,14 @@ public class ConfigurationSchemaTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration("A", KeyStyle = ConfigurationKeyStyle.Camel)]
+                               [Optionary("A", KeyStyle = ConfigurationKeyStyle.Camel)]
                                public class AOptions { public NamedRetry Retry { get; set; } = new(); public SharedRetry Shared { get; set; } = new(); }
 
-                               [DovetailConfiguration("B", KeyStyle = ConfigurationKeyStyle.Dash)]
+                               [Optionary("B", KeyStyle = ConfigurationKeyStyle.Dash)]
                                public class BOptions { public NamedRetry Retry { get; set; } = new(); }
 
                                // Described only: nothing is bound, so there is no binder to disagree with.
-                               [DovetailConfiguration("C", KeyStyle = ConfigurationKeyStyle.Dash, RegisterOptions = false)]
+                               [Optionary("C", KeyStyle = ConfigurationKeyStyle.Dash, RegisterOptions = false)]
                                public class COptions { public SharedRetry Shared { get; set; } = new(); }
 
                                public class NamedRetry
@@ -994,7 +993,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
     /// <summary>The raw schema fragments in the compilation, by section.</summary>
     private static Dictionary<string, string> Fragments(GeneratorTestResults result)
     {
-        const string prefix = "Dovetail.ConfigurationSchema.v1:";
+        const string prefix = "Optionary.Schema.v1:";
         return result.FinalCompilation.Assembly.GetAttributes()
                      .Select(z => z is { AttributeClass.Name: "AssemblyMetadataAttribute", ConstructorArguments: [{ Value: string key }, { Value: string value }] } ? (key, value) : default)
                      .Where(z => z.key?.StartsWith(prefix, StringComparison.Ordinal) == true)
@@ -1008,7 +1007,7 @@ public class ConfigurationSchemaTests() : GeneratorTest()
         var compileErrors = result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error && z.Id.StartsWith("CS", StringComparison.Ordinal)).ToArray();
         if (compileErrors.Length > 0) throw new InvalidOperationException(string.Join(Environment.NewLine, compileErrors.Select(z => z.ToString())));
 
-        const string prefix = "Dovetail.ConfigurationSchema.v1:";
+        const string prefix = "Optionary.Schema.v1:";
         var options = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping };
         var text = new StringBuilder();
         foreach (var attribute in result.FinalCompilation.Assembly.GetAttributes())

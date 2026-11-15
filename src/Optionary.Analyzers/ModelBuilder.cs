@@ -1,13 +1,13 @@
 using System.Globalization;
-using Joinery.Dovetail.Support.Configuration.Binding;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Optionary.Analyzers.Binding;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
 /// <summary>
-///     Turns a <c>[DovetailConfiguration]</c> declaration into a <see cref="ConfigurationSection" />, describing what Microsoft's
+///     Turns a <c>[Optionary]</c> declaration into a <see cref="ConfigurationSection" />, describing what Microsoft's
 ///     configuration-binding source generator fills: settable, init-only and constructor-bound properties, plus get-only
 ///     collections and objects it binds in place. Each object type becomes one <see cref="SchemaDefinition" />.
 /// </summary>
@@ -68,7 +68,7 @@ internal sealed class ModelBuilder
         _cancellationToken = cancellationToken;
     }
 
-    /// <summary>Builds the section for one <c>[DovetailConfiguration]</c> attribute.</summary>
+    /// <summary>Builds the section for one <c>[Optionary]</c> attribute.</summary>
     /// <param name="attribute">The attribute.</param>
     /// <param name="attributedType">The class it's on, or <see langword="null" /> on the assembly.</param>
     /// <param name="compilation">The compilation, for the binder's view of the type.</param>
@@ -76,7 +76,7 @@ internal sealed class ModelBuilder
     public static ConfigurationDeclaration Build(AttributeData attribute, INamedTypeSymbol? attributedType, Compilation compilation, CancellationToken cancellationToken)
     {
         string? section = null;
-        // The class form's options type is the class; the assembly form's is the type argument of DovetailConfiguration<T>.
+        // The class form's options type is the class; the assembly form's is the type argument of Optionary<T>.
         var type = attributedType ?? attribute.AttributeClass?.TypeArguments.FirstOrDefault();
         foreach (var argument in attribute.ConstructorArguments)
         {

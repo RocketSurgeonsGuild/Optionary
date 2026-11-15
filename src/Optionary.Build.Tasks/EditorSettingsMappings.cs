@@ -1,9 +1,9 @@
 using System.Text;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
-///     What Dovetail maps for one host in VS Code's settings: the host's merged schema, and the configuration files it applies to
+///     What Optionary maps for one host in VS Code's settings: the host's merged schema, and the configuration files it applies to
 ///     in each of the three formats. Every path is relative to the folder that holds <c>.vscode</c>, which is where VS Code
 ///     resolves relative schema paths from.
 /// </summary>

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace Joinery.Dovetail.Build.Tasks;
+namespace Optionary.Build.Tasks;
 
 /// <summary>
 ///     A node of a parsed JSONC document. Positions are offsets into the text that was parsed, so a caller can splice new text

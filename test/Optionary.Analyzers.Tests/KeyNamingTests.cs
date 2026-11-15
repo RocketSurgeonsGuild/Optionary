@@ -1,8 +1,7 @@
 using System.Text;
 using System.Text.Json;
-using Joinery.Dovetail.Support.Configuration;
 
-namespace Joinery.Dovetail.Analyzers.Tests;
+namespace Optionary.Analyzers.Tests;
 
 /// <summary>
 ///     The generator's own spelling of camel-case, dash-case and underscore-case keys (it targets netstandard2.0, so it can't use

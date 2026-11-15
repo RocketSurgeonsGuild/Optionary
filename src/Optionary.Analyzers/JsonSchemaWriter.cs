@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace Joinery.Dovetail.Support.Configuration;
+namespace Optionary.Analyzers;
 
 /// <summary>
 ///     Writes a section's schema as compact draft-07 JSON. Output is deterministic: keywords in a fixed order, properties in

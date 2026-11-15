@@ -3,17 +3,17 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Options;
 using Rocket.Surgery.Extensions.Testing.SourceGenerators;
 
-namespace Joinery.Dovetail.Analyzers.Tests;
+namespace Optionary.Analyzers.Tests;
 
 /// <summary>
-///     The seam Optionary takes over: the configuration generator, running alone, emits
+///     The registration method: the generator emits
 ///     <c>OptionaryConfigurationOptions.AddOptionaryConfigurationOptions</c> in the <c>RootNamespace</c> build property, or the global
-///     namespace when there is none. The joint Dovetail exports to call it is covered by <see cref="OptionsJointTests" />.
+///     namespace when there is none.
 /// </summary>
 public class OptionsRegistrationMethodTests() : GeneratorTest()
 {
     private const string Usings = """
-        using Joinery.Dovetail.Attributes;
+        using Optionary;
 
         """;
 
@@ -21,7 +21,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
       + """
         namespace Sample;
 
-        [DovetailConfiguration]
+        [Optionary]
         public class GreetingsOptions
         {
             public string Message { get; set; } = "Hello";
@@ -31,10 +31,8 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
     [Test]
     public async Task Emits_the_registration_method_in_the_root_namespace()
     {
-        // The exports namespace is set on purpose: the method follows RootNamespace, not DovetailExportNamespace.
         var result = await Options()
                           .AddGlobalOption("build_property.RootNamespace", "Sample.App")
-                          .AddGlobalOption("build_property.DovetailExportNamespace", "Sample.Exports")
                           .AddSources(OptionsClass)
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
@@ -60,7 +58,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration(RegisterOptions = false)]
+                               [Optionary(RegisterOptions = false)]
                                public class SchemaOnlyOptions
                                {
                                    public string? Value { get; set; }
@@ -83,7 +81,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                              + """
                                namespace Sample;
 
-                               [DovetailConfiguration]
+                               [Optionary]
                                public class RefOptions
                                {
                                    public RefOptions(ref int value) => Value = value;
