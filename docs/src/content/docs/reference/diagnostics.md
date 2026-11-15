@@ -101,16 +101,22 @@ the shared type `[ConfigurationKeyName]` attributes. See [key styles](../../guid
 `Optionary.targets`, before `CoreCompile`, when `Optionary.dll` is among the resolved references (`@(ReferencePath)`) and
 no `@(Analyzer)` item has the file name `Optionary.Analyzers`:
 
-> _Project_ references Optionary.dll, but Optionary's source generator (Optionary.Analyzers) isn't loaded, so its
-> [Optionary] types get no AddOptionaryConfigurationOptions registration method or configuration schema. Don't exclude the
-> Optionary package's analyzers (remove ExcludeAssets="analyzers", or add analyzers to IncludeAssets), and build with the
-> .NET 10 SDK or later, whose compiler (Roslyn 5.0 or later) Optionary's generator supports.
+> _Project_ references Optionary.dll, but Optionary's source generator (Optionary.Analyzers) isn't loaded: no @(Analyzer)
+> item is Optionary.Analyzers, so its [Optionary] types get no AddOptionaryConfigurationOptions registration method or
+> configuration schema. Look for a target (in the project, a Directory.Build.targets, or another package) that removes
+> Optionary.Analyzers from @(Analyzer), and build with the .NET 10 SDK or later: the package has generators only for Roslyn
+> 5.0 and later, so an older compiler loads none.
 
 Without the generator nothing is bound and no registration method exists.
 
 It happens when:
 
-- the package reference excludes analyzers, for example `ExcludeAssets="analyzers"`; or
-- the compiler is older than Roslyn 5.0, for which the package has no generator.
+- a target removes `Optionary.Analyzers` from `@(Analyzer)`; or
+- the compiler is older than Roslyn 5.0, so none of the package's generator slices matches it.
 
-Remove the exclusion, or build with the .NET 10 SDK or later. See [troubleshooting](../../troubleshooting/).
+`ExcludeAssets="analyzers"` doesn't cause it: the .NET SDK passes a package's analyzers to the compiler whatever the
+reference excludes, so the generator still runs. `ExcludeAssets="build"` or `"all"` skips `Optionary.targets`, and with it
+this check; see [troubleshooting](../../troubleshooting/#cs0234-cs0103-or-cs1061-at-a-call-to-addoptionaryconfigurationoptions)
+for what you see then.
+
+Remove the target, or build with the .NET 10 SDK or later. See [troubleshooting](../../troubleshooting/).
