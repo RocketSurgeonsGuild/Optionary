@@ -1,0 +1,17 @@
+﻿{
+  Projects: [
+    {
+      Name: lib
+    }
+  ],
+  Packages: [
+    {
+      PackageId: lib,
+      Version: {Scrubbed},
+      Files: [
+        ConfigurationSchema.json,
+        lib/{TargetFramework}/lib.dll
+      ]
+    }
+  ]
+}
