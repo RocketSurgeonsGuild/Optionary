@@ -1,0 +1,29 @@
+<Project>
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+  <!--
+      Build infrastructure rather than Optionary consumers: no configuration schema files, which for Optionary.Build.Tasks would
+      also need the very tasks it builds.
+  -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Optionary.Build.Tasks' or $(MSBuildProjectName.StartsWith('Optionary.Analyzers'))">
+    <OptionarySchema>false</OptionarySchema>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)Optionary/build/Optionary.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)Optionary.Build.Tasks/Optionary.Build.Tasks.InRepo.targets" />
+  <!--
+    Analyzer release tracking (RS2000-RS2008) for every analyzer/generator project:
+    https://github.com/dotnet/roslyn/blob/main/src/RoslynAnalyzers/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
+    On release, move the entries from AnalyzerReleases.Unshipped.md into a new "## Release x.y.z" section of AnalyzerReleases.Shipped.md.
+  -->
+  <ItemGroup Condition="'$(EnforceExtendedAnalyzerRules)' == 'true'">
+    <AdditionalFiles Include="AnalyzerReleases.Shipped.md;AnalyzerReleases.Unshipped.md" />
+  </ItemGroup>
+  <!--
+    Public API tracking (Microsoft.CodeAnalysis.PublicApiAnalyzers, a GlobalPackageReference): every packable project lists its
+    public surface in PublicAPI.Shipped.txt and PublicAPI.Unshipped.txt next to its project file. On release, move the
+    Unshipped entries into Shipped.
+  -->
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <AdditionalFiles Include="PublicAPI.Shipped.txt;PublicAPI.Unshipped.txt" />
+  </ItemGroup>
+  <!-- Each project names its own test assemblies (InternalsVisibleTo items in its project file). -->
+</Project>

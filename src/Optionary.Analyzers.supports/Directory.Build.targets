@@ -1,0 +1,13 @@
+<Project>
+    <ItemGroup>
+        <PackageReference Include="Polyfill" PrivateAssets="all" />
+        <PackageReference Include="Rocket.Surgery.AssemblyInfo" PrivateAssets="all" />
+        <Compile Include="$(MSBuildThisFileDirectory)..\Optionary.Analyzers\**\*.cs" Exclude="$(MSBuildThisFileDirectory)..\Optionary.Analyzers\obj\**\*.cs;$(MSBuildThisFileDirectory)..\Optionary.Analyzers\bin\**\*.cs" />
+    </ItemGroup>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+    <!-- These builds compile Optionary.Analyzers' sources, so they track its rules too. -->
+    <ItemGroup>
+        <AdditionalFiles Remove="AnalyzerReleases.Shipped.md;AnalyzerReleases.Unshipped.md" />
+        <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\Optionary.Analyzers\AnalyzerReleases.Shipped.md;$(MSBuildThisFileDirectory)..\Optionary.Analyzers\AnalyzerReleases.Unshipped.md" />
+    </ItemGroup>
+</Project>

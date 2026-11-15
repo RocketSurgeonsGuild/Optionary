@@ -1,0 +1,24 @@
+<Project>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Testing.Extensions.CrashDump" />
+        <PackageReference Include="Microsoft.Testing.Extensions.HangDump" />
+        <PackageReference Include="Bogus" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Testing.TUnit" />
+        <PackageReference Include="TUnit" />
+        <PackageReference Include="TUnit.Mocks" />
+        <PackageReference Include="TUnit.Assertions.Should" />
+        <Using Include="TUnit.Assertions.Should" />
+        <Using Include="TUnit.Assertions.Should.Extensions" />
+        <Using Include="TUnit.Assertions.Enums" />
+        <PackageReference Include="Verify.TUnit" />
+        <ProjectReference
+            Include="$(MSBuildThisFileDirectory)../src/Optionary.Analyzers/Optionary.Analyzers.csproj"
+            OutputItemType="Analyzer"
+            ReferenceOutputAssembly="false"
+            Condition="!$(MSBuildProjectName.StartsWith('Optionary.Analyzers.'))"
+        />
+    </ItemGroup>
+    <Import Project="$(MSBuildThisFileDirectory)../src/Optionary/build/Optionary.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)../src/Optionary.Build.Tasks/Optionary.Build.Tasks.InRepo.targets" />
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        Optionary's source generator. It ships inside the Optionary package (analyzers/dotnet/roslyn5.x/cs, see Optionary.csproj),
+        built once against the newest Roslyn here and against older ones in Optionary.Analyzers.supports.
+    -->
+    <PropertyGroup>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <IsRoslynComponent>true</IsRoslynComponent>
+        <RootNamespace>Optionary.Analyzers</RootNamespace>
+        <DefineConstants>$(DefineConstants);ROSLYN_CURRENT</DefineConstants>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <NoWarn>$(NoWarn);MSB3277</NoWarn>
+        <!-- The generator stamps [GeneratedCode] from its AssemblyInfo constants. Nothing of it ships, so no manifest is written, and the
+             dependency accessors load assemblies, which analyzers may not. -->
+        <GenerateAssemblyInfoManifest>false</GenerateAssemblyInfoManifest>
+        <AssemblyInfoDependencies>false</AssemblyInfoDependencies>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
+        <PackageReference Include="Polyfill" PrivateAssets="all" />
+        <PackageReference Include="Rocket.Surgery.AssemblyInfo" PrivateAssets="all" />
+        <!--
+            Built only so Optionary can pack their outputs. Private="false" keeps their content from flowing on to this project and
+            every project that references the generator.
+        -->
+        <ProjectReference Include="../Optionary.Analyzers.supports/Optionary.Analyzers.roslyn5.0.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" Private="false" />
+        <ProjectReference Include="../Optionary.Analyzers.supports/Optionary.Analyzers.roslyn5.3.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" Private="false" />
+        <ProjectReference Include="../Optionary.Analyzers.supports/Optionary.Analyzers.roslyn5.6.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" Private="false" />
+    </ItemGroup>
+</Project>

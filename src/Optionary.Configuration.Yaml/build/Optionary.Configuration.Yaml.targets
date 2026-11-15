@@ -1,0 +1,6 @@
+<Project>
+  <!--
+      The YAML joint templates (DovetailTemplate items, only for applications and test projects) and BlazorConfigurationFile
+      metadata arrive with the code import (RocketSurgeonsGuild/Optionary#4).
+  -->
+</Project>

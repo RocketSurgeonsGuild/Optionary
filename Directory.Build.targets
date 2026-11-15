@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+    <!--
+        A project that references Rocket.Surgery.AssemblyInfo gets its generated AssemblyInfo class in its own root namespace (set here, after
+        the SDK has defaulted RootNamespace). In the global namespace every such project would have the same AssemblyInfo, so a project that
+        sees another's internals would bind typeof(AssemblyInfo) to its own copy, and Specular, which can anchor an assembly with that type,
+        would scan the wrong one.
+    -->
+    <PropertyGroup>
+        <AssemblyInfoNamespace Condition="'$(AssemblyInfoNamespace)' == ''">$(RootNamespace)</AssemblyInfoNamespace>
+    </PropertyGroup>
+    <!-- Runtime async: net11.0+ only (the flag breaks net10.0 builds). Opt out per project with UseRuntimeAsync=false. -->
+    <PropertyGroup Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net11.0')) and '$(UseRuntimeAsync)' != 'false'">
+        <Features>$(Features);runtime-async=on</Features>
+    </PropertyGroup>
+    <!--
+        Public API tracking (Microsoft.CodeAnalysis.PublicApiAnalyzers, a GlobalPackageReference) is for the shipped packages, which
+        keep PublicAPI.Shipped.txt / PublicAPI.Unshipped.txt beside their project files (src/Directory.Build.targets). Projects that
+        don't pack (tests, the generator, the MSBuild tasks) would otherwise have to list their public types too.
+    -->
+    <Target Name="_RemovePublicApiAnalyzers" BeforeTargets="CoreCompile" Condition="'$(IsPackable)' != 'true'">
+        <ItemGroup>
+            <Analyzer Remove="@(Analyzer)" Condition="'%(Analyzer.NuGetPackageId)' == 'Microsoft.CodeAnalysis.PublicApiAnalyzers'" />
+        </ItemGroup>
+    </Target>
+    <!--
+        On CI, skip Verify's sponsor check: the Verify_SponsorshipExemption in Directory.Build.props already settles it. The check calls
+        MSBuild on every project reference of each test project's inner build, and each call waits for the node that owns that
+        configuration, which holds up test builds behind unrelated compiles (LaunchPad #3203 measured 12,226 s of that waiting).
+        ContinuousIntegrationBuild comes from Rocket.Surgery.MSBuild.CI's props, which load after Directory.Build.props, so this has
+        to be in a .targets file. The suffix is Verify's hash of its package id; if Verify renames the property this just stops applying.
+    -->
+    <PropertyGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
+        <_SponsorCheck_OwnerVerified_Verify_eea2745e>true</_SponsorCheck_OwnerVerified_Verify_eea2745e>
+    </PropertyGroup>
+</Project>

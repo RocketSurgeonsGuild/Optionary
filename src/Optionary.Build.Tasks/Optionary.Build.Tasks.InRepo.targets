@@ -1,0 +1,25 @@
+<Project>
+  <!--
+      In-repo builds (src and test import this from their Directory.Build.targets) run Optionary's MSBuild tasks from this
+      project's output instead of a packed Optionary: Optionary.Schema.targets only registers the packed copy when
+      _OptionaryBuildTasksAssembly is empty. TaskHostFactory runs each call in a short-lived task host, so no long-lived MSBuild
+      node keeps (and locks) an old copy of the DLL while it is rebuilt.
+
+      The UsingTask entries, one per task with TaskFactory="TaskHostFactory", arrive with the tasks themselves
+      (RocketSurgeonsGuild/Optionary#4).
+  -->
+  <PropertyGroup>
+    <_OptionaryBuildTasksAssembly>$(MSBuildThisFileDirectory)bin/$(Configuration)/netstandard2.0/Optionary.Build.Tasks.dll</_OptionaryBuildTasksAssembly>
+  </PropertyGroup>
+  <!--
+      Builds the tasks first. Not a real reference: nothing compiles against it and no package depends on it.
+  -->
+  <ItemGroup Condition="'$(OptionarySchema)' != 'false' and '@(ProjectReference->AnyHaveMetadataValue('Filename', 'Optionary.Build.Tasks'))' != 'true'">
+    <ProjectReference
+      Include="$(MSBuildThisFileDirectory)Optionary.Build.Tasks.csproj"
+      ReferenceOutputAssembly="false"
+      PrivateAssets="all"
+      AdditionalProperties=""
+      IsAspireProjectResource="false" />
+  </ItemGroup>
+</Project>

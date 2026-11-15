@@ -1,0 +1,7 @@
+<Project>
+  <!--
+      Optionary's compiler-visible properties and defaults. Imported by package consumers (build/, buildTransitive/ and
+      buildMultiTargeting/) and by this repository's own projects (src/Directory.Build.props). The real content arrives with
+      the code import (RocketSurgeonsGuild/Optionary#4).
+  -->
+</Project>

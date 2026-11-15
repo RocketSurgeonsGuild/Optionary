@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <PackageDescription>Source-generated, reflection-free options binding and JSON Schema for .NET configuration.</PackageDescription>
+    <PackageTags>$(PackageTags);configuration;options;json-schema;source-generator</PackageTags>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <RootNamespace>Optionary</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
+  </ItemGroup>
+  <ItemGroup>
+    <!--
+        Builds the generator (and, through its references, each roslyn5.x slice) before this project packs them. Not a compile
+        reference, and not a package dependency: the generator ships inside this package.
+    -->
+    <ProjectReference
+      Include="../Optionary.Analyzers/Optionary.Analyzers.csproj"
+      ReferenceOutputAssembly="false"
+      PrivateAssets="all"
+    />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="build/*.*" Pack="true" PackagePath="build" />
+    <None Include="buildMultiTargeting/*.*" Pack="true" PackagePath="buildMultiTargeting" />
+    <None Include="buildTransitive/*.*" Pack="true" PackagePath="buildTransitive" />
+    <!--
+        The generator, once per Roslyn version (NuGet picks the highest roslynX.Y folder the compiler supports): the main project
+        compiles against the newest Roslyn, the Optionary.Analyzers.supports projects against the older ones.
+    -->
+    <None Include="../Optionary.Analyzers/bin/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.9/cs" Visible="false" />
+    <None Include="../Optionary.Analyzers.supports/bin/roslyn5.0/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs" Visible="false" />
+    <None Include="../Optionary.Analyzers.supports/bin/roslyn5.3/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.3/cs" Visible="false" />
+    <None Include="../Optionary.Analyzers.supports/bin/roslyn5.6/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.6/cs" Visible="false" />
+    <!--
+        The MSBuild tasks build/Optionary.Schema.targets will run. The in-repo wiring (Optionary.Build.Tasks.InRepo.targets)
+        builds Optionary.Build.Tasks before this project.
+    -->
+    <None Include="../Optionary.Build.Tasks/bin/$(Configuration)/netstandard2.0/Optionary.Build.Tasks.dll" Pack="true" PackagePath="build/tasks/netstandard2.0" Visible="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Optionary.Runtime.Tests" />
+  </ItemGroup>
+</Project>
