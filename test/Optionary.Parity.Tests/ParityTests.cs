@@ -1,0 +1,106 @@
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+
+namespace Optionary.Parity.Tests;
+
+/// <summary>
+///     Optionary's generated binder against Microsoft's configuration binding source generator, the oracle: on net10.0 both follow
+///     version 10 of its rules, on net11.0 version 11. Where Optionary differs on purpose (see
+///     <c>plans/configuration-json-schema-p3.md</c>), the reflection binder or the documented behaviour is the expectation instead.
+/// </summary>
+public class ParityTests
+{
+    public static IEnumerable<Func<ParityCase>> Cases() => ParityCases.All().Select(z => (Func<ParityCase>)( () => z ));
+
+    [Test]
+    [MethodDataSource(nameof(Cases))]
+    public async Task Binds_like_Microsofts_generator(ParityCase parity)
+    {
+        var configuration = parity.Build();
+
+        var microsoft = Render.Outcome(() => parity.Microsoft(configuration));
+        var optionary = Render.Outcome(() => parity.Optionary(configuration));
+
+        await optionary.Should().BeEqualTo(microsoft);
+        await Task.CompletedTask;
+    }
+
+    [Test]
+    public async Task Rebinds_when_configuration_reloads()
+    {
+        var configuration = Build(("Reload:Name", "first"), ("Reload:Count", "1"));
+        await using var provider = Binders.OptionaryServices(configuration).BuildServiceProvider();
+        var monitor = provider.GetRequiredService<IOptionsMonitor<ReloadOptions>>();
+        await monitor.CurrentValue.Name.Should().BeEqualTo("first");
+
+        var memory = (MemoryConfigurationProvider)configuration.Providers.Single();
+        memory.Set("Reload:Name", "second");
+        memory.Set("Reload:Count", "2");
+        configuration.Reload();
+
+        await monitor.CurrentValue.Name.Should().BeEqualTo("second");
+        await monitor.CurrentValue.Count.Should().BeEqualTo(2);
+        await provider.GetRequiredService<IOptionsSnapshot<ReloadOptions>>().Value.Name.Should().BeEqualTo("second");
+    }
+
+    [Test]
+    public async Task Creates_constructor_types_without_values_and_reports_missing_parameters()
+    {
+        // Get<T>() returns null for a section without values; IOptions<T>.Value can't, so Optionary calls the constructor and a
+        // missing parameter without a default throws, as it does for a section that has other values.
+        var configuration = Build(("Other", "x"));
+
+        var optionary = Render.Outcome(() => Binders.Optionary<PosRecord>(configuration));
+        var microsoftWithOtherValues = Render.Outcome(() => Build(("S:Unrelated", "x")).GetSection("S").Get<PosRecord>());
+
+        await optionary.Should().BeEqualTo(microsoftWithOtherValues);
+        await optionary.Should().Contain("has no matching config");
+        await Task.CompletedTask;
+    }
+
+    [Test]
+    [Arguments("present", true)]
+    [Arguments("missing", false)]
+    public async Task Sets_init_only_members_like_the_reflection_binder(string label, bool present)
+    {
+        var configuration = present ? Build(("S:Name", "n"), ("S:Port", "80"), ("S:Items:0", "x")) : Build(("S:Other", "x"));
+
+        var reflection = Render.Outcome(() => Binders.Reflection<InitOnlyClass>(configuration.GetSection("S")));
+        var optionary = Render.Outcome(() => Binders.Optionary<InitOnlyClass>(configuration));
+
+        // The reflection binder appends to the initial list; Optionary binds into it too, so both keep "init" first.
+        await optionary.Should().BeEqualTo(reflection).Because(label);
+        await Task.CompletedTask;
+    }
+
+    [Test]
+    [Arguments("present", true)]
+    [Arguments("missing", false)]
+    public async Task Creates_types_with_required_members_like_the_reflection_binder(string label, bool present)
+    {
+        var configuration = present ? Build(("S:Name", "n"), ("S:Port", "80")) : Build(("S:Port", "80"));
+
+        var reflection = Render.Outcome(() => Binders.Reflection<RequiredClass>(configuration.GetSection("S")));
+        var optionary = Render.Outcome(() => Binders.Optionary<RequiredClass>(configuration));
+
+        await optionary.Should().BeEqualTo(reflection).Because(label);
+        await Task.CompletedTask;
+    }
+
+    [Test]
+    public async Task Sets_init_only_members_of_collection_elements()
+    {
+        var configuration = Build(("S:InitOnlyList:0:Name", "a"), ("S:InitOnlyList:0:Port", "2"));
+
+        var reflection = Render.Outcome(() => Binders.Reflection<CollTarget>(configuration.GetSection("S"))!.InitOnlyList);
+        var optionary = Render.Outcome(() => Binders.Optionary<CollTarget>(configuration).InitOnlyList);
+
+        await optionary.Should().BeEqualTo(reflection);
+        await Task.CompletedTask;
+    }
+
+    private static IConfigurationRoot Build(params (string Key, string? Value)[] pairs) =>
+        new ConfigurationBuilder().AddInMemoryCollection(pairs.Select(z => KeyValuePair.Create(z.Key, z.Value))).Build();
+}

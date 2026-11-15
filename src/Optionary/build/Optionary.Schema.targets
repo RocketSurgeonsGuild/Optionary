@@ -1,0 +1,236 @@
+<Project>
+  <!--
+    Configuration JSON Schema files, built from the fragments Optionary's generator embeds in assemblies as
+    [assembly: AssemblyMetadata("Optionary.Schema.v1:<Section path>", "<schema of the section's value>")].
+
+      Hosts (applications and test projects) merge their own fragments and those of every assembly they reference into
+      $(BaseIntermediateOutputPath)appsettings.schema.json, a stable path editors can point at. It is strict (each Optionary
+      section and the object types it uses accept only their keys, ignoring case), embeds SchemaStore's appsettings schema, and is
+      copied to the output directory and always published, unless OptionarySchemaCopyToOutput is false. A host
+      that targets several frameworks writes that file from its first one and $(IntermediateOutputPath)appsettings.schema.json
+      from the others.
+
+      Every other project (a library) writes its own fragments to $(IntermediateOutputPath)ConfigurationSchema.json, permissive
+      and rooted at the configuration root like Aspire's, and packs it at the package root from its first target framework. A
+      library that declares no sections writes nothing.
+
+    Properties:
+      OptionarySchema=false                    no schema files at all.
+      OptionarySchemaHost=true|false           which projects are hosts. Left empty, test projects (IsTestProject) and
+                                               applications (OutputType Exe/WinExe, or an Android app) are. A host framework
+                                               (Dovetail's SDK, for one) can set it from its own application detection.
+      OptionarySchemaCopyToOutput=false        keeps a host's file in obj/: not copied to the output directory or published,
+                                               for hosts that embed their configuration (MAUI, Uno).
+      OptionaryReferenceDocumentation=false    doesn't pass referenced packages' XML documentation to the generator.
+      OptionarySchemaStrict=false              leaves Optionary's sections open (no propertyNames) in the host file.
+      OptionarySchemaIncludeSchemaStore=false  leaves SchemaStore's appsettings schema out of the host file.
+
+    Merging (Optionary.Build.Tasks): section paths compare ignoring case. When fragments spell a section (or a key) differently,
+    the ordinal-smallest spelling is displayed, so "Greetings" wins over "greetings". A section several fragments declare
+    becomes an allOf of their schemas, closed once on the merged object. Fragments' definitions move to the file's root
+    definitions as "<section path>.<name>" (".2", ".3"... when taken). Nothing depends on the order of references: the same
+    fragments always give a byte-identical file.
+  -->
+  <PropertyGroup>
+    <_OptionarySchemaTargetsImported>true</_OptionarySchemaTargetsImported>
+    <_OptionarySchemaTargetsDirectory>$(MSBuildThisFileDirectory)</_OptionarySchemaTargetsDirectory>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Read by the generator's configuration schema pipeline. -->
+    <CompilerVisibleProperty Include="OptionarySchemaRequired" />
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="OptionaryReferenceDocumentation" />
+  </ItemGroup>
+
+  <!-- In-repo builds register these from src/Optionary.Build.Tasks instead (Optionary.Build.Tasks.InRepo.targets). -->
+  <UsingTask TaskName="Optionary.Build.Tasks.MergeConfigurationSchema" AssemblyFile="$(MSBuildThisFileDirectory)tasks/netstandard2.0/Optionary.Build.Tasks.dll" Condition="'$(_OptionaryBuildTasksAssembly)' == ''" />
+  <UsingTask TaskName="Optionary.Build.Tasks.WriteConfigurationSchemaSegment" AssemblyFile="$(MSBuildThisFileDirectory)tasks/netstandard2.0/Optionary.Build.Tasks.dll" Condition="'$(_OptionaryBuildTasksAssembly)' == ''" />
+
+  <!--
+    Decides the project's role and its file paths. Runs inside a target so properties set anywhere (Directory.Build.targets
+    included, which is imported after this file) count. Every path handed to the tasks is absolute.
+  -->
+  <Target Name="_OptionaryComputeSchema">
+    <PropertyGroup>
+      <_OptionarySchemaIsHost>$(OptionarySchemaHost)</_OptionarySchemaIsHost>
+      <_OptionarySchemaIsHost Condition="'$(_OptionarySchemaIsHost)' == '' and '$(IsTestProject)' == 'true'">true</_OptionarySchemaIsHost>
+      <_OptionarySchemaIsHost Condition="'$(_OptionarySchemaIsHost)' == '' and ('$(OutputType)' == 'Exe' or '$(OutputType)' == 'WinExe' or '$(AndroidApplication)' == 'true')">true</_OptionarySchemaIsHost>
+
+      <_OptionarySchemaRole>None</_OptionarySchemaRole>
+      <_OptionarySchemaRole Condition="'$(OptionarySchema)' != 'false' and '$(_OptionarySchemaIsHost)' == 'true'">Host</_OptionarySchemaRole>
+      <_OptionarySchemaRole Condition="'$(OptionarySchema)' != 'false' and '$(_OptionarySchemaIsHost)' != 'true'">Library</_OptionarySchemaRole>
+
+      <_OptionarySchemaPrimaryTargetFramework>$(TargetFramework)</_OptionarySchemaPrimaryTargetFramework>
+      <_OptionarySchemaPrimaryTargetFramework Condition="'$(TargetFrameworks)' != ''">$([System.Text.RegularExpressions.Regex]::Match('$(TargetFrameworks)', '[^;\s]+').Value)</_OptionarySchemaPrimaryTargetFramework>
+      <_OptionarySchemaIsPrimaryTargetFramework>false</_OptionarySchemaIsPrimaryTargetFramework>
+      <_OptionarySchemaIsPrimaryTargetFramework Condition="'$(TargetFramework)' == '$(_OptionarySchemaPrimaryTargetFramework)'">true</_OptionarySchemaIsPrimaryTargetFramework>
+
+      <_OptionaryHostSchemaFile>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(BaseIntermediateOutputPath)', 'appsettings.schema.json'))</_OptionaryHostSchemaFile>
+      <_OptionaryTargetFrameworkHostSchemaFile>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', 'appsettings.schema.json'))</_OptionaryTargetFrameworkHostSchemaFile>
+      <_OptionaryLibrarySchemaFile>$([MSBuild]::NormalizePath('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', 'ConfigurationSchema.json'))</_OptionaryLibrarySchemaFile>
+      <_OptionarySchemaFile />
+      <_OptionarySchemaFile Condition="'$(_OptionarySchemaRole)' == 'Host' and '$(_OptionarySchemaIsPrimaryTargetFramework)' == 'true'">$(_OptionaryHostSchemaFile)</_OptionarySchemaFile>
+      <_OptionarySchemaFile Condition="'$(_OptionarySchemaRole)' == 'Host' and '$(_OptionarySchemaIsPrimaryTargetFramework)' != 'true'">$(_OptionaryTargetFrameworkHostSchemaFile)</_OptionarySchemaFile>
+
+      <_OptionarySchemaStrict>true</_OptionarySchemaStrict>
+      <_OptionarySchemaStrict Condition="'$(OptionarySchemaStrict)' == 'false'">false</_OptionarySchemaStrict>
+      <_OptionarySchemaIncludeSchemaStore>true</_OptionarySchemaIncludeSchemaStore>
+      <_OptionarySchemaIncludeSchemaStore Condition="'$(OptionarySchemaIncludeSchemaStore)' == 'false'">false</_OptionarySchemaIncludeSchemaStore>
+      <_OptionarySchemaCopy>false</_OptionarySchemaCopy>
+      <_OptionarySchemaCopy Condition="'$(_OptionarySchemaRole)' == 'Host' and '$(OptionarySchemaCopyToOutput)' != 'false'">true</_OptionarySchemaCopy>
+
+      <_OptionarySchemaTasksAssembly>$(_OptionaryBuildTasksAssembly)</_OptionarySchemaTasksAssembly>
+      <_OptionarySchemaTasksAssembly Condition="'$(_OptionarySchemaTasksAssembly)' == ''">$(_OptionarySchemaTargetsDirectory)tasks/netstandard2.0/Optionary.Build.Tasks.dll</_OptionarySchemaTasksAssembly>
+      <_OptionarySchemaInputsFile>$(IntermediateOutputPath)$(MSBuildProjectName).OptionarySchema.inputs</_OptionarySchemaInputsFile>
+      <_OptionarySchemaStampFile>$(IntermediateOutputPath)$(MSBuildProjectName).OptionarySchema.stamp</_OptionarySchemaStampFile>
+    </PropertyGroup>
+  </Target>
+
+  <Target
+    Name="_OptionarySchema"
+    AfterTargets="CoreCompile"
+    DependsOnTargets="_OptionaryComputeSchema;_OptionarySchemaInputs;_OptionaryWriteSchema;_OptionaryDeleteStaleSchema"
+    Condition="'$(DesignTimeBuild)' != 'true' and '$(BuildingProject)' == 'true'" />
+
+  <!--
+    Everything that should rewrite the schema without changing a timestamp - a reference added or removed, a property flipped -
+    goes into a hash, written only when it changes.
+  -->
+  <Target Name="_OptionarySchemaInputs" Condition="'$(_OptionarySchemaRole)' != 'None'">
+    <ItemGroup>
+      <_OptionarySchemaHashInput Include="@(ReferencePath->'%(FullPath)')" />
+      <_OptionarySchemaHashInput Include="@(IntermediateAssembly->'%(FullPath)')" />
+      <_OptionarySchemaHashInput Include="$(_OptionarySchemaRole)|$(_OptionarySchemaFile)|$(_OptionarySchemaStrict)|$(_OptionarySchemaIncludeSchemaStore)|$(_OptionarySchemaTasksAssembly)" />
+    </ItemGroup>
+    <Hash ItemsToHash="@(_OptionarySchemaHashInput)">
+      <Output TaskParameter="HashResult" PropertyName="_OptionarySchemaHash" />
+    </Hash>
+    <WriteLinesToFile File="$(_OptionarySchemaInputsFile)" Lines="$(_OptionarySchemaHash)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <!-- Recorded on every build, not only when the schema is rewritten, so IncrementalClean never takes them for stale files. -->
+    <ItemGroup>
+      <FileWrites Include="$(_OptionarySchemaInputsFile);$(_OptionarySchemaStampFile)" />
+      <FileWrites Include="$(_OptionaryLibrarySchemaFile)" Condition="'$(_OptionarySchemaRole)' == 'Library'" />
+      <FileWrites Include="$(_OptionarySchemaFile)" Condition="'$(_OptionarySchemaRole)' == 'Host'" />
+    </ItemGroup>
+  </Target>
+
+  <Target
+    Name="_OptionaryWriteSchema"
+    Condition="'$(_OptionarySchemaRole)' != 'None'"
+    Inputs="@(ReferencePath);@(IntermediateAssembly);$(_OptionarySchemaInputsFile);$(_OptionarySchemaTasksAssembly)"
+    Outputs="$(_OptionarySchemaStampFile);$(_OptionarySchemaFile)">
+    <MergeConfigurationSchema
+      Condition="'$(_OptionarySchemaRole)' == 'Host'"
+      References="@(ReferencePath->'%(FullPath)')"
+      ProjectAssemblies="@(IntermediateAssembly->'%(FullPath)')"
+      OutputFile="$(_OptionarySchemaFile)"
+      Strict="$(_OptionarySchemaStrict)"
+      IncludeSchemaStore="$(_OptionarySchemaIncludeSchemaStore)" />
+    <WriteConfigurationSchemaSegment
+      Condition="'$(_OptionarySchemaRole)' == 'Library'"
+      Assemblies="@(IntermediateAssembly->'%(FullPath)')"
+      OutputFile="$(_OptionaryLibrarySchemaFile)" />
+    <Touch Files="$(_OptionarySchemaStampFile)" AlwaysCreate="true" />
+  </Target>
+
+  <!-- Files this project's role doesn't write any more, e.g. after it stopped being a host or turned the schema off. -->
+  <Target Name="_OptionaryDeleteStaleSchema">
+    <Delete
+      Files="$(_OptionaryLibrarySchemaFile)"
+      Condition="'$(_OptionarySchemaRole)' != 'Library' and Exists('$(_OptionaryLibrarySchemaFile)')" />
+    <Delete
+      Files="$(_OptionaryHostSchemaFile)"
+      Condition="'$(_OptionarySchemaRole)' != 'Host' and Exists('$(_OptionaryHostSchemaFile)')" />
+    <Delete
+      Files="$(_OptionaryTargetFrameworkHostSchemaFile)"
+      Condition="('$(_OptionarySchemaRole)' != 'Host' or '$(_OptionarySchemaIsPrimaryTargetFramework)' == 'true') and Exists('$(_OptionaryTargetFrameworkHostSchemaFile)')" />
+    <!-- Without these, turning the schema back on would find an up-to-date stamp and write nothing. -->
+    <Delete
+      Files="$(_OptionarySchemaInputsFile);$(_OptionarySchemaStampFile)"
+      Condition="'$(_OptionarySchemaRole)' == 'None'" />
+  </Target>
+
+  <!--
+    The host's schema goes next to its configuration files. It is copied here rather than through a None item, so projects
+    that reference the host (a test project referencing an application) don't get a second appsettings.schema.json.
+  -->
+  <Target
+    Name="_OptionaryCopySchemaToOutputDirectory"
+    AfterTargets="CopyFilesToOutputDirectory"
+    DependsOnTargets="_OptionaryComputeSchema"
+    Condition="'$(DesignTimeBuild)' != 'true'">
+    <Copy
+      Condition="'$(_OptionarySchemaCopy)' == 'true' and Exists('$(_OptionarySchemaFile)')"
+      SourceFiles="$(_OptionarySchemaFile)"
+      DestinationFolder="$(OutDir)"
+      SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+      OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+      Retries="$(CopyRetryCount)"
+      RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)">
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites" />
+    </Copy>
+  </Target>
+
+  <Target
+    Name="_OptionaryPublishSchema"
+    AfterTargets="ComputeResolvedFilesToPublishList"
+    DependsOnTargets="_OptionaryComputeSchema">
+    <ItemGroup Condition="'$(_OptionarySchemaCopy)' == 'true' and Exists('$(_OptionarySchemaFile)')">
+      <!-- A hand-made appsettings.schema.json (Web SDK content, or a reference's) would collide with this one (NETSDK1152). -->
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)" Condition="'%(ResolvedFileToPublish.RelativePath)' == 'appsettings.schema.json'" />
+      <ResolvedFileToPublish
+        Include="$(_OptionarySchemaFile)"
+        RelativePath="appsettings.schema.json"
+        CopyToPublishDirectory="PreserveNewest"
+        ExcludeFromSingleFile="true" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Packs a library's file at the package root. Each target framework writes its own, so the first one's is packed: a
+    multi-targeted project's outer build (where Pack runs) asks that inner build for it.
+  -->
+  <Target Name="_OptionaryPackSchema" BeforeTargets="_GetPackageFiles" DependsOnTargets="_OptionaryComputeSchema">
+    <MSBuild
+      Condition="'$(TargetFramework)' == '' and '$(_OptionarySchemaPrimaryTargetFramework)' != ''"
+      Projects="$(MSBuildProjectFullPath)"
+      Targets="_OptionarySchemaPackFile"
+      Properties="TargetFramework=$(_OptionarySchemaPrimaryTargetFramework)">
+      <Output TaskParameter="TargetOutputs" ItemName="_OptionarySchemaPackFile" />
+    </MSBuild>
+    <ItemGroup Condition="'$(TargetFramework)' != '' and '$(_OptionarySchemaRole)' == 'Library' and Exists('$(_OptionaryLibrarySchemaFile)')">
+      <_OptionarySchemaPackFile Include="$(_OptionaryLibrarySchemaFile)" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Include="@(_OptionarySchemaPackFile)" Pack="true" PackagePath="/" Visible="false" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_OptionarySchemaPackFile" DependsOnTargets="_OptionaryComputeSchema" Returns="@(_OptionarySchemaPackFile)">
+    <ItemGroup Condition="'$(_OptionarySchemaRole)' == 'Library' and Exists('$(_OptionaryLibrarySchemaFile)')">
+      <_OptionarySchemaPackFile Include="$(_OptionaryLibrarySchemaFile)" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+      Descriptions for configuration types from packages ([assembly: Optionary<T>("Section")]) come from the
+      packages' XML documentation files: the compiler loads no docs for references, and analyzers can't read files. Pass the doc
+      file next to each package reference to the generator, which reads only the ones for the types it describes. Targeting
+      packs are left out (framework types aren't configuration types, and their docs run to tens of megabytes).
+      This has to run before GenerateMSBuildEditorConfigFileCore writes the AdditionalFiles metadata into the generated
+      editorconfig (GenerateMSBuildEditorConfigFile itself is empty; its DependsOnTargets run before any BeforeTargets hook).
+      Opt out with OptionaryReferenceDocumentation=false.
+  -->
+  <Target Name="_OptionaryReferenceDocumentation"
+          BeforeTargets="GenerateMSBuildEditorConfigFileCore"
+          DependsOnTargets="ResolveAssemblyReferences"
+          Condition="'$(OptionaryReferenceDocumentation)' != 'false'">
+    <ItemGroup>
+      <_OptionaryReferenceDocumentationFile Include="@(ReferencePath->'%(RootDir)%(Directory)%(Filename).xml')" Condition="'%(ReferencePath.NuGetPackageId)' != '' and '%(ReferencePath.FrameworkReferenceName)' == ''" />
+      <AdditionalFiles Include="@(_OptionaryReferenceDocumentationFile)" Condition="Exists('%(_OptionaryReferenceDocumentationFile.Identity)')" OptionaryReferenceDocumentation="true" />
+    </ItemGroup>
+  </Target>
+
+  <Import Project="$(MSBuildThisFileDirectory)Optionary.Schema.VisualStudio.targets" />
+  <Import Project="$(MSBuildThisFileDirectory)Optionary.Schema.EditorSettings.targets" />
+</Project>

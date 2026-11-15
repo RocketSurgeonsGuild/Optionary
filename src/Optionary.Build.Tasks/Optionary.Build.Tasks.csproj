@@ -25,5 +25,16 @@
     <!-- netstandard2.0 has no NotNullAttribute, and a polyfilled one would clash with the real one in the tests (InternalsVisibleTo). -->
     <Using Remove="System.Diagnostics.CodeAnalysis.NotNullAttribute" />
     <InternalsVisibleTo Include="Optionary.Build.Tasks.Tests" />
+    <EmbeddedResource Include="SchemaStore/appsettings.json" LogicalName="Optionary.Build.Tasks.SchemaStore.appsettings.json" />
   </ItemGroup>
+
+  <!--
+      SchemaStore/appsettings.json is a pinned, unmodified copy of SchemaStore's appsettings schema (Apache-2.0, see
+      THIRD-PARTY-NOTICES.txt); the merge task embeds it into every application schema. Refresh it, then review the diff and
+      record the source commit in THIRD-PARTY-NOTICES.txt:
+        dotnet msbuild src/Optionary.Build.Tasks/Optionary.Build.Tasks.csproj -t:UpdateSchemaStoreAppSettings
+  -->
+  <Target Name="UpdateSchemaStoreAppSettings">
+    <DownloadFile SourceUrl="https://json.schemastore.org/appsettings.json" DestinationFolder="$(MSBuildThisFileDirectory)SchemaStore" DestinationFileName="appsettings.json" />
+  </Target>
 </Project>

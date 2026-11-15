@@ -1,0 +1,12 @@
+<Project>
+    <ItemGroup>
+        <!-- AssemblyInfo.Dependencies gives the generator's versions to the shared snapshot scrubbers without reflection. -->
+        <PackageReference Include="Rocket.Surgery.AssemblyInfo" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+        <PackageReference Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" />
+        <PackageReference Include="Verify.SourceGenerators" />
+        <ProjectReference Include="..\..\src\Optionary\Optionary.csproj" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" VersionOverride="5.9.0" PrivateAssets="all" />
+    </ItemGroup>
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

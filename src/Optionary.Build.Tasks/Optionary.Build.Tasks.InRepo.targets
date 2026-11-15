@@ -4,13 +4,13 @@
       project's output instead of a packed Optionary: Optionary.Schema.targets only registers the packed copy when
       _OptionaryBuildTasksAssembly is empty. TaskHostFactory runs each call in a short-lived task host, so no long-lived MSBuild
       node keeps (and locks) an old copy of the DLL while it is rebuilt.
-
-      The UsingTask entries, one per task with TaskFactory="TaskHostFactory", arrive with the tasks themselves
-      (RocketSurgeonsGuild/Optionary#4).
   -->
   <PropertyGroup>
     <_OptionaryBuildTasksAssembly>$(MSBuildThisFileDirectory)bin/$(Configuration)/netstandard2.0/Optionary.Build.Tasks.dll</_OptionaryBuildTasksAssembly>
   </PropertyGroup>
+  <UsingTask TaskName="Optionary.Build.Tasks.MergeConfigurationSchema" AssemblyFile="$(_OptionaryBuildTasksAssembly)" TaskFactory="TaskHostFactory" />
+  <UsingTask TaskName="Optionary.Build.Tasks.WriteConfigurationSchemaSegment" AssemblyFile="$(_OptionaryBuildTasksAssembly)" TaskFactory="TaskHostFactory" />
+  <UsingTask TaskName="Optionary.Build.Tasks.ScaffoldEditorSettings" AssemblyFile="$(_OptionaryBuildTasksAssembly)" TaskFactory="TaskHostFactory" />
   <!--
       Builds the tasks first. Not a real reference: nothing compiles against it and no package depends on it.
   -->

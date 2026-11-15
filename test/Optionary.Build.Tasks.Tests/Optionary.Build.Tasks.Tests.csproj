@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Optionary.Build.Tasks\Optionary.Build.Tasks.csproj" />
+        <PackageReference Include="Corvus.Json.JsonSchema.Draft7" />
+    </ItemGroup>
+    <ItemGroup>
+        <!-- Copies of the generator's snapshots in Optionary.Analyzers.Tests (see GeneratorOutputTests). -->
+        <None Include="generator-output/*.txt" CopyToOutputDirectory="PreserveNewest" LinkBase="generator-output" />
+        <!-- A hand-written fragment, a copy of the one Joinery.Dovetail.Serilog writes in RocketSurgeonsGuild/Dovetail (see HandWrittenFragmentTests). -->
+        <None Include="fixtures/*.json" CopyToOutputDirectory="PreserveNewest" LinkBase="fixtures" />
+    </ItemGroup>
+</Project>

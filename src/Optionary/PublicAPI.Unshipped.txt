@@ -1,1 +1,29 @@
 #nullable enable
+Optionary.ConfigurationKeyStyle
+Optionary.ConfigurationKeyStyle.Camel = 2 -> Optionary.ConfigurationKeyStyle
+Optionary.ConfigurationKeyStyle.Dash = 3 -> Optionary.ConfigurationKeyStyle
+Optionary.ConfigurationKeyStyle.Pascal = 1 -> Optionary.ConfigurationKeyStyle
+Optionary.ConfigurationKeyStyle.Undefined = 0 -> Optionary.ConfigurationKeyStyle
+Optionary.ConfigurationKeyStyle.Underscore = 4 -> Optionary.ConfigurationKeyStyle
+Optionary.OptionaryAttribute
+Optionary.OptionaryAttribute.KeyStyle.get -> Optionary.ConfigurationKeyStyle
+Optionary.OptionaryAttribute.KeyStyle.set -> void
+Optionary.OptionaryAttribute.OptionaryAttribute() -> void
+Optionary.OptionaryAttribute.OptionaryAttribute(string! section) -> void
+Optionary.OptionaryAttribute.RegisterOptions.get -> bool
+Optionary.OptionaryAttribute.RegisterOptions.set -> void
+Optionary.OptionaryAttribute.Section.get -> string?
+Optionary.OptionaryAttribute.ValidateOnStart.get -> bool
+Optionary.OptionaryAttribute.ValidateOnStart.set -> void
+Optionary.OptionaryAttribute<T>
+Optionary.OptionaryAttribute<T>.KeyStyle.get -> Optionary.ConfigurationKeyStyle
+Optionary.OptionaryAttribute<T>.KeyStyle.set -> void
+Optionary.OptionaryAttribute<T>.OptionaryAttribute() -> void
+Optionary.OptionaryAttribute<T>.OptionaryAttribute(string! section) -> void
+Optionary.OptionaryAttribute<T>.RegisterOptions.get -> bool
+Optionary.OptionaryAttribute<T>.RegisterOptions.set -> void
+Optionary.OptionaryAttribute<T>.Section.get -> string?
+Optionary.OptionaryAttribute<T>.ValidateOnStart.get -> bool
+Optionary.OptionaryAttribute<T>.ValidateOnStart.set -> void
+Optionary.OptionaryServiceCollectionExtensions
+static Optionary.OptionaryServiceCollectionExtensions.AddOptionaryOptions<TOptions>(this Microsoft.Extensions.DependencyInjection.IServiceCollection! services, string! sectionPath, System.Func<Microsoft.Extensions.Configuration.IConfiguration!, TOptions!>! create) -> Microsoft.Extensions.Options.OptionsBuilder<TOptions!>!
