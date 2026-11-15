@@ -6,7 +6,7 @@ tags: [source-generator, msbuild]
 
 The generator reports `OPT0001` to `OPT0012`, in the `Optionary` category. `OPT1001` is an MSBuild error from Optionary's
 targets. The generator runs in every project that references `Optionary`, including through a transitive reference, so these
-can fire in a consumer of a library too. They are reported against source, so `#pragma warning disable` works for the
+can fire in a consumer of a library too. Except for `OPT0001`, they are reported against source, so `#pragma warning disable` works for the
 warnings.
 
 | Id                    | Severity | Summary                                                  |
@@ -27,9 +27,15 @@ warnings.
 
 ## OPT0001
 
-**The project's C# version is older than 12.** The [registration method](../../guides/registering-from-a-library/) is still
-emitted, so calls to it compile, but its body is empty: no options type is registered and no fragment is written. Set
-`LangVersion` to 12 or later.
+**The project's C# version is older than 12.** Warning, reported once per compilation by every project that references
+`Optionary` (with or without declarations) whose `LangVersion` is below 12:
+
+> Optionary's source generator needs C# 12 or later, but this project uses C# _version_, so AddOptionaryConfigurationOptions
+> registers nothing and no configuration schema is generated; set LangVersion to 12 or later to enable it
+
+The [registration method](../../guides/registering-from-a-library/) is still emitted, so calls to it compile, but its body is
+empty: no options type is registered and no fragment is written. Set `LangVersion` to 12 or later. It has no source
+location, so suppress it with `<NoWarn>` rather than `#pragma`.
 
 ## OPT0002
 
@@ -92,8 +98,15 @@ the shared type `[ConfigurationKeyName]` attributes. See [key styles](../../guid
 ## OPT1001
 
 **`Optionary` is referenced but its generator isn't loaded.** Reported by the `_OptionaryCheckGenerator` target in
-`Optionary.targets`, before `CoreCompile`, when `Optionary.dll` is among the references and no analyzer named
-`Optionary.Analyzers` is. Without the generator nothing is bound and no registration method exists.
+`Optionary.targets`, before `CoreCompile`, when `Optionary.dll` is among the resolved references (`@(ReferencePath)`) and
+no `@(Analyzer)` item has the file name `Optionary.Analyzers`:
+
+> _Project_ references Optionary.dll, but Optionary's source generator (Optionary.Analyzers) isn't loaded, so its
+> [Optionary] types get no AddOptionaryConfigurationOptions registration method or configuration schema. Don't exclude the
+> Optionary package's analyzers (remove ExcludeAssets="analyzers", or add analyzers to IncludeAssets), and build with the
+> .NET 10 SDK or later, whose compiler (Roslyn 5.0 or later) Optionary's generator supports.
+
+Without the generator nothing is bound and no registration method exists.
 
 It happens when:
 

@@ -57,6 +57,21 @@ your editor, or let `OptionaryScaffoldEditorSettings` write the VS Code mapping.
 
 ## With Dovetail
 
-The package also declares Dovetail joint templates (`DovetailTemplate` items), only in applications and test projects, so
-that a Dovetail application gets the YAML provider wired up for it. Without Dovetail nothing reads those items and they do
-nothing.
+The package's `build/Optionary.Configuration.Yaml.targets` declares three Dovetail joint templates, so a Dovetail application
+gets its YAML files loaded without any code. Only Dovetail reads `DovetailTemplate` items, and only in a project that runs
+Dovetail's generator and references this package; without Dovetail they do nothing, and nothing extra is compiled.
+
+| `DovetailTemplate`  | Generated joint                                 | What it adds                                                                                                                                                                         |
+| ------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `YamlJoint`         | `YamlJoint` (`IConfigurationJoint`)             | `appsettings.yaml`, `appsettings.{Environment}.yaml`, the same named after the application, and the `.local` overrides, each also as `.yml`, from the configuration's file provider. |
+| `YamlBrowserJoint`  | `YamlBrowserJoint` (`IConfigurationAsyncJoint`) | The same files in the browser (WebAssembly), downloaded from the application's base address.                                                                                         |
+| `YamlEmbeddedJoint` | `YamlEmbeddedJoint` (`IConfigurationJoint`)     | The YAML files of hosts that embed their configuration in the assembly (MAUI, Uno), read with `AddYamlStream`.                                                                       |
+
+- Each item has `Package="Optionary.Configuration.Yaml"` and `OutputPrefix="OptionaryYaml"`. The joints are generated as
+  internal classes in the namespace `Optionary.Configuration.Yaml`, and each adds its files once even when a test project
+  imports the application's copy as well as its own.
+- The items are declared only in applications (`OutputType` `Exe` or `WinExe`, or an Android application) and test
+  projects (`IsTestProject`). A joint compiled into a library would be exported to every application that references it, so
+  libraries never get one, and each application gets exactly one of each.
+- The targets also add a `BlazorConfigurationFile` assembly metadata entry listing `wwwroot/appsettings*.yml` and
+  `wwwroot/appsettings*.yaml`, which the browser joint uses to know which files to download.

@@ -12,8 +12,8 @@ and validators still run on the created instance, whenever they were registered.
 
 Optionary doesn't call Microsoft's configuration binding source generator: a source generator never sees another
 generator's output, so calls in Optionary's own generated code would not be intercepted. Instead it **ports** that
-generator (the parser, the type specifications and the emitter from dotnet/runtime, MIT) at tags `v10.0.13` and
-`v11.0.0-rc.2`.
+generator (the parser, the type specifications and the emitter from dotnet/runtime's
+`Microsoft.Extensions.Configuration.Binder/gen`, MIT), with both its version 10 and version 11 rules.
 
 The rules follow the **major version of `Microsoft.Extensions.Configuration.Binder`** the project references, not its
 target framework, because a `net10.0` application can reference Binder 11. A project that references no Binder gets the
