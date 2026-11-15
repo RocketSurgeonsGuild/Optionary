@@ -5,6 +5,7 @@
 #:package Joinery.Dovetail.ModularPipelines
 #:package Specular
 #:property JsonSerializerIsReflectionEnabledByDefault=true
+#:property IsPackable=false
 
 using Build;
 using Joinery.Dovetail;
