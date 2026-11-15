@@ -35,6 +35,8 @@
     <PackageVersion Include="Microsoft.Build.Framework" Version="18.12.2" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.12.2" />
     <PackageVersion Include="MSBuild.ProjectCreation" Version="20.0.0" />
+    <!-- Reads the binary logs of the scaffolded builds in Optionary.Build.Tests. -->
+    <PackageVersion Include="MSBuild.StructuredLogger.Utils" Version="2.3.269" />
     <!-- Validates the merged schemas against the draft-07 meta-schema in the tasks' tests (Apache-2.0). -->
     <PackageVersion Include="Corvus.Json.JsonSchema.Draft7" Version="5.8.11" />
     <PackageVersion Include="ZeroAlloc.Validation" Version="2.6.0" />
