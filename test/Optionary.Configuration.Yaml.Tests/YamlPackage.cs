@@ -1,5 +1,4 @@
 using System.IO.Compression;
-using System.Reflection;
 
 namespace Optionary.Configuration.Yaml.Tests;
 
@@ -10,8 +9,7 @@ internal static class YamlPackage
 {
     public const string Id = "Optionary.Configuration.Yaml";
 
-    public static string Directory { get; } =
-        typeof(YamlPackage).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Single(z => z.Key == "OptionaryYamlPackageDirectory").Value!;
+    public static string Directory { get; } = TestAssemblyMetadata.Get("PackageUnderTestDirectory");
 
     public static string Path { get; } = System.IO.Directory.EnumerateFiles(Directory, $"{Id}.*.nupkg").Single();
 

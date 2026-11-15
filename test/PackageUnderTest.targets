@@ -1,0 +1,49 @@
+<Project>
+    <!--
+        Packs a package of this repository on every build of a test project that scaffolds or inspects it, the way it ships.
+
+        Import it from the test project after setting:
+          PackageUnderTestProject    the src project to pack;
+          PackageUnderTestDirectory  where to write the package (read back through TestAssemblyMetadata.Get("PackageUnderTestDirectory"));
+          PackageUnderTestRestore    true when nothing references the src project, so it has to be restored first.
+
+        Every request (each target framework's inner build asks) is routed to one call without a TargetFramework, which MSBuild
+        caches, so the package is packed once per build rather than once (and concurrently) per framework, and the src project
+        never inherits the test project's TargetFramework.
+    -->
+    <ItemGroup>
+        <AssemblyMetadata Include="PackageUnderTestDirectory" Value="$(PackageUnderTestDirectory)" />
+        <Compile Include="$(MSBuildThisFileDirectory)TestAssemblyMetadata.cs" Link="TestAssemblyMetadata.cs" />
+    </ItemGroup>
+
+    <Target Name="PackPackageUnderTest" BeforeTargets="Build">
+        <MSBuild
+            Projects="$(MSBuildProjectFullPath)"
+            Targets="_PackPackageUnderTest"
+            Properties="Configuration=$(Configuration)"
+            RemoveProperties="TargetFramework;RuntimeIdentifier"
+        />
+    </Target>
+
+    <Target Name="_PackPackageUnderTest">
+        <ItemGroup>
+            <_StalePackageUnderTest Include="$(PackageUnderTestDirectory)*.nupkg;$(PackageUnderTestDirectory)*.snupkg" />
+        </ItemGroup>
+        <Delete Files="@(_StalePackageUnderTest)" />
+        <!--
+            Restore and Pack run as separate calls: with "Restore;Pack" in one call, Pack reuses the evaluation made before restore.
+            The extra global property gives the restore its own evaluation.
+        -->
+        <MSBuild
+            Condition="'$(PackageUnderTestRestore)' == 'true'"
+            Projects="$(PackageUnderTestProject)"
+            Targets="Restore"
+            Properties="Configuration=$(Configuration);_PackageUnderTestRestore=true"
+        />
+        <MSBuild
+            Projects="$(PackageUnderTestProject)"
+            Targets="Pack"
+            Properties="Configuration=$(Configuration);PackageOutputPath=$(PackageUnderTestDirectory)"
+        />
+    </Target>
+</Project>
