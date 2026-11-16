@@ -2,7 +2,7 @@
 
 - Kind: `class`
 - Package: [Optionary](/Optionary/api/optionary.md)
-- Version: `0.0.1-beta.8`
+- Version: `0.0.1-beta.12`
 - Namespace: `Optionary`
 - Target framework: `net10.0`
 - Inherits: `Attribute`

@@ -1,7 +1,7 @@
 # Optionary.Configuration.Yaml
 
 - Package: `Optionary.Configuration.Yaml`
-- Version: `0.0.1-beta.8`
+- Version: `0.0.1-beta.12`
 - Target framework: `net10.0`
 - NuGet: [Optionary.Configuration.Yaml](https://www.nuget.org/packages/Optionary.Configuration.Yaml)
 

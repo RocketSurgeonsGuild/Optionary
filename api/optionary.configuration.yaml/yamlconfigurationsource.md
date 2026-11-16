@@ -2,7 +2,7 @@
 
 - Kind: `class`
 - Package: [Optionary.Configuration.Yaml](/Optionary/api/optionary.configuration.yaml.md)
-- Version: `0.0.1-beta.8`
+- Version: `0.0.1-beta.12`
 - Namespace: `Optionary.Configuration.Yaml`
 - Target framework: `net10.0`
 - Inherits: `FileConfigurationSource`

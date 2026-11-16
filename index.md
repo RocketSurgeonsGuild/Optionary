@@ -1,9 +1,62 @@
 # Optionary
 
-Optionary binds `[Optionary]` options types to configuration without reflection, and writes a JSON Schema for each
-application's `appsettings.json`.
+Optionary turns an **options type** into two things, generated from the same model at build time:
 
-> [!NOTE]
-> Optionary is being extracted from [Dovetail](https://github.com/RocketSurgeonsGuild/Dovetail). These docs are a
-> placeholder until the code lands: see the
-> [migration plan](https://github.com/RocketSurgeonsGuild/Optionary/blob/main/plans/migration-from-dovetail.md).
+- a **binder** that creates the type from its **section** of `IConfiguration` and registers it as `IOptions<T>`, with no
+  reflection, so it is trimming and Native AOT safe;
+- a **JSON Schema** for the section. Every assembly carries a **fragment** per section, and each **host** (an application
+  or a test project) **merges** the fragments it can see into one **application schema**, which editors use for
+  completion, hover documentation and validation of `appsettings.json`, YAML and TOML files.
+
+```csharp
+using Optionary;
+
+/// <summary>Options for the greetings this library prints.</summary>
+[Optionary] // section "Greetings"
+public sealed class GreetingsOptions
+{
+    /// <summary>The text that comes before the name.</summary>
+    public string Message { get; set; } = "Hello";
+}
+```
+
+| Package                        | What it is                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `Optionary`                    | The `[Optionary]` attribute, the source generator, the runtime registration and the schema build. |
+| `Optionary.Configuration.Yaml` | A YAML configuration provider. It doesn't depend on `Optionary`.                                  |
+
+## Where to go next
+
+- [Getting started](getting-started/): add the package, declare a section, register it and point an editor at the schema.
+- [Declarations](guides/declarations/): the class and assembly forms, and how the section path is derived.
+- [Key styles](guides/key-styles/): spelling keys in Pascal, camel, dash or underscore case.
+- [Binding and validation](guides/binding/): what the generated binder does, and where it deliberately differs from
+  Microsoft's configuration binding generator.
+- [Schema and editors](guides/schema-and-editors/): the library and application schemas, Visual Studio, VS Code and Rider.
+- [Registering from a library](guides/registering-from-a-library/): the generated registration method and its contract.
+- [YAML provider](guides/yaml/), [MSBuild properties](reference/msbuild-properties/),
+  [diagnostics](reference/diagnostics/) and [troubleshooting](troubleshooting/).
+
+## Glossary
+
+The docs use these terms throughout.
+
+| Term                    | Meaning                                                                                                                                                                                                              |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Options type**        | A class or record whose instance holds one configuration section's values, read by code through `IOptions<T>`.                                                                                                       |
+| **Section**             | The part of the application's configuration an options type is read from, named by its **section path** (for example `Http:Retry`). An options type has exactly one section.                                         |
+| **Declaration**         | Marking an options type with its section, on the type itself (`[Optionary]`) or, for a type you don't own, on the assembly (`[assembly: Optionary<T>]`). A rejected declaration is reported and contributes nothing. |
+| **Key style**           | How a declaration spells the keys of its options type and everything nested in it. An explicit key name on a member always wins.                                                                                     |
+| **Registration method** | The method generated into each assembly that has declarations, which registers that assembly's options types with the options pipeline. It exists even when every declaration was rejected.                          |
+| **Fragment**            | The description of one section's shape that an assembly carries with it, so that projects referencing the assembly can learn the section without running its code.                                                   |
+| **Library schema**      | The file a library packs, describing only its own sections. It is permissive.                                                                                                                                        |
+| **Host**                | A project whose build combines its own fragments with those of everything it references: applications and test projects.                                                                                             |
+| **Application schema**  | The one file a host's build writes, covering every section it can see plus the common appsettings keys. It is strict: unknown keys in a section are flagged, ignoring case.                                          |
+| **Merge**               | Producing the application schema from fragments. The same fragments always give the same file, whatever order the references come in.                                                                                |
+
+## Origins
+
+Optionary started as the configuration schema and binding feature of
+[Dovetail](https://github.com/RocketSurgeonsGuild/Dovetail). It was imported from Dovetail at commit
+[`3f512a33b0`](https://github.com/RocketSurgeonsGuild/Dovetail/commit/3f512a33b0) and renamed; it doesn't depend on
+Dovetail and works without it.
