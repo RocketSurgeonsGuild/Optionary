@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <!--
         An application (a host): its build merges its own schema fragments and the library's into obj/appsettings.schema.json,
-        which this project's appsettings*.json files name with their "$schema" key.
+        which the repository's .vscode/settings.json maps to this project's appsettings*.json files.
     -->
     <PropertyGroup>
         <OutputType>Exe</OutputType>
