@@ -260,7 +260,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
         );
         using var image = new MemoryStream();
         var emitted = compilation.Emit(image);
-        return  !emitted.Success 
+        return !emitted.Success
             ? throw new InvalidOperationException(string.Join(Environment.NewLine, emitted.Diagnostics))
             : (MetadataReference)MetadataReference.CreateFromImage(image.ToArray());
     }
