@@ -60,12 +60,11 @@ startup when the library didn't ask for it. Start it with an empty title to see 
 Site__Title= dotnet run --project samples/Optionary.Samples.Web
 ```
 
-Each sample's `appsettings*.json` starts with `"$schema": "./obj/appsettings.schema.json"`, pointing at its host's merged
-schema, so any editor that honours `$schema` picks it up without settings. Build the samples once and the files get
-completion, hover documentation and checks for unknown keys and out-of-range values. The key is ordinary configuration to
-the binder (a root `$schema` value no section reads), and the merged schema leaves the root open, so it validates. To map
-files without editing them, use `OptionaryScaffoldEditorSettings` instead (see
-[schema and editors](../guides/schema-and-editors/#visual-studio-code)).
+The repository's checked-in [`.vscode/settings.json`](https://github.com/RocketSurgeonsGuild/Optionary/blob/main/.vscode/settings.json)
+maps each sample's `appsettings*.json` to its schema, with the same `json.schemas` entries `OptionaryScaffoldEditorSettings`
+writes (see [schema and editors](../guides/schema-and-editors/#visual-studio-code)). Build the samples once, open the
+repository in VS Code, and the files get completion, hover documentation and checks for unknown keys and out-of-range
+values.
 
 ## How they consume Optionary
 
