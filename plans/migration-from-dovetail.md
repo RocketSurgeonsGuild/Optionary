@@ -12,7 +12,7 @@ grilling. Source facts were checked against Dovetail `main` at `e35038ab3c`.
 | #   | Area                 | Decision                                                                                                                                                                                                                                                                                                                    |
 | --- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | D1  | Repository           | A separate repository, not a package inside Dovetail.                                                                                                                                                                                                                                                                       |
-| D2  | Independence         | Optionary knows nothing about Dovetail: no reference, no detection, no joint. **One amendment, D12**: the YAML package declares Dovetail joint templates.                                                                                                                                                                   |
+| D2  | Independence         | Optionary knows nothing about Dovetail: no reference, no detection, no joint. **One amendment, D12**: the format packages declare Dovetail joint templates.                                                                                                                                                                 |
 | D3  | Registration method  | Optionary's generator emits a plain `IServiceCollection` registration method. It is emitted whenever the attribute type is in the compilation, even if every declaration was rejected (contract in section 4).                                                                                                              |
 | D4  | Dovetail's side      | Dovetail's generator detects Optionary's attribute by metadata name (strings only). It emits a joint, nested in the exports class and listed first, whose body calls the registration method.                                                                                                                               |
 | D5  | Contract             | The attribute names and the method's name and signature are a cross-repo contract, treated as public API.                                                                                                                                                                                                                   |
@@ -303,6 +303,11 @@ The templates' classes are `internal sealed` in the namespace `Optionary.Configu
     - `DovetailEmbeddedConfiguration.GetConventionalFileNames(context, "yaml", "yml")` and `DovetailEmbeddedConfiguration.OpenResource(assembly, fileName)` (`YamlEmbeddedJoint`);
     - `global::Microsoft.CodeAnalysis.EmbeddedAttribute`, which the compiling project must define (Dovetail's generator emits it).
 
+**TOML.** `Optionary.Configuration.Toml/build/Optionary.Configuration.Toml.targets` declares `TomlJoint`, `TomlBrowserJoint` and `TomlEmbeddedJoint` with the same gating, `Package="Optionary.Configuration.Toml"` and `OutputPrefix="OptionaryToml"`, and keeps Dovetail's `BlazorConfigurationFile` metadata for `wwwroot/appsettings*.toml`.
+
+- The joints compile against the same Dovetail API (`GetConventionalFileNames(context, "toml")` in `TomlEmbeddedJoint`, and `Optionary.Configuration.Toml.<Joint>.Applied` guards) and against Tomlyn's provider (`TomlConfigurationSource`, `AddTomlStream`), which reaches the application as the package's only dependency.
+- The package has no API of its own, but it still ships an `Optionary.Configuration.Toml` assembly: Dovetail emits a template with `Package` set only into a project whose resolved references include an assembly of that name.
+
 ## 5. Repository structure (template: Dovetail, trimmed)
 
 **Copied as-is**
@@ -345,7 +350,7 @@ The templates' classes are `internal sealed` in the namespace `Optionary.Configu
 **Dropped**
 
 - `sample/` (MAUI/Uno/Blazor/SdkSample), `benchmarks/` and `samples.yml`.
-- `Joinery.Dovetail.Sdk` and everything joint, host or template related (except the YAML templates in 4.6).
+- `Joinery.Dovetail.Sdk` and everything joint, host or template related (except the format templates in 4.6).
 - `Directory.Build.workloads.props`, `Dovetail.sln.DotSettings.user`, `.idea/`, `artifacts/`, `TestResults/`, `node_modules/`, and Dovetail's `plans/` (they stay in Dovetail as history).
 
 ## 6. Phases

@@ -6,6 +6,7 @@ Strongly-typed, AOT-safe configuration options for .NET: a reflection-free optio
 | ------------------------------ | ----------------------------------------------------------------------------------- |
 | `Optionary`                    | The `[Optionary]` attribute, the source generator, the binder and the schema build. |
 | `Optionary.Configuration.Yaml` | A YAML configuration provider.                                                      |
+| `Optionary.Configuration.Toml` | Dovetail joint templates for TOML files, over Tomlyn's configuration provider.      |
 
 Documentation: <https://rocketsurgeonsguild.github.io/Optionary/>. Optionary is being extracted from Dovetail; see the
 [migration plan](plans/migration-from-dovetail.md).

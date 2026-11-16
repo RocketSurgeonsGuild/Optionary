@@ -75,6 +75,7 @@ export default defineConfig({
                                         { label: "Registering from a library", link: "/guides/registering-from-a-library/" },
                                         { label: "JSON joints", link: "/guides/json/" },
                                         { label: "YAML provider", link: "/guides/yaml/" },
+                                        { label: "TOML with Dovetail", link: "/guides/toml/" },
                                     ],
                                 },
                                 {
