@@ -2,10 +2,9 @@
 
 Strongly-typed, AOT-safe configuration options for .NET: a reflection-free options binder and per-application JSON Schema for editor completion, generated from your options types.
 
-| Package                        | What it is                                                                          |
-| ------------------------------ | ----------------------------------------------------------------------------------- |
-| `Optionary`                    | The `[Optionary]` attribute, the source generator, the binder and the schema build. |
-| `Optionary.Configuration.Yaml` | A YAML configuration provider.                                                      |
+It ships as one package, `Optionary`: the `[Optionary]` attribute, the source generator, the binder and the schema build.
+Optionary reads whatever `IConfiguration` holds and adds no configuration providers of its own; use Microsoft's JSON
+provider or any other `IConfigurationSource` for the files.
 
 Documentation: <https://rocketsurgeonsguild.github.io/Optionary/>. Optionary is being extracted from Dovetail; see the
 [migration plan](plans/migration-from-dovetail.md).

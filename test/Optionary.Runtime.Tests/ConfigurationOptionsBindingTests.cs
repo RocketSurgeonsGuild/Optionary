@@ -2,7 +2,6 @@ using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Optionary.Configuration.Yaml;
 
 namespace Optionary.Runtime.Tests;
 
@@ -11,7 +10,7 @@ namespace Optionary.Runtime.Tests;
 /// is expected to compose with:
 ///     <see cref="OptionaryServiceCollectionExtensions.AddOptionaryOptions{TOptions}(IServiceCollection, string, Func{IConfiguration, TOptions})" />
 ///     (with <c>CreateSample</c> standing in for the generated <c>Create…</c> method) plus the
-///     JSON and YAML runtime <see cref="IConfigurationSource" />s, exercising <see cref="IOptions{TOptions}" />
+///     JSON runtime <see cref="IConfigurationSource" />, exercising <see cref="IOptions{TOptions}" />
 ///     resolution (task 6.3) and <see cref="IOptionsMonitor{TOptions}" /> reload-on-file-change (task 6.4).
 /// </summary>
 public sealed class ConfigurationOptionsBindingTests
@@ -32,23 +31,6 @@ public sealed class ConfigurationOptionsBindingTests
             (directory, fileName) => new ConfigurationBuilder()
                                      .SetBasePath(directory)
                                      .AddJsonFile(fileName, optional: false, reloadOnChange: true)
-                                     .Build()
-        );
-    }
-
-    [Test]
-    public async Task Should_Resolve_IOptions_And_IOptionsMonitor_For_Yaml()
-    {
-        await RunResolveScenarioAsync(
-            "appsettings.yaml",
-            """
-            Sample:
-              Name: initial
-              Count: 1
-            """,
-            (directory, fileName) => new ConfigurationBuilder()
-                                     .SetBasePath(directory)
-                                     .AddYamlFile(fileName, optional: false, reloadOnChange: true)
                                      .Build()
         );
     }
@@ -77,28 +59,6 @@ public sealed class ConfigurationOptionsBindingTests
             (directory, fileName) => new ConfigurationBuilder()
                                      .SetBasePath(directory)
                                      .AddJsonFile(fileName, optional: false, reloadOnChange: true)
-                                     .Build()
-        );
-    }
-
-    [Test]
-    public async Task Should_Reload_IOptionsMonitor_On_File_Change_For_Yaml()
-    {
-        await RunReloadScenarioAsync(
-            "appsettings.yaml",
-            """
-            Sample:
-              Name: initial
-              Count: 1
-            """,
-            """
-            Sample:
-              Name: updated
-              Count: 2
-            """,
-            (directory, fileName) => new ConfigurationBuilder()
-                                     .SetBasePath(directory)
-                                     .AddYamlFile(fileName, optional: false, reloadOnChange: true)
                                      .Build()
         );
     }

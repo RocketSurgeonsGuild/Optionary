@@ -4,7 +4,6 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Optionary\Optionary.csproj" />
-        <ProjectReference Include="..\..\src\Optionary.Configuration.Yaml\Optionary.Configuration.Yaml.csproj" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Json" />
         <!-- Host start for the ValidateOnStart tests. -->
         <PackageReference Include="Microsoft.Extensions.Hosting" />
