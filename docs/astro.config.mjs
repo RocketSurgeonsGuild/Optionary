@@ -74,6 +74,7 @@ export default defineConfig({
                                         { label: "Schema and editors", link: "/guides/schema-and-editors/" },
                                         { label: "Registering from a library", link: "/guides/registering-from-a-library/" },
                                         { label: "YAML provider", link: "/guides/yaml/" },
+                                        { label: "TOML with Dovetail", link: "/guides/toml/" },
                                     ],
                                 },
                                 {

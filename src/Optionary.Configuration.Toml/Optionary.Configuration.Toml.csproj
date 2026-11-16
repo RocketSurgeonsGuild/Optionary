@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+      The Dovetail joint templates for TOML files, over the Tomlyn.Extensions.Configuration provider. It doesn't depend on Optionary
+      (decision D12). build/*.cs.template are declared by build/Optionary.Configuration.Toml.targets and packed as they are; they are
+      not compiled here.
+
+      The assembly has no API of its own. It ships anyway: Dovetail emits a template with Package="Optionary.Configuration.Toml" only
+      into a project whose resolved references include an assembly of that name.
+  -->
+  <PropertyGroup>
+    <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+    <PackageDescription>Dovetail joint templates that add an application's TOML configuration files (TomlJoint, TomlBrowserJoint and TomlEmbeddedJoint), over the Tomlyn.Extensions.Configuration provider, which this package brings in. The templates target Dovetail's joint API and do nothing without Dovetail.</PackageDescription>
+    <PackageTags>$(PackageTags);configuration;toml</PackageTags>
+    <IsTrimmable>true</IsTrimmable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <RootNamespace>Optionary.Configuration.Toml</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Tomlyn.Extensions.Configuration" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="build/*.*" Pack="true" PackagePath="build" />
+    <None Include="buildMultiTargeting/*.*" Pack="true" PackagePath="buildMultiTargeting" />
+    <None Include="buildTransitive/*.*" Pack="true" PackagePath="buildTransitive" />
+  </ItemGroup>
+</Project>

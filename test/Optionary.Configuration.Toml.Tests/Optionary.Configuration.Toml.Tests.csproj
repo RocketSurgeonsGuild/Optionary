@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+        <!-- The package under test (PackageUnderTest.targets). Nothing references the src project, so it's restored before packing. -->
+        <PackageUnderTestProject>$(MSBuildThisFileDirectory)../../src/Optionary.Configuration.Toml/Optionary.Configuration.Toml.csproj</PackageUnderTestProject>
+        <PackageUnderTestDirectory>$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)toml-package/</PackageUnderTestDirectory>
+        <PackageUnderTestRestore>true</PackageUnderTestRestore>
+    </PropertyGroup>
+
+    <!-- The package tests (PackageContentTests, WithoutDovetailTests) read the Optionary.Configuration.Toml package as it ships. -->
+    <Import Project="$(MSBuildThisFileDirectory)../PackageUnderTest.targets" />
+</Project>

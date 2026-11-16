@@ -1,0 +1,29 @@
+<Project>
+  <ItemGroup>
+    <_BlazorTomlConfigurationFiles Include="wwwroot\appsettings*.toml" />
+    <AssemblyMetadata Include="BlazorConfigurationFile" Value="@(_BlazorTomlConfigurationFiles -> '%(Filename)%(Extension)')" />
+  </ItemGroup>
+
+  <!--
+      Dovetail joint templates (decision D12). The joints that add the application's TOML files, written against Dovetail's joint API
+      (Joinery.Dovetail: [DovetailExport], IConfigurationJoint, IConfigurationAsyncJoint, IDovetailContext) and the provider from
+      Tomlyn.Extensions.Configuration. Only Dovetail's Joinery.Dovetail.Templates.targets reads DovetailTemplate items, and only in a
+      project that runs the Dovetail generator and references this package, so without Dovetail they do nothing: nothing is written and
+      nothing extra is compiled.
+
+      They are declared only for applications (Exe, WinExe, or an Android app, which the .NET for Android SDK rewrites to a Library) and
+      test projects. A joint compiled into a library would be exported to every application that references the library, and each copy
+      would load the application's TOML files again; this way each application gets one internal copy of each joint.
+  -->
+  <ItemGroup Condition="'$(OutputType)' == 'Exe' or '$(OutputType)' == 'WinExe' or '$(AndroidApplication)' == 'true' or '$(IsTestProject)' == 'true'">
+    <_OptionaryTomlJoint Include="TomlJoint" />
+    <_OptionaryTomlJoint Include="TomlBrowserJoint" />
+    <_OptionaryTomlJoint Include="TomlEmbeddedJoint" />
+    <DovetailTemplate
+      Include="@(_OptionaryTomlJoint)"
+      File="$(MSBuildThisFileDirectory)%(Identity).cs.template"
+      Package="Optionary.Configuration.Toml"
+      OutputPrefix="OptionaryToml"
+    />
+  </ItemGroup>
+</Project>
