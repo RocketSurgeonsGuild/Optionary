@@ -73,6 +73,7 @@ export default defineConfig({
                                         { label: "Binding and validation", link: "/guides/binding/" },
                                         { label: "Schema and editors", link: "/guides/schema-and-editors/" },
                                         { label: "Registering from a library", link: "/guides/registering-from-a-library/" },
+                                        { label: "JSON joints", link: "/guides/json/" },
                                         { label: "YAML provider", link: "/guides/yaml/" },
                                     ],
                                 },

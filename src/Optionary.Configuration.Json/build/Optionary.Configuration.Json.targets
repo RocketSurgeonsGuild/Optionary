@@ -1,0 +1,28 @@
+<Project>
+  <ItemGroup>
+    <_BlazorJsonConfigurationFiles Include="wwwroot\appsettings*.json" />
+    <AssemblyMetadata Include="BlazorConfigurationFile" Value="@(_BlazorJsonConfigurationFiles -> '%(Filename)%(Extension)')" />
+  </ItemGroup>
+
+  <!--
+      Dovetail joint templates (decision D12). The joints that add the application's JSON files, written against Dovetail's joint API
+      (Joinery.Dovetail: [DovetailExport], IConfigurationJoint, IConfigurationAsyncJoint, IDovetailContext). Only Dovetail's
+      Joinery.Dovetail.Templates.targets reads DovetailTemplate items, and only in a project that runs the Dovetail generator and
+      references this package, so without Dovetail they do nothing: nothing is written and nothing extra is compiled.
+
+      They are declared only for applications (Exe, WinExe, or an Android app, which the .NET for Android SDK rewrites to a Library) and
+      test projects. A joint compiled into a library would be exported to every application that references the library, and each copy
+      would load the application's JSON files again; this way each application gets one internal copy of each joint.
+  -->
+  <ItemGroup Condition="'$(OutputType)' == 'Exe' or '$(OutputType)' == 'WinExe' or '$(AndroidApplication)' == 'true' or '$(IsTestProject)' == 'true'">
+    <_OptionaryJsonJoint Include="JsonJoint" />
+    <_OptionaryJsonJoint Include="JsonBrowserJoint" />
+    <_OptionaryJsonJoint Include="JsonEmbeddedJoint" />
+    <DovetailTemplate
+      Include="@(_OptionaryJsonJoint)"
+      File="$(MSBuildThisFileDirectory)%(Identity).cs.template"
+      Package="Optionary.Configuration.Json"
+      OutputPrefix="OptionaryJson"
+    />
+  </ItemGroup>
+</Project>
