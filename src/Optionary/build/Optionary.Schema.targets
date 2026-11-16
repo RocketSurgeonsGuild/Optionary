@@ -45,6 +45,7 @@
   <!-- In-repo builds register these from src/Optionary.Build.Tasks instead (Optionary.Build.Tasks.InRepo.targets). -->
   <UsingTask TaskName="Optionary.Build.Tasks.MergeConfigurationSchema" AssemblyFile="$(MSBuildThisFileDirectory)tasks/netstandard2.0/Optionary.Build.Tasks.dll" Condition="'$(_OptionaryBuildTasksAssembly)' == ''" />
   <UsingTask TaskName="Optionary.Build.Tasks.WriteConfigurationSchemaSegment" AssemblyFile="$(MSBuildThisFileDirectory)tasks/netstandard2.0/Optionary.Build.Tasks.dll" Condition="'$(_OptionaryBuildTasksAssembly)' == ''" />
+  <UsingTask TaskName="Optionary.Build.Tasks.ReadConfigurationSchemaFragmentItems" AssemblyFile="$(MSBuildThisFileDirectory)tasks/netstandard2.0/Optionary.Build.Tasks.dll" Condition="'$(_OptionaryBuildTasksAssembly)' == ''" />
 
   <!--
     Decides the project's role and its file paths. Runs inside a target so properties set anywhere (Directory.Build.targets
@@ -210,6 +211,80 @@
     <ItemGroup Condition="'$(_OptionarySchemaRole)' == 'Library' and Exists('$(_OptionaryLibrarySchemaFile)')">
       <_OptionarySchemaPackFile Include="$(_OptionaryLibrarySchemaFile)" />
     </ItemGroup>
+  </Target>
+
+  <!--
+    OptionarySchemaFragment items declare a section's schema without code. Public MSBuild API; a package's buildTransitive
+    targets can add them. Include is the section path, and exactly one metadata holds the draft-07 schema of the section's value,
+    in the v1 fragment format: Schema (inline JSON) or File (a JSON file, relative to the project).
+
+      <OptionarySchemaFragment Include="HttpClients:Petstore" File="$(MSBuildThisFileDirectory)petstore.schema.json" />
+      <OptionarySchemaFragment Include="@(OpenApiClient->'Clients:%(ClientName)')" Schema='{"type":"object"}' />
+
+    Each becomes the attribute Optionary's generator writes, [assembly: AssemblyMetadata("Optionary.Schema.v1:<section>", "<JSON>")],
+    so from there it flows like a generated fragment: the library schema and its package, and every host that references the
+    project. Several items (and options types) for one section are merged by the host. Each item is validated first (OPT1002
+    to OPT1005). The attribute goes through the SDK's assembly-info generation as an AssemblyMetadata item, whose hash rewrites
+    AssemblyInfo.cs when the JSON changes; with GenerateAssemblyInfo or GenerateAssemblyMetadataAttributes off, Optionary writes
+    it to a file of its own instead. OptionarySchema=false skips it all.
+    Runs before GetAssemblyAttributes (which GenerateAssemblyInfo, before BeforeCompile, depends on), so the items exist in time.
+  -->
+  <Target
+    Name="_OptionarySchemaFragments"
+    BeforeTargets="GetAssemblyAttributes;BeforeCompile;CoreCompile"
+    DependsOnTargets="_OptionaryReadSchemaFragments;_OptionaryHashSchemaFragments;_OptionaryWriteSchemaFragments"
+    Condition="'@(OptionarySchemaFragment)' != '' and '$(OptionarySchema)' != 'false'" />
+
+  <Target Name="_OptionaryReadSchemaFragments" DependsOnTargets="PrepareForBuild">
+    <ReadConfigurationSchemaFragmentItems Fragments="@(OptionarySchemaFragment)" ProjectDirectory="$(MSBuildProjectDirectory)">
+      <Output TaskParameter="AssemblyMetadata" ItemName="_OptionarySchemaFragmentMetadata" />
+      <Output TaskParameter="Files" ItemName="_OptionarySchemaFragmentFile" />
+    </ReadConfigurationSchemaFragmentItems>
+
+    <PropertyGroup>
+      <_OptionarySchemaFragmentsFile>$(IntermediateOutputPath)$(MSBuildProjectName).OptionarySchemaFragments$(DefaultLanguageSourceExtension)</_OptionarySchemaFragmentsFile>
+      <_OptionarySchemaFragmentsInputsFile>$(IntermediateOutputPath)$(MSBuildProjectName).OptionarySchemaFragments.inputs</_OptionarySchemaFragmentsInputsFile>
+      <_OptionarySchemaFragmentsOwnFile>true</_OptionarySchemaFragmentsOwnFile>
+      <_OptionarySchemaFragmentsOwnFile Condition="'$(GenerateAssemblyInfo)' == 'true' and '$(GenerateAssemblyMetadataAttributes)' != 'false'">false</_OptionarySchemaFragmentsOwnFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <!-- Editing a file rebuilds even when nothing else changed. -->
+      <CustomAdditionalCompileInputs Include="@(_OptionarySchemaFragmentFile)" />
+      <AssemblyMetadata Include="@(_OptionarySchemaFragmentMetadata)" Condition="'$(_OptionarySchemaFragmentsOwnFile)' != 'true'" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Without the SDK's metadata attributes: Optionary's own file, written only when the attributes change (like the SDK's
+    AssemblyInfo.cs), so an unchanged fragment doesn't recompile.
+  -->
+  <Target Name="_OptionaryHashSchemaFragments" Condition="'$(_OptionarySchemaFragmentsOwnFile)' == 'true'">
+    <ItemGroup>
+      <_OptionarySchemaFragmentAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="'%(_OptionarySchemaFragmentMetadata.Identity)' != ''">
+        <_Parameter1>%(_OptionarySchemaFragmentMetadata.Identity)</_Parameter1>
+        <_Parameter2>%(_OptionarySchemaFragmentMetadata.Value)</_Parameter2>
+      </_OptionarySchemaFragmentAttribute>
+    </ItemGroup>
+    <Hash ItemsToHash="@(_OptionarySchemaFragmentAttribute->'%(_Parameter1)%(_Parameter2)');$(Language)">
+      <Output TaskParameter="HashResult" PropertyName="_OptionarySchemaFragmentsHash" />
+    </Hash>
+    <WriteLinesToFile File="$(_OptionarySchemaFragmentsInputsFile)" Lines="$(_OptionarySchemaFragmentsHash)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <ItemGroup Condition="'@(_OptionarySchemaFragmentAttribute)' != ''">
+      <Compile Remove="$(_OptionarySchemaFragmentsFile)" />
+      <Compile Include="$(_OptionarySchemaFragmentsFile)" />
+    </ItemGroup>
+    <ItemGroup>
+      <FileWrites Include="$(_OptionarySchemaFragmentsFile);$(_OptionarySchemaFragmentsInputsFile)" />
+    </ItemGroup>
+  </Target>
+
+  <Target
+    Name="_OptionaryWriteSchemaFragments"
+    Condition="'$(_OptionarySchemaFragmentsOwnFile)' == 'true' and '@(_OptionarySchemaFragmentAttribute)' != ''"
+    Inputs="$(_OptionarySchemaFragmentsInputsFile)"
+    Outputs="$(_OptionarySchemaFragmentsFile)">
+    <WriteCodeFragment AssemblyAttributes="@(_OptionarySchemaFragmentAttribute)" Language="$(Language)" OutputFile="$(_OptionarySchemaFragmentsFile)" />
   </Target>
 
   <!--

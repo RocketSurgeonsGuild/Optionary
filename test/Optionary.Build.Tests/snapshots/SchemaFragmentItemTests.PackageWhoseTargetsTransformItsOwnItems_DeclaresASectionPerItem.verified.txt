@@ -1,0 +1,8 @@
+﻿[
+  {
+    Name: host,
+    OutputFiles: [
+      appsettings.schema.json
+    ]
+  }
+]

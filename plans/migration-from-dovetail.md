@@ -176,21 +176,22 @@ TOML, YAML) and their joints stay in Dovetail (4.6).
 
 **Diagnostics.** IDs are renumbered and the category becomes `Optionary`.
 
-| Dovetail                       | Optionary | Rule                                                                                             |
-| ------------------------------ | --------- | ------------------------------------------------------------------------------------------------ |
-| DT0006 (stays in Dovetail too) | OPT0001   | C# older than 12: the registration method is emitted with an empty body, nothing else            |
-| DT0007                         | OPT0002   | invalid options type                                                                             |
-| DT0008                         | OPT0003   | invalid section path                                                                             |
-| DT0009                         | OPT0004   | unsupported member                                                                               |
-| DT0010                         | OPT0005   | key collision                                                                                    |
-| DT0011                         | OPT0006   | type can't be created                                                                            |
-| DT0012                         | OPT0007   | type graph too large                                                                             |
-| DT0013                         | OPT0008   | annotation not expressible                                                                       |
-| DT0014                         | OPT0009   | schema generation failed                                                                         |
-| DT0015                         | OPT0010   | type declared twice                                                                              |
-| DT0016                         | OPT0011   | key style conflict                                                                               |
-| DT0018                         | OPT0012   | ZeroAlloc async rule                                                                             |
-| new                            | OPT1001   | MSBuild error from `Optionary.targets`: the runtime is referenced but the generator isn't loaded |
+| Dovetail                       | Optionary       | Rule                                                                                                                                          |
+| ------------------------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| DT0006 (stays in Dovetail too) | OPT0001         | C# older than 12: the registration method is emitted with an empty body, nothing else                                                         |
+| DT0007                         | OPT0002         | invalid options type                                                                                                                          |
+| DT0008                         | OPT0003         | invalid section path                                                                                                                          |
+| DT0009                         | OPT0004         | unsupported member                                                                                                                            |
+| DT0010                         | OPT0005         | key collision                                                                                                                                 |
+| DT0011                         | OPT0006         | type can't be created                                                                                                                         |
+| DT0012                         | OPT0007         | type graph too large                                                                                                                          |
+| DT0013                         | OPT0008         | annotation not expressible                                                                                                                    |
+| DT0014                         | OPT0009         | schema generation failed                                                                                                                      |
+| DT0015                         | OPT0010         | type declared twice                                                                                                                           |
+| DT0016                         | OPT0011         | key style conflict                                                                                                                            |
+| DT0018                         | OPT0012         | ZeroAlloc async rule                                                                                                                          |
+| new                            | OPT1001         | MSBuild error from `Optionary.targets`: the runtime is referenced but the generator isn't loaded                                              |
+| new                            | OPT1002–OPT1005 | MSBuild errors for `OptionarySchemaFragment` items: not exactly one of `Schema`/`File`, an invalid section path, no such file, not a fragment |
 
 All of them start in Optionary's `AnalyzerReleases.Unshipped.md`. Dovetail moves DT0007–DT0016 and DT0018 to "Removed Rules".
 

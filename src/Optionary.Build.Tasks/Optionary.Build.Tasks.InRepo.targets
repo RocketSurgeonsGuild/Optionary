@@ -10,6 +10,7 @@
   </PropertyGroup>
   <UsingTask TaskName="Optionary.Build.Tasks.MergeConfigurationSchema" AssemblyFile="$(_OptionaryBuildTasksAssembly)" TaskFactory="TaskHostFactory" />
   <UsingTask TaskName="Optionary.Build.Tasks.WriteConfigurationSchemaSegment" AssemblyFile="$(_OptionaryBuildTasksAssembly)" TaskFactory="TaskHostFactory" />
+  <UsingTask TaskName="Optionary.Build.Tasks.ReadConfigurationSchemaFragmentItems" AssemblyFile="$(_OptionaryBuildTasksAssembly)" TaskFactory="TaskHostFactory" />
   <UsingTask TaskName="Optionary.Build.Tasks.ScaffoldEditorSettings" AssemblyFile="$(_OptionaryBuildTasksAssembly)" TaskFactory="TaskHostFactory" />
   <!--
       Builds the tasks first. Not a real reference: nothing compiles against it and no package depends on it.
