@@ -41,6 +41,13 @@
     <File Path=".github/workflows/sync-labels.yml" />
     <File Path=".github/workflows/update-milestone.yml" />
   </Folder>
+  <Folder Name="/samples/">
+    <File Path="samples/Directory.Build.props" />
+    <File Path="samples/Directory.Build.targets" />
+    <Project Path="samples/Optionary.Samples.Console/Optionary.Samples.Console.csproj" />
+    <Project Path="samples/Optionary.Samples.Library/Optionary.Samples.Library.csproj" />
+    <Project Path="samples/Optionary.Samples.Web/Optionary.Samples.Web.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <File Path="src/.editorconfig" />
     <File Path="src/Directory.Build.props" />

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <!--
+        An ASP.NET Core application (a host): its build merges its own fragments and the library's into obj/appsettings.schema.json
+        and copies the file next to appsettings.json. The Web SDK's own appsettings*.json content stays as it is.
+    -->
+    <PropertyGroup>
+        <RootNamespace>Optionary.Samples.Web</RootNamespace>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../Optionary.Samples.Library/Optionary.Samples.Library.csproj" />
+    </ItemGroup>
+</Project>

@@ -36,6 +36,8 @@ docs = { run = [
   "mise run docs:api",
   "npm run dev --workspace docs",
 ], description = "Build the solution, generate the API reference and start the Astro/Starlight dev server" }
+"sample:console" = { run = "dotnet run --project samples/Optionary.Samples.Console --", description = "Run the console sample, which prints the options it binds (mise run sample:console --watch reprints them when appsettings*.json changes)" }
+"sample:web" = { run = "dotnet run --project samples/Optionary.Samples.Web", description = "Run the ASP.NET Core sample on http://localhost:5180" }
 "docs:preview" = { run = "npm run preview --workspace docs", description = "Preview built Starlight site" }
 "docs:build" = { run = "npm run build --workspace docs", depends = [
   "docs:api",

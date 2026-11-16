@@ -1,0 +1,21 @@
+<Project>
+    <!--
+        The samples consume Optionary as a package consumer does, from this repository's source: Optionary's build/ props and
+        targets, the generator as an analyzer, and the MSBuild tasks from Optionary.Build.Tasks' output (Directory.Build.targets).
+    -->
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+    <Import Project="$(MSBuildThisFileDirectory)../src/Optionary/build/Optionary.props" />
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <!-- Samples are demonstrations, never packed or published as packages. -->
+        <IsPackable>false</IsPackable>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <!--
+            The samples aren't part of the tracked public API: drop the RS0016/RS0017 warnings-as-errors inherited from the root
+            and silence the public API analyzer, so they need no PublicAPI.*.txt files.
+        -->
+        <WarningsAsErrors>$(WarningsAsErrors.Replace('RS0016', '').Replace('RS0017', '').Trim(';'))</WarningsAsErrors>
+        <NoWarn>$(NoWarn);RS0016;RS0017;RS0026;RS0027;RS0037;RS0041</NoWarn>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    </PropertyGroup>
+</Project>
