@@ -12,7 +12,7 @@ Each library contributes JSON Schema fragments (assembly metadata prefixed `Opti
 
 ### III. Independent of Dovetail
 
-Optionary knows nothing about Dovetail: no reference, no detection. The cross-repo contract is the attribute names and the generated `OptionaryConfigurationOptions.AddOptionaryConfigurationOptions(IServiceCollection)` method (plan section 4); changing either is a breaking change for Dovetail and is treated as public API. The only exception is `Optionary.Configuration.Yaml`, which declares Dovetail joint templates that do nothing without Dovetail.
+Optionary knows nothing about Dovetail: no reference, no detection. The cross-repo contract is the attribute names and the generated `OptionaryConfigurationOptions.AddOptionaryConfigurationOptions(IServiceCollection)` method (plan section 4); changing either is a breaking change for Dovetail and is treated as public API. Configuration-format packages and Dovetail joints live in Dovetail.
 
 ### IV. Public API Surface is a Contract (RS0016, RS0017)
 
@@ -29,8 +29,8 @@ Generated binders and schema fragments are verified against committed Verify sna
 ## Code Standards
 
 - **Language**: C# with `LangVersion=preview`, `Nullable=enable`, `ImplicitUsings=enable`, `Features=strict`, `AnalysisMode=AllEnabledByDefault`
-- **Targets**: runtime and YAML packages `net10.0;net11.0`; the generator `netstandard2.0`, built per Roslyn version (roslyn5.0/5.3/5.6 in `src/Optionary.Analyzers.supports/`, roslyn5.9 in `src/Optionary.Analyzers/`); the MSBuild tasks `netstandard2.0`
-- **Packaging**: one `Optionary` package carries the runtime (`lib/`), the generator (`analyzers/dotnet/roslyn5.x/cs/`), the tasks (`build/tasks/netstandard2.0/`) and the MSBuild assets (`build/`, `buildTransitive/`, `buildMultiTargeting/`). `Optionary.Configuration.Yaml` doesn't depend on `Optionary`.
+- **Targets**: the runtime `net10.0;net11.0`; the generator `netstandard2.0`, built per Roslyn version (roslyn5.0/5.3/5.6 in `src/Optionary.Analyzers.supports/`, roslyn5.9 in `src/Optionary.Analyzers/`); the MSBuild tasks `netstandard2.0`
+- **Packaging**: one `Optionary` package carries the runtime (`lib/`), the generator (`analyzers/dotnet/roslyn5.x/cs/`), the tasks (`build/tasks/netstandard2.0/`) and the MSBuild assets (`build/`, `buildTransitive/`, `buildMultiTargeting/`).
 - **Global usings**: `JetBrains.Annotations`, `System.Diagnostics.CodeAnalysis`, `NotNullAttribute` alias applied to all projects
 - **Warnings as errors**: `RS0016` and `RS0017` — do not silently suppress other warnings without justification
 - **Formatting**: `hk fix` (dotnet format for C#, biome for JS/TS/JSON, oxfmt for YAML/Markdown/CSS, tombi for TOML); CI enforces it via `lint.yml`

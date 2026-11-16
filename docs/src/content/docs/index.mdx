@@ -25,10 +25,9 @@ public sealed class GreetingsOptions
 }
 ```
 
-| Package                        | What it is                                                                                        |
-| ------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `Optionary`                    | The `[Optionary]` attribute, the source generator, the runtime registration and the schema build. |
-| `Optionary.Configuration.Yaml` | A YAML configuration provider. It doesn't depend on `Optionary`.                                  |
+Everything ships in one package, `Optionary`: the `[Optionary]` attribute, the source generator, the runtime
+registration and the schema build. Optionary binds from whatever `IConfiguration` holds and adds no configuration
+providers of its own, so the files can be JSON or any other format a provider reads.
 
 ## Where to go next
 
@@ -39,8 +38,8 @@ public sealed class GreetingsOptions
   Microsoft's configuration binding generator.
 - [Schema and editors](guides/schema-and-editors/): the library and application schemas, Visual Studio, VS Code and Rider.
 - [Registering from a library](guides/registering-from-a-library/): the generated registration method and its contract.
-- [YAML provider](guides/yaml/), [MSBuild properties](reference/msbuild-properties/),
-  [diagnostics](reference/diagnostics/) and [troubleshooting](troubleshooting/).
+- [MSBuild properties](reference/msbuild-properties/), [diagnostics](reference/diagnostics/) and
+  [troubleshooting](troubleshooting/).
 
 ## Glossary
 
