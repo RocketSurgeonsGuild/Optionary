@@ -19,16 +19,28 @@ internal static class ConfigurationSchemaPipeline
     public const string GenericAttributeMetadataName = "Optionary.OptionaryAttribute`1";
     public const string MetadataPrefix = "Optionary.Schema.v1:";
 
+    /// <summary>The assembly the attributes must come from. An <c>Optionary.OptionaryAttribute</c> from any other assembly is ignored.</summary>
+    public const string AttributeAssemblyName = "Optionary";
+
     /// <summary>Marks the XML documentation files of package references, which Optionary's targets pass in as additional files.</summary>
     private const string ReferenceDocumentationMetadata = "build_metadata.AdditionalFiles.OptionaryReferenceDocumentation";
 
     /// <summary>Registers the schema and options outputs.</summary>
     public static void Register(IncrementalGeneratorInitializationContext context)
     {
-        // The generated code uses C# 12 syntax (collection expressions). Below it nothing is generated.
-        var supportedLanguageVersion = context.ParseOptionsProvider.Select(
-            static (options, _) => options is not CSharpParseOptions csharp || csharp.LanguageVersion >= LanguageVersion.CSharp12
+        // Everything here, the registration method included, depends on Optionary.OptionaryAttribute coming from the assembly
+        // named Optionary. Dovetail applies the same test before its joint calls the method, so the two always agree.
+        var optionaryReferenced = context
+                                 .CompilationProvider
+                                 .Select(static (compilation, _) => compilation.GetTypeByMetadataName(AttributeMetadataName) is { ContainingAssembly.Name: AttributeAssemblyName })
+                                 .WithTrackingName("optionary:referenced");
+
+        // The generated binder and schema use C# 12 syntax (collection expressions). Below it the registration method is still
+        // emitted, empty, so that its callers compile, and OPT0001 says why it registers nothing.
+        var languageVersion = context.ParseOptionsProvider.Select(
+            static (options, _) => options is CSharpParseOptions csharp ? csharp.LanguageVersion : LanguageVersion.Latest
         );
+        var supportedLanguageVersion = languageVersion.Select(static (version, _) => version >= LanguageVersion.CSharp12);
 
         // The registration method's namespace, verbatim; callers (Dovetail's exported joint among them) find it there.
         var rootNamespace = context.AnalyzerConfigOptionsProvider.Select(static (options, _) => options.GlobalOptions.GetBuildProperty("RootNamespace", s => s));
@@ -41,10 +53,6 @@ internal static class ConfigurationSchemaPipeline
         var options = declarations
                      .Select(static (declarations, _) => declarations.Select(z => z.Options).OfType<ConfigurationOptions>().ToEquatableArray())
                      .WithTrackingName("optionary:options");
-        // The method is emitted for every declaration, even one that registers nothing, because callers such as
-        // Dovetail's joint generator call it whenever they find a declaration, and don't read what this generator made of it.
-        var hasDeclarations = declarations.Select(static (declarations, _) => !declarations.IsEmpty);
-
         // [OptionsValidator] classes for the options types are registered with them.
         var validators = context
                         .SyntaxProvider
@@ -78,8 +86,14 @@ internal static class ConfigurationSchemaPipeline
         );
 
         context.RegisterSourceOutput(
-            described.Combine(includeRequired).Combine(supportedLanguageVersion),
-            static (production, input) => Emit(production, input.Left.Left, input.Left.Right, input.Right)
+            described.Combine(includeRequired).Combine(supportedLanguageVersion.Combine(optionaryReferenced)),
+            static (production, input) =>
+            {
+                if (input.Right is (true, true))
+                {
+                    Emit(production, input.Left.Left, input.Left.Right);
+                }
+            }
         );
 
         // The class ZeroAlloc.Validation.Options writes ValidateWithZeroAlloc() into, unless ZeroAlloc.Validation is left to the project.
@@ -89,24 +103,42 @@ internal static class ConfigurationSchemaPipeline
                 : ZeroAllocOptionsValidation.ExtensionsClass(options.GlobalOptions.GetBuildProperty(ZeroAllocOptionsValidation.AccessibilityProperty, z => z))
         );
 
+        // The registration method is emitted whenever Optionary is referenced, with or without declarations, and whether or not
+        // they register anything: callers (Dovetail's exported joint among them) call it without reading this generator's output.
         context.RegisterSourceOutput(
-            options.Combine(validators).Combine(zeroAllocExtensions).Combine(rootNamespace).Combine(hasDeclarations.Combine(supportedLanguageVersion)),
+            options.Combine(validators).Combine(zeroAllocExtensions).Combine(rootNamespace).Combine(languageVersion.Combine(optionaryReferenced)),
             static (production, input) =>
             {
                 var (((registrations, validators), zeroAllocExtensions), rootNamespace) = input.Left;
-                if (input.Right is (true, true))
+                var (version, referenced) = input.Right;
+                if (!referenced)
                 {
-                    production.AddSource("Optionary.Options.g.cs", ConfigurationOptionsEmitter.Emit(rootNamespace, registrations, validators, zeroAllocExtensions));
+                    return;
                 }
+
+                if (version < LanguageVersion.CSharp12)
+                {
+                    production.ReportDiagnostic(Diagnostic.Create(ConfigurationDiagnostics.UnsupportedLanguageVersion, Location.None, version.ToDisplayString()));
+                    production.AddSource("Optionary.Options.g.cs", ConfigurationOptionsEmitter.EmitEmpty(rootNamespace, version));
+                    return;
+                }
+
+                production.AddSource("Optionary.Options.g.cs", ConfigurationOptionsEmitter.Emit(rootNamespace, registrations, validators, zeroAllocExtensions));
             }
         );
 
         // Reported against the compilation's syntax trees, so #pragma warning disable works. This step re-runs on every edit,
         // but all it does is report.
         context.RegisterSourceOutput(
-            diagnostics.Combine(context.CompilationProvider),
-            static (production, input) =>
+            diagnostics.Combine(context.CompilationProvider).Combine(optionaryReferenced),
+            static (production, pair) =>
             {
+                var (input, referenced) = pair;
+                if (!referenced)
+                {
+                    return;
+                }
+
                 foreach (var diagnostic in input.Left)
                 {
                     production.ReportDiagnostic(diagnostic.ToDiagnostic(input.Right));
@@ -315,9 +347,9 @@ internal static class ConfigurationSchemaPipeline
         return end > start ? path[start..end] : path[start..];
     }
 
-    private static void Emit(SourceProductionContext production, EquatableArray<ConfigurationSection> sections, bool includeRequired, bool supportedLanguageVersion)
+    private static void Emit(SourceProductionContext production, EquatableArray<ConfigurationSection> sections, bool includeRequired)
     {
-        if (!supportedLanguageVersion || sections.IsEmpty)
+        if (sections.IsEmpty)
         {
             return;
         }

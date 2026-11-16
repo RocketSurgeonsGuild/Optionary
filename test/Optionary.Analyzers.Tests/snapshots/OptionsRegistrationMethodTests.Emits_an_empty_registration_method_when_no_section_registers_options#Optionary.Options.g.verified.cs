@@ -13,7 +13,7 @@ namespace Sample
     ///     Registers this assembly's <c>[Optionary]</c> types with the options pipeline, bound from configuration
     ///     without reflection.
     /// </summary>
-    [System.CodeDom.Compiler.GeneratedCode("Optionary.Analyzers", "version"), System.Runtime.CompilerServices.CompilerGenerated, System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [global::System.CodeDom.Compiler.GeneratedCode("Optionary", "version"), global::System.Runtime.CompilerServices.CompilerGenerated, global::System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     internal static class OptionaryConfigurationOptions
     {
         /// <summary>
