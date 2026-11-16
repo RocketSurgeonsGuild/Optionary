@@ -45,7 +45,8 @@ public class GeneratorCheckTests
 
         var output = await project.BuildProjectExpectingFailure("app");
 
-        await output.Should().Contain("error OPT1001: app references Optionary.dll, but Optionary's source generator (Optionary.Analyzers) isn't loaded");
+        await output.Should().Contain("error OPT1001: app references Optionary.dll, but Optionary's source generator (Optionary.Analyzers) isn't loaded: no @(Analyzer) item is Optionary.Analyzers");
+        await output.Should().Contain("Look for a target (in the project, a Directory.Build.targets, or another package) that removes Optionary.Analyzers from @(Analyzer)");
         await output.Should().NotContain("error CS");
     }
 
