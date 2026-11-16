@@ -20,7 +20,7 @@ internal static class ConfigurationSchemaPipeline
     public const string MetadataPrefix = "Optionary.Schema.v1:";
 
     /// <summary>The assembly the attributes must come from. An <c>Optionary.OptionaryAttribute</c> from any other assembly is ignored.</summary>
-    public const string AttributeAssemblyName = "Optionary";
+    public const string AttributeAssemblyName = ConfigurationHelpers.OptionaryName;
 
     /// <summary>Marks the XML documentation files of package references, which Optionary's targets pass in as additional files.</summary>
     private const string ReferenceDocumentationMetadata = "build_metadata.AdditionalFiles.OptionaryReferenceDocumentation";
@@ -30,17 +30,19 @@ internal static class ConfigurationSchemaPipeline
     {
         // Everything here, the registration method included, depends on Optionary.OptionaryAttribute coming from the assembly
         // named Optionary. Dovetail applies the same test before its joint calls the method, so the two always agree.
+        // GetTypeByMetadataName returns null when two references define the name, so look at every definition.
         var optionaryReferenced = context
                                  .CompilationProvider
-                                 .Select(static (compilation, _) => compilation.GetTypeByMetadataName(AttributeMetadataName) is { ContainingAssembly.Name: AttributeAssemblyName })
+                                 .Select(static (compilation, _) => IsOptionaryReferenced(compilation))
                                  .WithTrackingName("optionary:referenced");
 
         // The generated binder and schema use C# 12 syntax (collection expressions). Below it the registration method is still
         // emitted, empty, so that its callers compile, and OPT0001 says why it registers nothing.
-        var languageVersion = context.ParseOptionsProvider.Select(
-            static (options, _) => options is CSharpParseOptions csharp ? csharp.LanguageVersion : LanguageVersion.Latest
-        );
-        var supportedLanguageVersion = languageVersion.Select(static (version, _) => version >= LanguageVersion.CSharp12);
+        var gate = context
+                  .ParseOptionsProvider
+                  .Select(static (options, _) => options is CSharpParseOptions csharp ? csharp.LanguageVersion : LanguageVersion.Latest)
+                  .Combine(optionaryReferenced)
+                  .Select(static (pair, _) => new GenerationGate(pair.Left, pair.Right));
 
         // The registration method's namespace, verbatim; callers (Dovetail's exported joint among them) find it there.
         var rootNamespace = context.AnalyzerConfigOptionsProvider.Select(static (options, _) => options.GlobalOptions.GetBuildProperty("RootNamespace", s => s));
@@ -86,10 +88,10 @@ internal static class ConfigurationSchemaPipeline
         );
 
         context.RegisterSourceOutput(
-            described.Combine(includeRequired).Combine(supportedLanguageVersion.Combine(optionaryReferenced)),
+            described.Combine(includeRequired).Combine(gate),
             static (production, input) =>
             {
-                if (input.Right is (true, true))
+                if (input.Right.GeneratesEverything)
                 {
                     Emit(production, input.Left.Left, input.Left.Right);
                 }
@@ -106,20 +108,20 @@ internal static class ConfigurationSchemaPipeline
         // The registration method is emitted whenever Optionary is referenced, with or without declarations, and whether or not
         // they register anything: callers (Dovetail's exported joint among them) call it without reading this generator's output.
         context.RegisterSourceOutput(
-            options.Combine(validators).Combine(zeroAllocExtensions).Combine(rootNamespace).Combine(languageVersion.Combine(optionaryReferenced)),
+            options.Combine(validators).Combine(zeroAllocExtensions).Combine(rootNamespace).Combine(gate),
             static (production, input) =>
             {
                 var (((registrations, validators), zeroAllocExtensions), rootNamespace) = input.Left;
-                var (version, referenced) = input.Right;
-                if (!referenced)
+                var gate = input.Right;
+                if (!gate.OptionaryReferenced)
                 {
                     return;
                 }
 
-                if (version < LanguageVersion.CSharp12)
+                if (!gate.LanguageVersionSupported)
                 {
-                    production.ReportDiagnostic(Diagnostic.Create(ConfigurationDiagnostics.UnsupportedLanguageVersion, Location.None, version.ToDisplayString()));
-                    production.AddSource("Optionary.Options.g.cs", ConfigurationOptionsEmitter.EmitEmpty(rootNamespace, version));
+                    production.ReportDiagnostic(Diagnostic.Create(ConfigurationDiagnostics.UnsupportedLanguageVersion, Location.None, gate.LanguageVersion.ToDisplayString()));
+                    production.AddSource("Optionary.Options.g.cs", ConfigurationOptionsEmitter.EmitEmpty(rootNamespace, gate.LanguageVersion));
                     return;
                 }
 
@@ -145,6 +147,20 @@ internal static class ConfigurationSchemaPipeline
                 }
             }
         );
+    }
+
+    /// <summary>Whether any definition of <c>Optionary.OptionaryAttribute</c> the compilation sees comes from the assembly named Optionary.</summary>
+    private static bool IsOptionaryReferenced(Compilation compilation)
+    {
+        foreach (var type in compilation.GetTypesByMetadataName(AttributeMetadataName))
+        {
+            if (type.ContainingAssembly.Name == AttributeAssemblyName)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static IncrementalValueProvider<EquatableArray<ConfigurationDeclaration>> Declarations(IncrementalGeneratorInitializationContext context)
@@ -361,5 +377,15 @@ internal static class ConfigurationSchemaPipeline
                   .WithAttributeLists(List(ordered.Select(z => ConfigurationHelpers.AddAssemblyAttribute(MetadataPrefix + z.Path, JsonSchemaWriter.Write(z, includeRequired)))))
                   .AddSharedTrivia();
         production.AddSource("Optionary.Schema.g.cs", unit.NormalizeWhitespace().GetText(Encoding.UTF8));
+    }
+
+    /// <summary>What the outputs are gated on: the project's C# version, and whether Optionary's attribute is referenced.</summary>
+    private readonly record struct GenerationGate(LanguageVersion LanguageVersion, bool OptionaryReferenced)
+    {
+        /// <summary>The generated binder and schema use C# 12 syntax (collection expressions).</summary>
+        public bool LanguageVersionSupported => LanguageVersion >= LanguageVersion.CSharp12;
+
+        /// <summary>Optionary is referenced and the C# version supports the binder and schema.</summary>
+        public bool GeneratesEverything => OptionaryReferenced && LanguageVersionSupported;
     }
 }

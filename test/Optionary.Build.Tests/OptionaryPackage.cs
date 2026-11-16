@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Xml.Linq;
 
 namespace Optionary.Build.Tests;
@@ -10,9 +9,9 @@ internal static class OptionaryPackage
 {
     public const string Id = "Optionary";
 
-    public static string Directory { get; } = Metadata("OptionaryPackageDirectory");
+    public static string Directory { get; } = TestAssemblyMetadata.Get("PackageUnderTestDirectory");
 
-    public static string RepositoryRoot { get; } = Metadata("OptionaryRepositoryRoot");
+    public static string RepositoryRoot { get; } = TestAssemblyMetadata.Get("OptionaryRepositoryRoot");
 
     public static string Path { get; } = System.IO.Directory.EnumerateFiles(Directory, $"{Id}.*.nupkg")
                                                  .Single(z => char.IsDigit(System.IO.Path.GetFileName(z)[Id.Length + 1]));
@@ -41,7 +40,4 @@ internal static class OptionaryPackage
                               ?.Value;
         return version ?? throw new InvalidOperationException($"No PackageVersion for {packageId} in {path}.");
     }
-
-    private static string Metadata(string key) =>
-        typeof(OptionaryPackage).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Single(z => z.Key == key).Value!;
 }

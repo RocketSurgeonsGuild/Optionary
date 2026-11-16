@@ -7,22 +7,29 @@ tags: [msbuild, source-generator]
 ## The generator isn't loaded
 
 The build fails with [`OPT1001`](../reference/diagnostics/#opt1001): `Optionary` is referenced, but its generator isn't
-among the project's analyzers. Nothing is bound and the registration method doesn't exist.
+among the compiler's analyzers (`@(Analyzer)`). Nothing is bound and the registration method doesn't exist.
 
-- **Analyzers are excluded.** Look for `ExcludeAssets="analyzers"` (or `all`) on the `Optionary` package reference, or in a
-  `Directory.Packages.props` or `Directory.Build.props`, and remove it.
-- **The compiler is too old.** The package carries the generator for Roslyn 5.0 and later. Build with the .NET 10 SDK or
-  later, and check that `global.json` doesn't pin an older one.
+- **A target removes the generator.** Look for a target, in the project, a `Directory.Build.targets` or another package,
+  that removes `Optionary.Analyzers` from `@(Analyzer)`, and remove it.
+- **The compiler is too old.** The package carries the generator for Roslyn 5.0 and later, so an older compiler matches no
+  slice and loads none. Build with the .NET 10 SDK or later, and check that `global.json` doesn't pin an older one.
 
-## CS0103 or CS1061 at a call to `AddOptionaryConfigurationOptions`
+`ExcludeAssets="analyzers"` on the package reference doesn't cause this: the .NET SDK passes a package's analyzers to the
+compiler whatever the reference excludes, so the generator still runs.
 
-If Optionary's build assets are excluded as well as its analyzers (`ExcludeAssets="build;analyzers"`, or
-`IncludeAssets="compile;runtime"`), its targets don't run either, so `OPT1001` can't be reported. The first sign is the
-compiler failing at the call to the registration method: CS1061 (`IServiceCollection` has no
-`AddOptionaryConfigurationOptions`) or CS0103 (the name doesn't exist). In a Dovetail application the error is in Dovetail's
-generated exports file, at the joint that calls the method, and is CS0234 or CS0103.
+## CS0234, CS0103 or CS1061 at a call to `AddOptionaryConfigurationOptions`
 
-Include the package's `build` and `analyzers` assets.
+If Optionary's build assets are excluded (`ExcludeAssets="build"` or `ExcludeAssets="all"`, or an `IncludeAssets` without
+`build`), its `.props` and `.targets` aren't imported, so the `OPT1001` check doesn't run either. The generator still runs,
+but `RootNamespace` isn't passed to it (Optionary's `CompilerVisibleProperty`), so it puts `OptionaryConfigurationOptions`
+in the global namespace. The schema targets don't run, so there's no `appsettings.schema.json` either.
+
+A `using <RootNamespace>;` then doesn't find the method (CS1061: `IServiceCollection` has no
+`AddOptionaryConfigurationOptions`), and a fully qualified call to `<RootNamespace>.OptionaryConfigurationOptions` fails
+with CS0234 (or CS0103). In a Dovetail application the error is in Dovetail's generated exports file, at the joint that
+calls `global::<RootNamespace>.OptionaryConfigurationOptions.AddOptionaryConfigurationOptions`: CS0234.
+
+Include the package's `build` assets.
 
 ## The registration method isn't found, but the generator runs
 

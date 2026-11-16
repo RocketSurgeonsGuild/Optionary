@@ -37,10 +37,13 @@ internal static class ConfigurationHelpers
         type.IsGenericType && ( type.IsUnboundGenericType || type.TypeArguments.All(z => z.TypeKind == TypeKind.TypeParameter) );
 
     /// <summary>
-    ///     The tool name in <c>[GeneratedCode]</c>: the package, not the generator assembly. Part of the registration method's
-    ///     contract (plan section 4.2).
+    ///     Optionary's name: the package, the runtime assembly the attributes must come from (plan section 4.3), and the tool in
+    ///     <c>[GeneratedCode]</c>, which names the package rather than the generator assembly (plan section 4.2).
     /// </summary>
-    internal const string GeneratedCodeTool = "Optionary";
+    internal const string OptionaryName = "Optionary";
+
+    /// <summary>The tool name in <c>[GeneratedCode]</c>. Part of the registration method's contract (plan section 4.2).</summary>
+    internal const string GeneratedCodeTool = OptionaryName;
 
     /// <summary>
     ///     <c>[GeneratedCode("Optionary", version)]</c>, <c>[CompilerGenerated]</c> and <c>[ExcludeFromCodeCoverage]</c>, qualified with

@@ -73,5 +73,6 @@ Give the projects distinct `RootNamespace`s.
 
 ## If the method is missing
 
-A call to `AddOptionaryConfigurationOptions` that doesn't compile (CS1061 or CS0103) means the generator didn't run. See
+A call to `AddOptionaryConfigurationOptions` that doesn't compile (CS1061, CS0234 or CS0103) usually means Optionary's build
+assets are excluded: the generator still runs, but without `RootNamespace`, so the method is in the global namespace. See
 [troubleshooting](../../troubleshooting/).
