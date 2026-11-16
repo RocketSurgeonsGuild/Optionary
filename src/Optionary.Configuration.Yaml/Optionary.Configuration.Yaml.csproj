@@ -1,8 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <!-- A YAML configuration provider. It doesn't depend on Optionary (decision D12). -->
+  <!--
+      A YAML configuration provider. It doesn't depend on Optionary (decision D12). build/*.cs.template are Dovetail joint templates,
+      declared by build/Optionary.Configuration.Yaml.targets and packed as they are; they are not compiled here.
+  -->
   <PropertyGroup>
     <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
-    <PackageDescription>A YAML configuration provider for Microsoft.Extensions.Configuration.</PackageDescription>
+    <PackageDescription>A YAML configuration provider for Microsoft.Extensions.Configuration. The package also ships three Dovetail joint templates (YamlJoint, YamlBrowserJoint and YamlEmbeddedJoint) that add an application's YAML files; they target Dovetail's joint API and do nothing without Dovetail.</PackageDescription>
     <PackageTags>$(PackageTags);configuration;yaml</PackageTags>
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
