@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
     <PackageDescription>Source-generated, reflection-free options binding and JSON Schema for .NET configuration.</PackageDescription>
-    <PackageTags>$(PackageTags);configuration;options;json-schema;source-generator</PackageTags>
+    <PackageTags>$(PackageTags);ioptions;options-pattern;appsettings;json-schema;source-generator;roslyn;aot;trimming</PackageTags>
     <IsTrimmable>true</IsTrimmable>
     <IsAotCompatible>true</IsAotCompatible>
     <RootNamespace>Optionary</RootNamespace>
