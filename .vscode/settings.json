@@ -36,15 +36,5 @@
         "activityBarTop.activeBorder": "#15202b",
         "statusBar.inactiveBackground": "#3737cc"
     },
-    "peacock.color": "#6060d6",
-    "json.schemas": [
-        {
-            "fileMatch": ["/samples/Optionary.Samples.Console/appsettings*.json"],
-            "url": "./samples/Optionary.Samples.Console/obj/appsettings.schema.json"
-        },
-        {
-            "fileMatch": ["/samples/Optionary.Samples.Web/appsettings*.json"],
-            "url": "./samples/Optionary.Samples.Web/obj/appsettings.schema.json"
-        }
-    ]
+    "peacock.color": "#6060d6"
 }
