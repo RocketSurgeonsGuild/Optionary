@@ -1,0 +1,14 @@
+﻿[
+  {
+    Name: lib1
+  },
+  {
+    Name: lib2
+  },
+  {
+    Name: host,
+    OutputFiles: [
+      appsettings.schema.json
+    ]
+  }
+]

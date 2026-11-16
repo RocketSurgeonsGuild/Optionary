@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!--
+            MSBuild.ProjectCreation loads MSBuild in-proc from an SDK of the host's major version, and only SDK 11 is installed (mise
+            adds just the .NET 10 runtime). The scaffolded projects cover both target frameworks instead, through
+            TargetFrameworksAttribute.
+        -->
+        <TargetFramework>net11.0</TargetFramework>
+        <!--
+            MSB3277: Microsoft.Build references a newer NuGet.Frameworks (shipped with the SDK) than the newest NuGet.* packages.
+            Harmless: MSBuild and NuGet are loaded from the installed SDK at run time, so these only compile against.
+        -->
+        <NoWarn>$(NoWarn);MSB3277</NoWarn>
+        <!-- Where _PackOptionary writes the package under test (OptionaryPackage reads it from the assembly metadata). -->
+        <OptionaryPackageDirectory>$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)optionary-package/</OptionaryPackageDirectory>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="MSBuild.ProjectCreation" />
+        <!-- Load all of MSBuild from the SDK (MSBuildAssemblyResolver): copies from these packages don't match its Microsoft.Build.dll. -->
+        <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" />
+        <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" ExcludeAssets="runtime" />
+        <PackageReference Include="MSBuild.StructuredLogger.Utils" />
+    </ItemGroup>
+    <ItemGroup>
+        <AssemblyMetadata Include="OptionaryPackageDirectory" Value="$(OptionaryPackageDirectory)" />
+        <!-- The scaffolds copy the repository's global.json, so they build with the SDK the repository pins. -->
+        <AssemblyMetadata Include="OptionaryRepositoryRoot" Value="$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', '..'))" />
+    </ItemGroup>
+
+    <!--
+        The tests scaffold throwaway projects that restore the Optionary package as it ships, so pack it on every build. Route the
+        request through one call without a TargetFramework, which MSBuild caches, so the package is packed once per build and the
+        src project never inherits this project's TargetFramework.
+    -->
+    <Target Name="PackOptionary" BeforeTargets="Build">
+        <MSBuild
+            Projects="$(MSBuildProjectFullPath)"
+            Targets="_PackOptionary"
+            Properties="Configuration=$(Configuration)"
+            RemoveProperties="TargetFramework;RuntimeIdentifier"
+        />
+    </Target>
+
+    <Target Name="_PackOptionary">
+        <ItemGroup>
+            <_StaleOptionaryPackage Include="$(OptionaryPackageDirectory)*.nupkg;$(OptionaryPackageDirectory)*.snupkg" />
+        </ItemGroup>
+        <Delete Files="@(_StaleOptionaryPackage)" />
+        <!--
+            Nothing references src/Optionary, so restore it first. Restore and Pack run as separate calls: with "Restore;Pack" in one
+            call, Pack reuses the evaluation made before restore. The extra global property gives the restore its own evaluation.
+        -->
+        <MSBuild
+            Projects="$(MSBuildThisFileDirectory)../../src/Optionary/Optionary.csproj"
+            Targets="Restore"
+            Properties="Configuration=$(Configuration);_OptionaryBuildTestsRestore=true"
+        />
+        <MSBuild
+            Projects="$(MSBuildThisFileDirectory)../../src/Optionary/Optionary.csproj"
+            Targets="Pack"
+            Properties="Configuration=$(Configuration);PackageOutputPath=$(OptionaryPackageDirectory)"
+        />
+    </Target>
+</Project>
