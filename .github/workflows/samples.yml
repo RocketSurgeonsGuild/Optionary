@@ -1,0 +1,123 @@
+name: samples
+
+# Builds and runs the samples in samples/, as a consumer of Optionary would see them: the console app binds and prints its
+# options, the web app starts (ValidateOnStart passes) and answers, both hosts' merged obj/appsettings.schema.json hold the
+# library's sections, and the library packs its ConfigurationSchema.json at the package root. The main ruleset requires the
+# `samples` check.
+
+on:
+    push:
+        branches:
+            - main
+            - next
+        tags:
+            - v*
+    pull_request:
+        branches:
+            - main
+            - next
+    merge_group:
+        branches:
+            - main
+            - next
+
+env:
+    # Adds .config/mise.ci.toml, which keeps the editor-only tools out of CI installs and out of the shared mise cache.
+    MISE_ENV: ci
+    DOTNET_NOLOGO: 'true'
+    DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+
+permissions:
+    contents: read
+
+# A newer run for the same branch (or pull request head) cancels this one; tags and merge-queue refs are unique.
+concurrency:
+    group: samples-${{ github.event_name }}-${{ github.head_ref || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+    samples:
+        name: samples
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+              with:
+                  fetch-depth: '0'
+            - name: 🛠️ Setup mise
+              uses: jdx/mise-action@v5
+              env:
+                  # One install at a time: mise downloads dotnet-install.sh to one shared path for every dotnet version, so the
+                  # SDK and runtime installs overwrite it under each other when they run in parallel.
+                  MISE_JOBS: '1'
+              with:
+                  install: true
+                  # Only dotnet: the samples need nothing else.
+                  install_args: dotnet
+                  cache: true
+                  # Restore only: build.yml is the single cache writer.
+                  cache_save: false
+                  cache_key: mise-{{platform}}-{{cache_period}}
+                  cache_max_age_days: 7
+                  experimental: true
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+            - name: ⚙️ Build the samples
+              run: |
+                  dotnet build samples/Optionary.Samples.Console -bl:artifacts/logs/samples-console.binlog
+                  dotnet build samples/Optionary.Samples.Web -bl:artifacts/logs/samples-web.binlog
+            - name: 🖥️ Run the console sample
+              run: |
+                  output="$(dotnet run --no-build --project samples/Optionary.Samples.Console)"
+                  echo "$output"
+                  grep -q 'Hello, ' <<< "$output"
+                  grep -q 'retry_policy:' <<< "$output"
+            - name: 📐 Check the merged schemas
+              run: |
+                  for host in Console Web; do
+                      schema="samples/Optionary.Samples.$host/obj/appsettings.schema.json"
+                      echo "$schema"
+                      # The library's sections, from its class-form, record, key-style and assembly-form declarations.
+                      for section in Greetings Farewell retry_policy Samples; do
+                          jq -e --arg s "$section" '[.allOf[] | .properties? // {} | keys[]] | index($s) != null' "$schema" > /dev/null \
+                              || { echo "::error file=$schema::No '$section' section in $host's schema"; exit 1; }
+                      done
+                  done
+            - name: 🌐 Run the web sample
+              run: |
+                  dotnet run --no-build --project samples/Optionary.Samples.Web --no-launch-profile --urls http://127.0.0.1:5180 > web.log 2>&1 &
+                  pid=$!
+                  trap 'kill $pid 2> /dev/null || true' EXIT
+                  for _ in $(seq 1 60); do
+                      if response="$(curl -fsS http://127.0.0.1:5180/)"; then
+                          echo "$response"
+                          jq -e '.title and (.greetings | length > 0)' <<< "$response" > /dev/null
+                          exit 0
+                      fi
+                      kill -0 $pid 2> /dev/null || { cat web.log; echo "::error::The web sample exited before answering"; exit 1; }
+                      sleep 1
+                  done
+                  cat web.log
+                  echo "::error::The web sample didn't answer within 60s"
+                  exit 1
+            - name: 🛑 ValidateOnStart rejects bad configuration
+              run: |
+                  if env Site__Title='' timeout 60 dotnet run --no-build --project samples/Optionary.Samples.Web --no-launch-profile --urls http://127.0.0.1:5181 > invalid.log 2>&1; then
+                      cat invalid.log
+                      echo "::error::The web sample started with an empty Site:Title"
+                      exit 1
+                  fi
+                  grep -q 'OptionsValidationException' invalid.log || { cat invalid.log; echo "::error::Expected an OptionsValidationException"; exit 1; }
+            - name: 📦 Pack the library
+              run: |
+                  dotnet pack samples/Optionary.Samples.Library -p:SamplePack=true -o artifacts/samples
+                  unzip -l artifacts/samples/*.nupkg | tee /dev/stderr | grep -q ' ConfigurationSchema.json$'
+            - name: 🏺 Publish logs
+              if: always()
+              uses: actions/upload-artifact@v7
+              with:
+                  name: samples-logs
+                  path: |
+                      artifacts/logs/
+                      web.log
+                      invalid.log
+                  if-no-files-found: ignore
