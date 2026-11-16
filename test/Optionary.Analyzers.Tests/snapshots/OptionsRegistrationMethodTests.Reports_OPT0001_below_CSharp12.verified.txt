@@ -1,0 +1,12 @@
+﻿[
+  {
+    Id: OPT0001,
+    Title: C# version too old for Optionary source generation,
+    Severity: Warning,
+    WarningLevel: 1,
+    Location: : (0,0)-(0,0),
+    MessageFormat: Optionary's source generator needs C# 12 or later, but this project uses C# {0}, so AddOptionaryConfigurationOptions registers nothing and no configuration schema is generated; set LangVersion to 12 or later to enable it,
+    Message: Optionary's source generator needs C# 12 or later, but this project uses C# 11.0, so AddOptionaryConfigurationOptions registers nothing and no configuration schema is generated; set LangVersion to 12 or later to enable it,
+    Category: Optionary
+  }
+]

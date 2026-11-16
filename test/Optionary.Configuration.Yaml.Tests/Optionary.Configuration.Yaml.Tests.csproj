@@ -1,40 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
-        <!-- Where _PackOptionaryConfigurationYaml writes the package under test (YamlPackage reads it from the assembly metadata). -->
-        <OptionaryYamlPackageDirectory>$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)yaml-package/</OptionaryYamlPackageDirectory>
+        <!-- The package under test (PackageUnderTest.targets). -->
+        <PackageUnderTestProject>$(MSBuildThisFileDirectory)../../src/Optionary.Configuration.Yaml/Optionary.Configuration.Yaml.csproj</PackageUnderTestProject>
+        <PackageUnderTestDirectory>$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)yaml-package/</PackageUnderTestDirectory>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Optionary.Configuration.Yaml\Optionary.Configuration.Yaml.csproj" />
     </ItemGroup>
-    <ItemGroup>
-        <AssemblyMetadata Include="OptionaryYamlPackageDirectory" Value="$(OptionaryYamlPackageDirectory)" />
-    </ItemGroup>
 
-    <!--
-        The package tests (PackageContentTests, WithoutDovetailTests) read the Optionary.Configuration.Yaml package as it ships, so
-        pack it on every build. Each target framework's inner build asks for it; route every request to one call without a
-        TargetFramework, which MSBuild caches, so the package is packed once per build rather than once (and concurrently) per
-        framework.
-    -->
-    <Target Name="PackOptionaryConfigurationYaml" BeforeTargets="Build">
-        <MSBuild
-            Projects="$(MSBuildProjectFullPath)"
-            Targets="_PackOptionaryConfigurationYaml"
-            Properties="Configuration=$(Configuration)"
-            RemoveProperties="TargetFramework;RuntimeIdentifier"
-        />
-    </Target>
-
-    <Target Name="_PackOptionaryConfigurationYaml">
-        <ItemGroup>
-            <_StaleOptionaryYamlPackage Include="$(OptionaryYamlPackageDirectory)*.nupkg;$(OptionaryYamlPackageDirectory)*.snupkg" />
-        </ItemGroup>
-        <Delete Files="@(_StaleOptionaryYamlPackage)" />
-        <MSBuild
-            Projects="$(MSBuildThisFileDirectory)../../src/Optionary.Configuration.Yaml/Optionary.Configuration.Yaml.csproj"
-            Targets="Pack"
-            Properties="Configuration=$(Configuration);PackageOutputPath=$(OptionaryYamlPackageDirectory)"
-        />
-    </Target>
+    <!-- The package tests (PackageContentTests, WithoutDovetailTests) read the Optionary.Configuration.Yaml package as it ships. -->
+    <Import Project="$(MSBuildThisFileDirectory)../PackageUnderTest.targets" />
 </Project>

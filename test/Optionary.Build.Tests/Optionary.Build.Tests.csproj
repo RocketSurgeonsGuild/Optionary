@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!--
+            MSBuild.ProjectCreation loads MSBuild in-proc from an SDK of the host's major version, and only SDK 11 is installed (mise
+            adds just the .NET 10 runtime). The scaffolded projects cover both target frameworks instead, through
+            TargetFrameworksAttribute.
+        -->
+        <TargetFramework>net11.0</TargetFramework>
+        <!--
+            MSB3277: Microsoft.Build references a newer NuGet.Frameworks (shipped with the SDK) than the newest NuGet.* packages.
+            Harmless: MSBuild and NuGet are loaded from the installed SDK at run time, so these only compile against.
+        -->
+        <NoWarn>$(NoWarn);MSB3277</NoWarn>
+        <!-- The package under test (PackageUnderTest.targets). Nothing references src/Optionary, so it is restored first. -->
+        <PackageUnderTestProject>$(MSBuildThisFileDirectory)../../src/Optionary/Optionary.csproj</PackageUnderTestProject>
+        <PackageUnderTestDirectory>$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)optionary-package/</PackageUnderTestDirectory>
+        <PackageUnderTestRestore>true</PackageUnderTestRestore>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="MSBuild.ProjectCreation" />
+        <!-- Load all of MSBuild from the SDK (MSBuildAssemblyResolver): copies from these packages don't match its Microsoft.Build.dll. -->
+        <PackageReference Include="Microsoft.Build" ExcludeAssets="runtime" />
+        <PackageReference Include="Microsoft.Build.Framework" ExcludeAssets="runtime" />
+        <PackageReference Include="Microsoft.Build.Utilities.Core" ExcludeAssets="runtime" />
+        <PackageReference Include="MSBuild.StructuredLogger.Utils" />
+    </ItemGroup>
+    <ItemGroup>
+        <!-- The scaffolds copy the repository's global.json, so they build with the SDK the repository pins. -->
+        <AssemblyMetadata Include="OptionaryRepositoryRoot" Value="$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', '..'))" />
+    </ItemGroup>
+
+    <!-- The tests scaffold throwaway projects that restore the Optionary package as it ships. -->
+    <Import Project="$(MSBuildThisFileDirectory)../PackageUnderTest.targets" />
+</Project>
