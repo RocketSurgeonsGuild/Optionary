@@ -1,0 +1,40 @@
+﻿{
+  "type": "object",
+  "properties": {
+    "HttpClients": {
+      "type": "object",
+      "properties": {
+        "Petstore": {
+          "type": "object",
+          "title": "HttpClients:Petstore",
+          "description": "Petstore client; 100% \"generated\" for $(Configuration), @(Compile) and %(Identity) at user@example.com, naïve 'quotes' \\ and %3B.\nSecond line.",
+          "properties": {
+            "BaseAddress": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https?://\\S+$"
+            },
+            "Retry": {
+              "type": "object",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/HttpClients.Petstore.Retry"
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "HttpClients.Petstore.Retry": {
+      "properties": {
+        "Count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    }
+  }
+}

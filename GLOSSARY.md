@@ -12,6 +12,8 @@
 
 **Fragment**: the description of one section's shape that an assembly carries with it, so that projects referencing the assembly can learn the section without running its code.
 
+**Fragment item**: an `OptionarySchemaFragment` MSBuild item, naming a section path and holding its fragment inline or in a JSON file. It becomes the assembly's fragment for that section, so a package's build files can declare a section without code.
+
 **Library schema**: the file a library packs, describing only its own sections. It is permissive.
 
 **Host**: a project whose build combines its own fragments with those of everything it references: applications and test projects. Not to be confused with Dovetail's host model (web, MAUI, Uno, ...).
