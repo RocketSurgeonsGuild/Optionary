@@ -25,7 +25,7 @@
     <Error
       Code="OPT1001"
       Condition="'@(_OptionaryRuntimeReference)' != '' and '@(_OptionaryGeneratorAnalyzer)' == ''"
-      Text="$(MSBuildProjectName) references Optionary.dll, but Optionary's source generator (Optionary.Analyzers) isn't loaded: no @(Analyzer) item is Optionary.Analyzers, so its [Optionary] types get no AddOptionaryConfigurationOptions registration method or configuration schema. Look for a target (in the project, a Directory.Build.targets, or another package) that removes Optionary.Analyzers from @(Analyzer), and build with the .NET 10 SDK or later: the package has generators only for Roslyn 5.0 and later, so an older compiler loads none." />
+      Text="$(MSBuildProjectName) references Optionary.dll, but Optionary's source generator (Optionary.Analyzers) isn't loaded: no %40(Analyzer) item is Optionary.Analyzers, so its [Optionary] types get no AddOptionaryConfigurationOptions registration method or configuration schema. Look for a target (in the project, a Directory.Build.targets, or another package) that removes Optionary.Analyzers from %40(Analyzer), and build with the .NET 10 SDK or later: the package has generators only for Roslyn 5.0 and later, so an older compiler loads none." />
     <ItemGroup>
       <_OptionaryRuntimeReference Remove="@(_OptionaryRuntimeReference)" />
       <_OptionaryGeneratorAnalyzer Remove="@(_OptionaryGeneratorAnalyzer)" />
