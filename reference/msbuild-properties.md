@@ -1,6 +1,6 @@
 # MSBuild properties
 
-These properties are Optionary's public MSBuild API. They change only in a major version. Set them in the project file or
+These properties and items are Optionary's public MSBuild API. They change only in a major version. Set them in the project file or
 in a `Directory.Build.props`:
 
 ```xml
@@ -38,6 +38,12 @@ in a `Directory.Build.props`:
 | `OptionaryZeroAllocValidation` | on      | `false` leaves ZeroAlloc.Validation's registrations to the project: the registration method doesn't call `ValidateWithZeroAlloc()`.                                 |
 | `LangVersion`                  | SDK     | C# 12 or later is required. Below that the registration method is empty and [`OPT0001`](../diagnostics/#opt0001) is reported.                                       |
 
+## Items
+
+| Item                      | Metadata                        | Effect                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OptionarySchemaFragment` | `Schema` or `File`, exactly one | `Include` is a section path. `Schema` is the schema of the section's value as inline JSON, `File` a JSON file holding it (relative to the project), in the [fragment format](../../guides/schema-and-editors/#fragments). It becomes the project's fragment for that section, like one the generator writes. A package's `buildTransitive` targets can add it. See [contributing a fragment](../../guides/schema-and-editors/#contributing-a-fragment-from-a-package-or-another-generator). |
+
 ## Item metadata
 
 | Item              | Metadata                                 | Effect                                                                                                                                                                                                       |
@@ -46,11 +52,12 @@ in a `Directory.Build.props`:
 
 ## Files
 
-| File                                                   | Written by         | What it is                                                                                                                                                              |
-| ------------------------------------------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `$(BaseIntermediateOutputPath)appsettings.schema.json` | hosts              | The application schema, at a stable path (normally `obj/appsettings.schema.json`). Copied to `$(OutDir)` and published unless `OptionarySchemaCopyToOutput` is `false`. |
-| `$(IntermediateOutputPath)appsettings.schema.json`     | multi-target hosts | The application schema for each target framework after the first.                                                                                                       |
-| `$(IntermediateOutputPath)ConfigurationSchema.json`    | libraries          | The library schema, packed at the package root.                                                                                                                         |
+| File                                                             | Written by                                    | What it is                                                                                                                                                              |
+| ---------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `$(BaseIntermediateOutputPath)appsettings.schema.json`           | hosts                                         | The application schema, at a stable path (normally `obj/appsettings.schema.json`). Copied to `$(OutDir)` and published unless `OptionarySchemaCopyToOutput` is `false`. |
+| `$(IntermediateOutputPath)appsettings.schema.json`               | multi-target hosts                            | The application schema for each target framework after the first.                                                                                                       |
+| `$(IntermediateOutputPath)ConfigurationSchema.json`              | libraries                                     | The library schema, packed at the package root.                                                                                                                         |
+| `$(IntermediateOutputPath)<project>.OptionarySchemaFragments.cs` | projects with `OptionarySchemaFragment` items | The fragments' attributes, when `GenerateAssemblyInfo` or `GenerateAssemblyMetadataAttributes` is `false`; otherwise they are in the SDK's `AssemblyInfo.cs`.           |
 
 ## For host frameworks
 

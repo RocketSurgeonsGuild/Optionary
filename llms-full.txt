@@ -22,10 +22,7 @@ public sealed class GreetingsOptions
 }
 ```
 
-| Package                        | What it is                                                                                        |
-| ------------------------------ | ------------------------------------------------------------------------------------------------- |
-| `Optionary`                    | The `[Optionary]` attribute, the source generator, the runtime registration and the schema build. |
-| `Optionary.Configuration.Yaml` | A YAML configuration provider. It doesn’t depend on `Optionary`.                                  |
+Everything ships in one package, `Optionary`: the `[Optionary]` attribute, the source generator, the runtime registration and the schema build. Optionary binds from whatever `IConfiguration` holds and adds no configuration providers of its own, so the files can be JSON or any other format a provider reads.
 
 ## Where to go next
 
@@ -37,7 +34,7 @@ public sealed class GreetingsOptions
 * [Binding and validation](guides/binding/): what the generated binder does, and where it deliberately differs from Microsoft’s configuration binding generator.
 * [Schema and editors](guides/schema-and-editors/): the library and application schemas, Visual Studio, VS Code and Rider.
 * [Registering from a library](guides/registering-from-a-library/): the generated registration method and its contract.
-* [YAML provider](guides/yaml/), [MSBuild properties](reference/msbuild-properties/), [diagnostics](reference/diagnostics/) and [troubleshooting](troubleshooting/).
+* [MSBuild properties](reference/msbuild-properties/), [diagnostics](reference/diagnostics/) and [troubleshooting](troubleshooting/).
 
 ## Glossary
 
@@ -546,6 +543,48 @@ Each fragment is a Draft-07 schema of the section’s value, with every object t
 
 Hand-written fragments in the same format are supported: a library whose section isn’t described by an options type can add the attribute itself, and it is merged like any other. Only the `Optionary.Schema.v1:` prefix is read.
 
+### Contributing a fragment from a package or another generator
+
+[Section titled “Contributing a fragment from a package or another generator”](#contributing-a-fragment-from-a-package-or-another-generator)
+
+A package that configures a section of its own, such as an HTTP-client generator that reads `HttpClients:Petstore`, can declare that section’s schema to the projects that use it. Source generators can’t see each other’s output, so there are three ways in.
+
+**The `OptionarySchemaFragment` item.** `Include` is the section path, and exactly one metadata holds the schema of the section’s value, in the fragment format above: `Schema` (inline JSON) or `File` (a JSON file):
+
+```xml
+<ItemGroup>
+  <OptionarySchemaFragment Include="HttpClients:Petstore" File="$(MSBuildThisFileDirectory)petstore.schema.json" />
+  <OptionarySchemaFragment
+    Include="@(OpenApiClient->'Clients:%(ClientName)')"
+    Schema='{"type":"object","properties":{"BaseAddress":{"type":"string","format":"uri"}}}' />
+</ItemGroup>
+```
+
+Put it in a project file, or in a package’s `buildTransitive/<PackageId>.targets` to declare the section in every project that references the package. As the second item shows, it can be a transform of the package’s own items, one section each. Optionary checks each item and turns it into the `[assembly: AssemblyMetadata("Optionary.Schema.v1:HttpClients:Petstore", "...")]` attribute, compacted to one line, before the assembly info is generated. From there it is a fragment like a generated one: it goes into the library schema and its package, and every host that references the project merges it. Several fragments for one section, from items and from options types, are merged into one.
+
+* The schema is a JSON object, with any object types it reuses under `definitions` and every local `$ref` pointing at one of them. Leave out `patternProperties` and `propertyNames` if you like: the fragment is permissive, and the host’s merge closes the section to the keys you list.
+* `File` is relative to the project; a package’s targets should use `$(MSBuildThisFileDirectory)`. Editing the file rebuilds the project and updates the schemas.
+* `Schema` is an MSBuild metadata value, so MSBuild expands property and metadata references (`$(...)`, `%(...)`) in it and unescapes `%XX`. Write `%25` for a `%` followed by two hex digits. Single-quote the attribute, as above, so the JSON’s double quotes need no escaping, and write `&apos;` for a `'`. `;`, `$`, `@` and `%` on their own are kept.
+* The project has to reference `Optionary`: its targets read the item. In a package, that means depending on `Optionary`.
+* With `GenerateAssemblyInfo` or `GenerateAssemblyMetadataAttributes` set to `false`, Optionary writes the attribute to `$(IntermediateOutputPath)<project>.OptionarySchemaFragments.cs` instead. `OptionarySchema=false` ignores the items.
+* Setting neither or both of `Schema` and `File`, an invalid section path, a missing file and a schema that isn’t a fragment are build errors, [`OPT1002`](../../reference/diagnostics/#opt1002) to [`OPT1005`](../../reference/diagnostics/#opt1005).
+
+**Emit the attribute from your generator.** A generator can add the `AssemblyMetadata` attribute to its own output: the merge reads the compiled assembly, not the source, so it doesn’t matter which generator wrote it. The schema has to be in the fragment format, as a C# string literal.
+
+**Declare an options type.** When the section binds to a class that the consuming project can already see (one in your package’s runtime assembly), a package can add a source file declaring it, and Optionary’s generator then binds the section and describes it:
+
+```xml
+<ItemGroup>
+  <Compile Include="$(MSBuildThisFileDirectory)PetstoreConfiguration.cs" Visible="false" />
+</ItemGroup>
+```
+
+```csharp
+[assembly: Optionary.Optionary<Petstore.PetstoreClientOptions>("HttpClients:Petstore")]
+```
+
+This doesn’t work for a class your generator writes: Optionary’s generator doesn’t see it.
+
 ### Annotations that reach the schema
 
 [Section titled “Annotations that reach the schema”](#annotations-that-reach-the-schema)
@@ -682,87 +721,11 @@ Rider uses its own JSON Schema mappings:
 * **A section is missing.** The application schema only covers assemblies the host references. Check the options type is declared and the declaration wasn’t rejected (look for `OPT` diagnostics).
 * **Quoted numbers are flagged.** Write the number without quotes.
 
-# YAML provider
-
-> Optionary.Configuration.Yaml, a YAML configuration provider for Microsoft.Extensions.Configuration.
-
-`Optionary.Configuration.Yaml` is a YAML configuration provider for `Microsoft.Extensions.Configuration`, built on YamlDotNet. It is its own package and doesn’t depend on `Optionary`: you can use it without declarations or schemas, and `Optionary` doesn’t need it. It is trimming and Native AOT compatible.
-
-```sh
-dotnet add package Optionary.Configuration.Yaml
-```
-
-## Adding YAML files
-
-[Section titled “Adding YAML files”](#adding-yaml-files)
-
-```csharp
-using Optionary.Configuration.Yaml;
-
-
-var builder = Host.CreateApplicationBuilder(args);
-builder.Configuration
-    .AddYamlFile("appsettings.yaml", optional: true, reloadOnChange: true)
-    .AddYamlFile($"appsettings.{builder.Environment.EnvironmentName}.yaml", optional: true, reloadOnChange: true);
-```
-
-appsettings.yaml
-
-```yaml
-Greetings:
-    Message: Howdy
-    Repeat: 2
-    Recipients:
-        - Ada
-        - Grace
-```
-
-| Method                                                                 | Adds                                                            |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------- |
-| `AddYamlFile(path)`                                                    | A required file, relative to the builder’s base path.           |
-| `AddYamlFile(path, optional)`                                          | A file that may be missing.                                     |
-| `AddYamlFile(path, optional, reloadOnChange)`                          | The same, reloaded when the file changes.                       |
-| `AddYamlFile(IFileProvider? provider, path, optional, reloadOnChange)` | A file read through the given file provider.                    |
-| `AddYamlFile(Action<YamlConfigurationSource> configureSource)`         | A source you configure yourself.                                |
-| `AddYamlStream(Stream stream)`                                         | YAML read once from a stream, for example an embedded resource. |
-
-## How YAML maps to configuration
-
-[Section titled “How YAML maps to configuration”](#how-yaml-maps-to-configuration)
-
-* Mappings become nested keys joined with `:`, so `Greetings: { Message: Howdy }` is `Greetings:Message`.
-* Sequences become indexed keys: `Greetings:Recipients:0`, `Greetings:Recipients:1`.
-* A plain (unquoted) `~`, `null`, `Null` or `NULL` is a null value. Quote it to keep the text.
-* Keys ignore case, as everywhere in configuration, so a key that appears twice in any casing is a `FormatException`.
-* Only the first document of a multi-document file is read, and its root must be a mapping. YAML that doesn’t parse is a `FormatException` with YamlDotNet’s message.
-
-## Schemas for YAML files
-
-[Section titled “Schemas for YAML files”](#schemas-for-yaml-files)
-
-The [application schema](../schema-and-editors/) describes YAML files as well as JSON ones: map `appsettings*.yaml` to it in your editor, or let `OptionaryScaffoldEditorSettings` write the VS Code mapping.
-
-## With Dovetail
-
-[Section titled “With Dovetail”](#with-dovetail)
-
-The package’s `build/Optionary.Configuration.Yaml.targets` declares three Dovetail joint templates, so a Dovetail application gets its YAML files loaded without any code. Only Dovetail reads `DovetailTemplate` items, and only in a project that runs Dovetail’s generator and references this package; without Dovetail they do nothing, and nothing extra is compiled.
-
-| `DovetailTemplate`  | Generated joint                                 | What it adds                                                                                                                                                                         |
-| ------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `YamlJoint`         | `YamlJoint` (`IConfigurationJoint`)             | `appsettings.yaml`, `appsettings.{Environment}.yaml`, the same named after the application, and the `.local` overrides, each also as `.yml`, from the configuration’s file provider. |
-| `YamlBrowserJoint`  | `YamlBrowserJoint` (`IConfigurationAsyncJoint`) | The same files in the browser (WebAssembly), downloaded from the application’s base address.                                                                                         |
-| `YamlEmbeddedJoint` | `YamlEmbeddedJoint` (`IConfigurationJoint`)     | The YAML files of hosts that embed their configuration in the assembly (MAUI, Uno), read with `AddYamlStream`.                                                                       |
-
-* Each item has `Package="Optionary.Configuration.Yaml"` and `OutputPrefix="OptionaryYaml"`. The joints are generated as internal classes in the namespace `Optionary.Configuration.Yaml`, and each adds its files once even when a test project imports the application’s copy as well as its own.
-* The items are declared only in applications (`OutputType` `Exe` or `WinExe`, or an Android application) and test projects (`IsTestProject`). A joint compiled into a library would be exported to every application that references it, so libraries never get one, and each application gets exactly one of each.
-* The targets also add a `BlazorConfigurationFile` assembly metadata entry listing `wwwroot/appsettings*.yml` and `wwwroot/appsettings*.yaml`, which the browser joint uses to know which files to download.
-
 # Diagnostics
 
 > The OPT diagnostics the generator and the build report, and how to fix each.
 
-The generator reports `OPT0001` to `OPT0012`, in the `Optionary` category. `OPT1001` is an MSBuild error from Optionary’s targets. The generator runs in every project that references `Optionary`, including through a transitive reference, so these can fire in a consumer of a library too. Except for `OPT0001`, they are reported against source, so `#pragma warning disable` works for the warnings.
+The generator reports `OPT0001` to `OPT0012`, in the `Optionary` category. `OPT1001` to `OPT1005` are MSBuild errors from Optionary’s targets. The generator runs in every project that references `Optionary`, including through a transitive reference, so these can fire in a consumer of a library too. Except for `OPT0001`, they are reported against source, so `#pragma warning disable` works for the warnings.
 
 | Id                    | Severity | Summary                                                  |
 | --------------------- | -------- | -------------------------------------------------------- |
@@ -779,6 +742,10 @@ The generator reports `OPT0001` to `OPT0012`, in the `Optionary` category. `OPT1
 | [`OPT0011`](#opt0011) | Error    | Key style conflict                                       |
 | [`OPT0012`](#opt0012) | Warning  | ZeroAlloc options validation skipped                     |
 | [`OPT1001`](#opt1001) | Error    | The runtime is referenced but the generator isn’t loaded |
+| [`OPT1002`](#opt1002) | Error    | Schema fragment item without exactly one schema          |
+| [`OPT1003`](#opt1003) | Error    | Schema fragment item with an invalid section path        |
+| [`OPT1004`](#opt1004) | Error    | Schema fragment file not found                           |
+| [`OPT1005`](#opt1005) | Error    | Schema fragment item’s schema isn’t a fragment           |
 
 ## OPT0001
 
@@ -875,11 +842,46 @@ It happens when:
 
 Remove the target, or build with the .NET 10 SDK or later. See [troubleshooting](../../troubleshooting/).
 
+## OPT1002
+
+[Section titled “OPT1002”](#opt1002)
+
+**An `OptionarySchemaFragment` item has neither or both of `Schema` and `File`.** Reported by the `_OptionaryReadSchemaFragments` target, against the project or targets file that declares the item:
+
+> The OptionarySchemaFragment item “*section*” has neither Schema nor File metadata: set exactly one, Schema to the section’s schema as JSON or File to a JSON file holding it.
+
+A value of only whitespace counts as not set. See [contributing a fragment](../../guides/schema-and-editors/#contributing-a-fragment-from-a-package-or-another-generator).
+
+## OPT1003
+
+[Section titled “OPT1003”](#opt1003)
+
+**An `OptionarySchemaFragment` item’s `Include` isn’t a valid section path:** it has an empty segment, such as `HttpClients::Petstore`, `HttpClients:` or `HttpClients: :Petstore`. The rules are those of [`OPT0003`](#opt0003) for a path given in a declaration. A transform such as `@(OpenApiClient->'Clients:%(ClientName)')` reports it for an item whose `ClientName` is empty.
+
+## OPT1004
+
+[Section titled “OPT1004”](#opt1004)
+
+**An `OptionarySchemaFragment` item’s `File` doesn’t exist**, or can’t be read. The message gives the full path. A relative `File` is relative to the project, so a package’s targets should use `$(MSBuildThisFileDirectory)`.
+
+## OPT1005
+
+[Section titled “OPT1005”](#opt1005)
+
+**An `OptionarySchemaFragment` item’s schema isn’t a configuration schema fragment.** Reported against the file, or for `Schema` against the project or targets file that declares the item, when the JSON:
+
+* isn’t valid JSON;
+* isn’t a JSON object (`true`, `false` and arrays aren’t accepted);
+* has `definitions` that aren’t an object, or definition names outside `^[A-Za-z0-9._-]+$`; or
+* has a local `$ref` that doesn’t point at one of its `definitions`.
+
+The message ends with the problem found. The format is described under [fragments](../../guides/schema-and-editors/#fragments). An inline `Schema` that MSBuild changed, by expanding `$(...)` or unescaping `%XX`, can also end up here: see [contributing a fragment](../../guides/schema-and-editors/#contributing-a-fragment-from-a-package-or-another-generator).
+
 # MSBuild properties
 
-> Every MSBuild property and item metadata Optionary reads, with defaults.
+> Every MSBuild property, item and item metadata Optionary reads, with defaults.
 
-These properties are Optionary’s public MSBuild API. They change only in a major version. Set them in the project file or in a `Directory.Build.props`:
+These properties and items are Optionary’s public MSBuild API. They change only in a major version. Set them in the project file or in a `Directory.Build.props`:
 
 ```xml
 <PropertyGroup>
@@ -922,6 +924,14 @@ These properties are Optionary’s public MSBuild API. They change only in a maj
 | `OptionaryZeroAllocValidation` | on      | `false` leaves ZeroAlloc.Validation’s registrations to the project: the registration method doesn’t call `ValidateWithZeroAlloc()`.                                 |
 | `LangVersion`                  | SDK     | C# 12 or later is required. Below that the registration method is empty and [`OPT0001`](../diagnostics/#opt0001) is reported.                                       |
 
+## Items
+
+[Section titled “Items”](#items)
+
+| Item                      | Metadata                        | Effect                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `OptionarySchemaFragment` | `Schema` or `File`, exactly one | `Include` is a section path. `Schema` is the schema of the section’s value as inline JSON, `File` a JSON file holding it (relative to the project), in the [fragment format](../../guides/schema-and-editors/#fragments). It becomes the project’s fragment for that section, like one the generator writes. A package’s `buildTransitive` targets can add it. See [contributing a fragment](../../guides/schema-and-editors/#contributing-a-fragment-from-a-package-or-another-generator). |
+
 ## Item metadata
 
 [Section titled “Item metadata”](#item-metadata)
@@ -934,17 +944,82 @@ These properties are Optionary’s public MSBuild API. They change only in a maj
 
 [Section titled “Files”](#files)
 
-| File                                                   | Written by         | What it is                                                                                                                                                              |
-| ------------------------------------------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `$(BaseIntermediateOutputPath)appsettings.schema.json` | hosts              | The application schema, at a stable path (normally `obj/appsettings.schema.json`). Copied to `$(OutDir)` and published unless `OptionarySchemaCopyToOutput` is `false`. |
-| `$(IntermediateOutputPath)appsettings.schema.json`     | multi-target hosts | The application schema for each target framework after the first.                                                                                                       |
-| `$(IntermediateOutputPath)ConfigurationSchema.json`    | libraries          | The library schema, packed at the package root.                                                                                                                         |
+| File                                                             | Written by                                    | What it is                                                                                                                                                              |
+| ---------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `$(BaseIntermediateOutputPath)appsettings.schema.json`           | hosts                                         | The application schema, at a stable path (normally `obj/appsettings.schema.json`). Copied to `$(OutDir)` and published unless `OptionarySchemaCopyToOutput` is `false`. |
+| `$(IntermediateOutputPath)appsettings.schema.json`               | multi-target hosts                            | The application schema for each target framework after the first.                                                                                                       |
+| `$(IntermediateOutputPath)ConfigurationSchema.json`              | libraries                                     | The library schema, packed at the package root.                                                                                                                         |
+| `$(IntermediateOutputPath)<project>.OptionarySchemaFragments.cs` | projects with `OptionarySchemaFragment` items | The fragments’ attributes, when `GenerateAssemblyInfo` or `GenerateAssemblyMetadataAttributes` is `false`; otherwise they are in the SDK’s `AssemblyInfo.cs`.           |
 
 ## For host frameworks
 
 [Section titled “For host frameworks”](#for-host-frameworks)
 
 A framework that builds on Optionary can set `OptionarySchemaHost`, `OptionarySchemaCopyToOutput` and `OptionaryZeroAllocValidation` from its own targets. Optionary reads them when the schema is computed, not at evaluation, so a value set anywhere during evaluation counts, and setting them has no effect in a project that doesn’t reference Optionary. Dovetail does this from its application detection and its embedded-configuration and ZeroAlloc switches.
+
+# Samples
+
+> A library, a console application and an ASP.NET Core application that use Optionary without any host framework.
+
+The repository’s [`samples/`](https://github.com/RocketSurgeonsGuild/Optionary/tree/main/samples) folder has three projects that use Optionary on its own, with Microsoft’s configuration providers and no host framework.
+
+| Project                                                                                                                     | Shows                                                                                                                                              |
+| --------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`Optionary.Samples.Library`](https://github.com/RocketSurgeonsGuild/Optionary/tree/main/samples/Optionary.Samples.Library) | A library’s declarations, its validator, and the public `AddSampleLibrary()` that calls the generated registration method.                         |
+| [`Optionary.Samples.Console`](https://github.com/RocketSurgeonsGuild/Optionary/tree/main/samples/Optionary.Samples.Console) | A console host that binds the library’s options from `appsettings.json` through `IOptions<T>` and `IOptionsMonitor<T>`, and prints them on reload. |
+| [`Optionary.Samples.Web`](https://github.com/RocketSurgeonsGuild/Optionary/tree/main/samples/Optionary.Samples.Web)         | An ASP.NET Core host with a declaration of its own that fails the application at startup when it is invalid (`ValidateOnStart`).                   |
+
+## Run them
+
+[Section titled “Run them”](#run-them)
+
+```sh
+mise run sample:console           # prints the bound options
+mise run sample:console --watch   # and prints them again when an appsettings*.json file changes
+mise run sample:web               # serves the bound options as JSON on http://localhost:5180
+```
+
+Without mise, use `dotnet run --project samples/Optionary.Samples.Console` (add `-- --watch` to watch) and `dotnet run --project samples/Optionary.Samples.Web`.
+
+The console sample shows layering with Microsoft’s providers: run it with `DOTNET_ENVIRONMENT=Development` and `appsettings.Development.json` overrides the greeting, or set `Greetings__Message=Hi` to override it from the environment.
+
+## The library
+
+[Section titled “The library”](#the-library)
+
+[`Optionary.Samples.Library`](https://github.com/RocketSurgeonsGuild/Optionary/tree/main/samples/Optionary.Samples.Library) declares four sections:
+
+* `GreetingsOptions`: the class form, `[Optionary]`, with `[Description]` and `[Range]` that reach the schema. Section `Greetings`.
+* `FarewellOptions`: a record. The generated binder calls its constructor. Section `Farewell`.
+* `RetryPolicyOptions`: `KeyStyle = ConfigurationKeyStyle.Underscore`, so the section is `retry_policy` and its keys are `max_attempts` and `delay` (see [key styles](../guides/key-styles/)).
+* `ClockSettings`: no attribute of its own, declared with `[assembly: Optionary<ClockSettings>("Samples:Clock")]`, the form for types you can’t annotate (see [declarations](../guides/declarations/#on-the-assembly-assemblyoptionaryt)).
+
+`GreetingsOptionsValidator` is an `[OptionsValidator]`, which the registration method registers with the library’s options. `AddSampleLibrary()` calls the internal, generated `AddOptionaryConfigurationOptions()`, as [registering from a library](../guides/registering-from-a-library/) describes.
+
+Its build writes the library schema, `ConfigurationSchema.json`, under `obj/`. The samples aren’t packable, so CI never publishes them; to see the file at the package root, run `dotnet pack samples/Optionary.Samples.Library -p:SamplePack=true`.
+
+## The hosts
+
+[Section titled “The hosts”](#the-hosts)
+
+Both applications are hosts, so each build writes `obj/appsettings.schema.json`, merged from the host’s own declarations and the library’s, with SchemaStore’s `appsettings.json` schema for `Logging` and the other framework sections. The console sample adds a `Console` section of its own, and the web sample a `Site` section with `ValidateOnStart = true` and its own validator. The web sample also calls `AddOptions<GreetingsOptions>().ValidateOnStart()`, to validate a library’s options at startup when the library didn’t ask for it. Start it with an empty title to see it fail:
+
+```sh
+Site__Title= dotnet run --project samples/Optionary.Samples.Web
+```
+
+The repository’s checked-in [`.vscode/settings.json`](https://github.com/RocketSurgeonsGuild/Optionary/blob/main/.vscode/settings.json) maps each sample’s `appsettings*.json` to its schema, with the same `json.schemas` entries `OptionaryScaffoldEditorSettings` writes (see [schema and editors](../guides/schema-and-editors/#visual-studio-code)). Build the samples once, open the repository in VS Code, and the files get completion, hover documentation and checks for unknown keys and out-of-range values.
+
+## How they consume Optionary
+
+[Section titled “How they consume Optionary”](#how-they-consume-optionary)
+
+The samples use Optionary from this repository’s source, wired as the package wires itself into a consumer:
+
+* [`samples/Directory.Build.props`](https://github.com/RocketSurgeonsGuild/Optionary/blob/main/samples/Directory.Build.props) imports the package’s `build/Optionary.props`;
+* [`samples/Directory.Build.targets`](https://github.com/RocketSurgeonsGuild/Optionary/blob/main/samples/Directory.Build.targets) references the runtime project and the generator as an analyzer, and imports the package’s `build/Optionary.targets` with the MSBuild tasks built in the repository.
+
+In your own projects, `dotnet add package Optionary` does all of this (see [getting started](../getting-started/)).
 
 # Troubleshooting
 

@@ -19,6 +19,67 @@ written as `Retries`.
 Hand-written fragments in the same format are supported: a library whose section isn't described by an options type can
 add the attribute itself, and it is merged like any other. Only the `Optionary.Schema.v1:` prefix is read.
 
+### Contributing a fragment from a package or another generator
+
+A package that configures a section of its own, such as an HTTP-client generator that reads `HttpClients:Petstore`, can
+declare that section's schema to the projects that use it. Source generators can't see each other's output, so there are
+three ways in.
+
+**The `OptionarySchemaFragment` item.** `Include` is the section path, and exactly one metadata holds the schema of the
+section's value, in the fragment format above: `Schema` (inline JSON) or `File` (a JSON file):
+
+```xml
+<ItemGroup>
+  <OptionarySchemaFragment Include="HttpClients:Petstore" File="$(MSBuildThisFileDirectory)petstore.schema.json" />
+  <OptionarySchemaFragment
+    Include="@(OpenApiClient->'Clients:%(ClientName)')"
+    Schema='{"type":"object","properties":{"BaseAddress":{"type":"string","format":"uri"}}}' />
+</ItemGroup>
+```
+
+Put it in a project file, or in a package's `buildTransitive/<PackageId>.targets` to declare the section in every project
+that references the package. As the second item shows, it can be a transform of the package's own items, one section each.
+Optionary checks each item and turns it into the
+`[assembly: AssemblyMetadata("Optionary.Schema.v1:HttpClients:Petstore", "...")]` attribute, compacted to one line, before
+the assembly info is generated. From there it is a fragment like a generated one: it goes into the library schema and its
+package, and every host that references the project merges it. Several fragments for one section, from items and from
+options types, are merged into one.
+
+- The schema is a JSON object, with any object types it reuses under `definitions` and every local `$ref` pointing at one
+  of them. Leave out `patternProperties` and `propertyNames` if you like: the fragment is permissive, and the host's merge
+  closes the section to the keys you list.
+- `File` is relative to the project; a package's targets should use `$(MSBuildThisFileDirectory)`. Editing the file
+  rebuilds the project and updates the schemas.
+- `Schema` is an MSBuild metadata value, so MSBuild expands property and metadata references (`$(...)`, `%(...)`) in it and unescapes `%XX`.
+  Write `%25` for a `%` followed by two hex digits. Single-quote the attribute, as above, so the JSON's double quotes need no
+  escaping, and write `&apos;` for a `'`. `;`, `$`, `@` and `%` on their own are kept.
+- The project has to reference `Optionary`: its targets read the item. In a package, that means depending on `Optionary`.
+- With `GenerateAssemblyInfo` or `GenerateAssemblyMetadataAttributes` set to `false`, Optionary writes the attribute to
+  `$(IntermediateOutputPath)<project>.OptionarySchemaFragments.cs` instead. `OptionarySchema=false` ignores the items.
+- Setting neither or both of `Schema` and `File`, an invalid section path, a missing file and a schema that isn't a
+  fragment are build errors, [`OPT1002`](../../reference/diagnostics/#opt1002) to
+  [`OPT1005`](../../reference/diagnostics/#opt1005).
+
+**Emit the attribute from your generator.** A generator can add the `AssemblyMetadata` attribute to its own output: the
+merge reads the compiled assembly, not the source, so it doesn't matter which generator wrote it. The schema has to be in the
+fragment format, as a C# string literal.
+
+**Declare an options type.** When the section binds to a class that the consuming project can already see (one in your
+package's runtime assembly), a package can add a source file declaring it, and Optionary's generator then binds the section
+and describes it:
+
+```xml
+<ItemGroup>
+  <Compile Include="$(MSBuildThisFileDirectory)PetstoreConfiguration.cs" Visible="false" />
+</ItemGroup>
+```
+
+```csharp
+[assembly: Optionary.Optionary<Petstore.PetstoreClientOptions>("HttpClients:Petstore")]
+```
+
+This doesn't work for a class your generator writes: Optionary's generator doesn't see it.
+
 ### Annotations that reach the schema
 
 | Source                                      | Schema                                                    |
