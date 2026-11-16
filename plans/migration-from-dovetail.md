@@ -22,7 +22,7 @@ grilling. Source facts were checked against Dovetail `main` at `e35038ab3c`.
 | D9  | Attribute            | `[Optionary]` / `[Optionary("Section")]` on a class, and `[assembly: Optionary<T>("Section")]`.                                                                                                                                                                                                                             |
 | D10 | Other names          | Short `OptionarySchema*` MSBuild properties, the `Optionary.Schema.v1:` prefix, generated files `Optionary.Schema.g.cs` and `Optionary.Options.g.cs`, and diagnostics renumbered from `OPT0001` (section 3).                                                                                                                |
 | D11 | Contract shape       | `internal static class OptionaryConfigurationOptions` in the project's `RootNamespace`, with `internal static IServiceCollection AddOptionaryConfigurationOptions(this IServiceCollection services)`. It is emitted whenever the attribute type resolves. If the generator doesn't run, the build fails with a clear error. |
-| D12 | YAML                 | `Optionary.Configuration.Yaml` is its own package, with no dependency on `Optionary`. It also declares the three YAML joints as `<DovetailTemplate>` items, only in applications and test projects. These templates do nothing unless Dovetail is present. `Joinery.Dovetail.Configuration.Yaml` is deleted.                |
+| D12 | Format packages      | `Optionary.Configuration.Json`, `.Toml` and `.Yaml` are their own packages, with no dependency on `Optionary`. Each declares its format's three joints as `<DovetailTemplate>` items, only in applications and test projects; they do nothing without Dovetail. Dovetail's own format packages are deleted.                 |
 | D13 | Template repo        | **Dovetail, trimmed** (section 5).                                                                                                                                                                                                                                                                                          |
 | D14 | Prereleases          | nuget.org prerelease tags (`v0.1.0-beta.N`) through the existing tag-publish workflow. No new feed.                                                                                                                                                                                                                         |
 | D15 | Dovetail dependency  | **Opt-in.** `Joinery.Dovetail` does not depend on Optionary; users add it. Dovetail's targets set Optionary's hook properties, which have no effect when Optionary is absent. There is no SDK switch for now.                                                                                                               |
@@ -272,7 +272,9 @@ These names are public API in Optionary's docs and change only in a major versio
     - `OptionarySchemaCopyToOutput`: Dovetail sets `false` when `DovetailEmbedConfiguration == true`.
     - `OptionaryZeroAllocValidation`: Dovetail sets `false` when `DovetailEnableZeroAllocValidation == false`.
 
-### 4.6 YAML joint templates (D12, the amendment to D2)
+### 4.6 Configuration format joint templates (D12, the amendment to D2)
+
+The JSON and TOML packages follow the YAML one below, with their own names: `Optionary.Configuration.Json` declares `JsonJoint`, `JsonBrowserJoint` and `JsonEmbeddedJoint` with `OutputPrefix="OptionaryJson"`, over `Microsoft.Extensions.Configuration.Json`. It has no types, but it still ships an assembly named after the package, because Dovetail's `Package` gate looks for that assembly among the resolved references. Like the YAML package, it adds a `BlazorConfigurationFile` assembly metadata entry, listing `wwwroot/appsettings*.json`.
 
 `Optionary.Configuration.Yaml/build/Optionary.Configuration.Yaml.targets` declares:
 

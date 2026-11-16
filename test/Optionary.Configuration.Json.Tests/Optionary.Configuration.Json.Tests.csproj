@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+        <!-- The package under test (PackageUnderTest.targets). -->
+        <PackageUnderTestProject>$(MSBuildThisFileDirectory)../../src/Optionary.Configuration.Json/Optionary.Configuration.Json.csproj</PackageUnderTestProject>
+        <PackageUnderTestDirectory>$(MSBuildProjectDirectory)/$(BaseIntermediateOutputPath)json-package/</PackageUnderTestDirectory>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Optionary.Configuration.Json\Optionary.Configuration.Json.csproj" />
+    </ItemGroup>
+
+    <!-- The package tests (PackageContentTests, WithoutDovetailTests) read the Optionary.Configuration.Json package as it ships. -->
+    <Import Project="$(MSBuildThisFileDirectory)../PackageUnderTest.targets" />
+</Project>

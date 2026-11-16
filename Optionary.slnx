@@ -48,6 +48,7 @@
     <Project Path="src/Optionary/Optionary.csproj" />
     <Project Path="src/Optionary.Analyzers/Optionary.Analyzers.csproj" />
     <Project Path="src/Optionary.Build.Tasks/Optionary.Build.Tasks.csproj" />
+    <Project Path="src/Optionary.Configuration.Json/Optionary.Configuration.Json.csproj" />
     <Project Path="src/Optionary.Configuration.Yaml/Optionary.Configuration.Yaml.csproj" />
   </Folder>
   <Folder Name="/src/Optionary.Analyzers.supports/">
@@ -66,6 +67,7 @@
     <Project Path="test/Optionary.Aot.Tests/Optionary.Aot.Tests.csproj" />
     <Project Path="test/Optionary.Build.Tasks.Tests/Optionary.Build.Tasks.Tests.csproj" />
     <Project Path="test/Optionary.Build.Tests/Optionary.Build.Tests.csproj" />
+    <Project Path="test/Optionary.Configuration.Json.Tests/Optionary.Configuration.Json.Tests.csproj" />
     <Project Path="test/Optionary.Configuration.Yaml.Tests/Optionary.Configuration.Yaml.Tests.csproj" />
     <Project Path="test/Optionary.Parity.Tests/Optionary.Parity.Tests.csproj" />
     <Project Path="test/Optionary.Runtime.Tests/Optionary.Runtime.Tests.csproj" />
