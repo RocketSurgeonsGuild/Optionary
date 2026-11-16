@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        An application (a host): its build merges its own schema fragments and the library's into obj/appsettings.schema.json,
+        which this project's appsettings*.json files name with their "$schema" key.
+    -->
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <RootNamespace>Optionary.Samples.Console</RootNamespace>
+        <!-- dotnet run starts in the project folder, so the host reads (and watches) the appsettings files you edit here. -->
+        <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="../Optionary.Samples.Library/Optionary.Samples.Library.csproj" />
+        <!-- Host.CreateApplicationBuilder: appsettings.json, appsettings.{Environment}.json and environment variables, with reload. -->
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="appsettings*.json" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+</Project>

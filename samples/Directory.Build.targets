@@ -1,0 +1,15 @@
+<Project>
+    <ItemGroup>
+        <!-- What the Optionary package carries: the runtime library and, as an analyzer, the source generator. -->
+        <ProjectReference Include="$(MSBuildThisFileDirectory)../src/Optionary/Optionary.csproj" />
+        <ProjectReference
+            Include="$(MSBuildThisFileDirectory)../src/Optionary.Analyzers/Optionary.Analyzers.csproj"
+            OutputItemType="Analyzer"
+            ReferenceOutputAssembly="false"
+        />
+    </ItemGroup>
+    <!-- The package's build/ targets (schema, Visual Studio segments, editor settings), with the tasks built in this repository. -->
+    <Import Project="$(MSBuildThisFileDirectory)../src/Optionary/build/Optionary.targets" />
+    <Import Project="$(MSBuildThisFileDirectory)../src/Optionary.Build.Tasks/Optionary.Build.Tasks.InRepo.targets" />
+    <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+</Project>

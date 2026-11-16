@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <!--
+        A library built with Optionary. Its build embeds one schema fragment per section in the assembly and writes the library
+        schema to obj/<configuration>/<tfm>/ConfigurationSchema.json; packing puts that file at the package root. The samples aren't
+        packable, so CI never publishes this one. To see the package:
+            dotnet pack samples/Optionary.Samples.Library -p:SamplePack=true
+        (SamplePack rather than IsPackable, which would flow to the referenced src projects as a global property.)
+    -->
+    <PropertyGroup>
+        <RootNamespace>Optionary.Samples.Library</RootNamespace>
+        <IsPackable Condition="'$(SamplePack)' == 'true'">true</IsPackable>
+    </PropertyGroup>
+</Project>

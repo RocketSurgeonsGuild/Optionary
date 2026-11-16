@@ -65,6 +65,7 @@ export default defineConfig({
                             items: [
                                 { label: "Overview", link: "/" },
                                 { label: "Getting started", link: "/getting-started/" },
+                                { label: "Samples", link: "/samples/" },
                                 {
                                     label: "Guides",
                                     items: [
