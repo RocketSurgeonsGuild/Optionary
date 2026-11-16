@@ -94,6 +94,11 @@ public sealed class OptionaryTestProject : IDisposable
                 <Nullable>enable</Nullable>
                 <RestorePackagesPath>$(MSBuildThisFileDirectory).packages</RestorePackagesPath>
                 <NuGetAudit>false</NuGetAudit>
+                <!--
+                  A prerelease of its own, so packing a scaffolded library that depends on a prerelease Optionary (as CI builds
+                  it, e.g. 0.0.1-beta.11) doesn't warn NU5104 "stable release with a prerelease dependency".
+                -->
+                <Version>1.0.0-scaffold</Version>
               </PropertyGroup>
               <ItemGroup Condition="'{referenceOptionary}' == 'True'">
                 <PackageReference Include="{OptionaryPackage.Id}" Version="{OptionaryPackage.Version}" />
