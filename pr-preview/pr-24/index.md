@@ -1,9 +1,0 @@
-# Optionary
-
-Optionary binds `[Optionary]` options types to configuration without reflection, and writes a JSON Schema for each
-application's `appsettings.json`.
-
-> [!NOTE]
-> Optionary is being extracted from [Dovetail](https://github.com/RocketSurgeonsGuild/Dovetail). These docs are a
-> placeholder until the code lands: see the
-> [migration plan](https://github.com/RocketSurgeonsGuild/Optionary/blob/main/plans/migration-from-dovetail.md).
