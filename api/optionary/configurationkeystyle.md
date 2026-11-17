@@ -2,7 +2,7 @@
 
 - Kind: `enum`
 - Package: [Optionary](/Optionary/api/optionary.md)
-- Version: `0.1.2-beta.4`
+- Version: `0.1.2-beta.7`
 - Namespace: `Optionary`
 - Target framework: `net10.0`
 

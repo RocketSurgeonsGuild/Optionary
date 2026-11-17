@@ -1,7 +1,7 @@
 # Optionary
 
 - Package: `Optionary`
-- Version: `0.1.2-beta.4`
+- Version: `0.1.2-beta.7`
 - Target framework: `net10.0`
 - NuGet: [Optionary](https://www.nuget.org/packages/Optionary)
 
