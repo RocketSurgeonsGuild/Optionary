@@ -2,7 +2,7 @@
 
 - Kind: `class`
 - Package: [Optionary](/Optionary/pr-preview/pr-16/api/optionary.md)
-- Version: `0.0.1-pr.10`
+- Version: `0.1.2-pr.9`
 - Namespace: `Optionary`
 - Target framework: `net10.0`
 
