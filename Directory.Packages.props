@@ -14,7 +14,7 @@
     <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.2" />
     <PackageVersion Include="Polyfill" Version="11.4.5" />
     <!-- The generator (src/Optionary.Analyzers); the roslyn5.x slices override this version. -->
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0" />
     <!-- The MSBuild tasks (src/Optionary.Build.Tasks) compile against these; MSBuild.ProjectCreation brings Microsoft.Build in the build tests. Keep all three on one version. -->
     <PackageVersion Include="Microsoft.Build" Version="18.12.2" />
     <PackageVersion Include="Microsoft.Build.Framework" Version="18.12.2" />
