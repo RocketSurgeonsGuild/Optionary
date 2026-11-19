@@ -11,7 +11,7 @@
     <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.172" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.2" />
+    <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.5" />
     <PackageVersion Include="Polyfill" Version="11.4.5" />
     <!-- The generator (src/Optionary.Analyzers); the roslyn5.x slices override this version. -->
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0" />
@@ -46,7 +46,7 @@
     <PackageVersion Include="Sourcy.DotNet" Version="1.1.1" />
     <PackageVersion Include="Sourcy.Git" Version="1.1.1" />
     <PackageVersion Include="Rocket.Surgery.ModularPipelines.Extensions" Version="0.2.4" />
-    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.7.1" />
+    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.8.0" />
     <PackageVersion Include="ModularPipelines" Version="4.0.0" />
     <PackageVersion Include="Specular" Version="0.4.1" />
   </ItemGroup>
