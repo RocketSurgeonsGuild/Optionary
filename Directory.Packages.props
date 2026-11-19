@@ -6,9 +6,7 @@
   <ItemGroup>
     <!-- Public API tracking: each packable project lists its public surface in PublicAPI.Shipped.txt / PublicAPI.Unshipped.txt (RS0016/RS0017 are errors). -->
     <GlobalPackageReference Include="Microsoft.DotNet.ApiCompat.Task" Version="11.0.100" />
-    <GlobalPackageReference Include="ZeroAlloc.Analyzers" Version="1.13.1" />
     <GlobalPackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
-    <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.172" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.2" />
@@ -39,8 +37,6 @@
     <PackageVersion Include="TUnit.Assertions.Should" Version="1.85.0-beta" />
     <PackageVersion Include="Verify.TUnit" Version="33.7.0" />
     <PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.CrashDump" Version="2.5.3" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.5.3" />
     <!-- The CI pipeline (build/Build.cs, a file-based app). Build tooling only: the libraries don't depend on any of these. -->
     <PackageVersion Include="Microsoft.VisualStudio.SolutionPersistence" Version="1.0.52" />
     <PackageVersion Include="Sourcy.DotNet" Version="1.1.1" />
