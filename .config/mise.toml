@@ -25,9 +25,9 @@ oxfmt = "0.75.0"
 
 [tasks]
 build = { run = "dotnet run build/Build.cs" }
-"docs:api" = { run = "api-reference --solution LaunchPad.slnx --output docs/src/data/api", tools = { "dotnet:Rocket.Surgery.ApiReference" = "0.1.14" }, description = "Generate the C# API reference JSON (docs/src/data/api) from the Release build output: build first (mise run build, or dotnet build LaunchPad.slnx -c Release)" }
+"docs:api" = { run = "api-reference --solution Optionary.slnx --output docs/src/data/api", tools = { "dotnet:Rocket.Surgery.ApiReference" = "0.1.14" }, description = "Generate the C# API reference JSON (docs/src/data/api) from the Release build output: build first (mise run build, or dotnet build Optionary.slnx -c Release)" }
 docs = { run = [
-  "dotnet build LaunchPad.slnx -c Release",
+  "dotnet build Optionary.slnx -c Release",
   "mise run docs:api",
   "npm run dev --workspace docs",
 ], description = "Build the solution, generate the API reference and start the Astro/Starlight dev server" }
@@ -45,7 +45,7 @@ prereleases = true
 [env]
 HK_MISE = 1
 # StrawberryShake.Server runs its code generator (tools/net9/dotnet-graphql.dll, Sample.Graphql.Tests) on .NET 9, which mise does not
-# install; this lets it run on the newest runtime installed. Everything else targets LaunchPad's own frameworks and finds its own runtime.
+# install; this lets it run on the newest runtime installed. Everything else targets Optionary's own frameworks and finds its own runtime.
 DOTNET_ROLL_FORWARD = "Major"
 npm_config_cache = "{{env.HOME}}/.local/share/mise/npm-cache"
 # Microsoft Roslyn language server (Microsoft.CodeAnalysis.LanguageServer), installed by the

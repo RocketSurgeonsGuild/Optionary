@@ -28,5 +28,6 @@
         <ProjectReference Include="../Optionary.Analyzers.supports/Optionary.Analyzers.roslyn5.0.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" Private="false" />
         <ProjectReference Include="../Optionary.Analyzers.supports/Optionary.Analyzers.roslyn5.3.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" Private="false" />
         <ProjectReference Include="../Optionary.Analyzers.supports/Optionary.Analyzers.roslyn5.6.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" Private="false" />
+        <ProjectReference Include="../Optionary.Analyzers.supports/Optionary.Analyzers.roslyn5.9.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" Private="false" />
     </ItemGroup>
 </Project>

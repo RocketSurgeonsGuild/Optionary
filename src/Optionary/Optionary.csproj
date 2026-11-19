@@ -33,10 +33,11 @@
         The generator, once per Roslyn version (NuGet picks the highest roslynX.Y folder the compiler supports): the main project
         compiles against the newest Roslyn, the Optionary.Analyzers.supports projects against the older ones.
     -->
-    <None Include="../Optionary.Analyzers/bin/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.9/cs" Visible="false" />
+    <None Include="../Optionary.Analyzers/bin/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.12/cs" Visible="false" />
     <None Include="../Optionary.Analyzers.supports/bin/roslyn5.0/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.0/cs" Visible="false" />
     <None Include="../Optionary.Analyzers.supports/bin/roslyn5.3/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.3/cs" Visible="false" />
     <None Include="../Optionary.Analyzers.supports/bin/roslyn5.6/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.6/cs" Visible="false" />
+    <None Include="../Optionary.Analyzers.supports/bin/roslyn5.9/$(Configuration)/netstandard2.0/Optionary.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn5.9/cs" Visible="false" />
     <!--
         The MSBuild tasks build/Optionary.Schema.targets will run. The in-repo wiring (Optionary.Build.Tasks.InRepo.targets)
         builds Optionary.Build.Tasks before this project.
