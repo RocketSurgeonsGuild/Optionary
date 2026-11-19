@@ -2,10 +2,10 @@
 
 - Kind: `class`
 - Package: [Optionary](/Optionary/pr-preview/pr-58/api/optionary.md)
-- Version: `0.1.2-pr.14`
+- Version: `0.1.2-pr.24`
 - Namespace: `Optionary`
 - Target framework: `net10.0`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-58-merge.Sha.d9271321a4a47b9287d344e53ccf6b1a65286e20/src/Optionary/OptionaryAttribute.cs)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-58-merge.Sha.663813de8e5c2ef2830b99a0f04924b906e30355/src/Optionary/OptionaryAttribute.cs)
 - Inherits: `Attribute`
 
 Declares the configuration section of an options class. Optionary's source generator describes the class as JSON Schema, which is merged into the application's `appsettings.schema.json` for editor completion and validation, and registers it with the options pipeline.
