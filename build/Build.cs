@@ -4,6 +4,7 @@
 #:package Sourcy.DotNet
 #:package Rocket.Surgery.ModularPipelines.Extensions
 #:property JsonSerializerIsReflectionEnabledByDefault=true
+#:property IsPackable=false
 #:property ExperimentalFileBasedProgramEnableTransitiveDirectives=true
 
 using Build;
