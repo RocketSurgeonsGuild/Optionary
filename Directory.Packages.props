@@ -46,7 +46,7 @@
     <PackageVersion Include="Sourcy.DotNet" Version="1.1.1" />
     <PackageVersion Include="Sourcy.Git" Version="1.1.1" />
     <PackageVersion Include="Rocket.Surgery.ModularPipelines.Extensions" Version="0.2.4" />
-    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.6.0" />
+    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.7.1" />
     <PackageVersion Include="ModularPipelines" Version="4.0.0" />
     <PackageVersion Include="Specular" Version="0.4.1" />
   </ItemGroup>
