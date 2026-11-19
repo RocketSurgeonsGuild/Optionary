@@ -14,7 +14,12 @@
     <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.2" />
     <PackageVersion Include="Polyfill" Version="11.4.5" />
     <!-- The generator (src/Optionary.Analyzers); the roslyn5.x slices override this version. -->
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0" />
+    <!-- Test-only: the source-generator test helpers bring the Workspaces/Features stack; keep it on the generator's Roslyn. -->
+    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.12.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="5.12.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Features" Version="5.12.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="5.12.0" />
     <!-- The MSBuild tasks (src/Optionary.Build.Tasks) compile against these; MSBuild.ProjectCreation brings Microsoft.Build in the build tests. Keep all three on one version. -->
     <PackageVersion Include="Microsoft.Build" Version="18.12.2" />
     <PackageVersion Include="Microsoft.Build.Framework" Version="18.12.2" />
@@ -41,7 +46,7 @@
     <PackageVersion Include="Sourcy.DotNet" Version="1.1.1" />
     <PackageVersion Include="Sourcy.Git" Version="1.1.1" />
     <PackageVersion Include="Rocket.Surgery.ModularPipelines.Extensions" Version="0.2.4" />
-    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.6.0" />
+    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.7.1" />
     <PackageVersion Include="ModularPipelines" Version="4.0.0" />
     <PackageVersion Include="Specular" Version="0.4.1" />
   </ItemGroup>
