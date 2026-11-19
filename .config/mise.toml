@@ -45,7 +45,7 @@ prereleases = true
 [env]
 HK_MISE = 1
 # StrawberryShake.Server runs its code generator (tools/net9/dotnet-graphql.dll, Sample.Graphql.Tests) on .NET 9, which mise does not
-# install; this lets it run on the newest runtime installed. Everything else targets LaunchPad's own frameworks and finds its own runtime.
+# install; this lets it run on the newest runtime installed. Everything else targets Optionary's own frameworks and finds its own runtime.
 DOTNET_ROLL_FORWARD = "Major"
 npm_config_cache = "{{env.HOME}}/.local/share/mise/npm-cache"
 # Microsoft Roslyn language server (Microsoft.CodeAnalysis.LanguageServer), installed by the
