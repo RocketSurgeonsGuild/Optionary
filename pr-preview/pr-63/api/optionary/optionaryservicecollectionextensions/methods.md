@@ -15,7 +15,7 @@ Registers strongly-typed configuration classes with the standard `Extensions.Opt
 - Name: `AddOptionaryOptions(IServiceCollection, string, Func<IConfiguration, TOptions>)`
 - Modifiers: `extension`
 - Returns: `OptionsBuilder<TOptions>`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-63-merge.Sha.33368a0e3ee62fdcbda2f49c1f871025938ef835/src/Optionary/OptionaryServiceCollectionExtensions.cs#L74-L99)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-63-merge.Sha.90865672bcb9ffa17b52ca7ce0ae6db00ffc494a/src/Optionary/OptionaryServiceCollectionExtensions.cs#L74-L99)
 
 Creates `TOptions` from the configuration section at `sectionPath` with `create`, without reflection.
 
