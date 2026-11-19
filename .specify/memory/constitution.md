@@ -29,7 +29,7 @@ Generated binders and schema fragments are verified against committed Verify sna
 ## Code Standards
 
 - **Language**: C# with `LangVersion=preview`, `Nullable=enable`, `ImplicitUsings=enable`, `Features=strict`, `AnalysisMode=AllEnabledByDefault`
-- **Targets**: the runtime `net10.0;net11.0`; the generator `netstandard2.0`, built per Roslyn version (roslyn5.0/5.3/5.6 in `src/Optionary.Analyzers.supports/`, roslyn5.9 in `src/Optionary.Analyzers/`); the MSBuild tasks `netstandard2.0`
+- **Targets**: the runtime `net10.0;net11.0`; the generator `netstandard2.0`, built per Roslyn version (roslyn5.0/5.3/5.6/5.9 in `src/Optionary.Analyzers.supports/`, roslyn5.12 in `src/Optionary.Analyzers/`); the MSBuild tasks `netstandard2.0`
 - **Packaging**: one `Optionary` package carries the runtime (`lib/`), the generator (`analyzers/dotnet/roslyn5.x/cs/`), the tasks (`build/tasks/netstandard2.0/`) and the MSBuild assets (`build/`, `buildTransitive/`, `buildMultiTargeting/`).
 - **Global usings**: `JetBrains.Annotations`, `System.Diagnostics.CodeAnalysis`, `NotNullAttribute` alias applied to all projects
 - **Warnings as errors**: `RS0016` and `RS0017` — do not silently suppress other warnings without justification
