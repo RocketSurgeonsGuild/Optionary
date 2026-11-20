@@ -99,7 +99,7 @@ internal sealed class ModelBuilder
                 case "ValidateOnStart" when named.Value.Value is bool value:
                     validateOnStart = value;
                     break;
-                case "KeyStyle" when named.Value.Value is int value && Enum.IsDefined(typeof(KeyStyle), value):
+                case "KeyStyle" when named.Value.Value is int value && IsDefinedKeyStyle(value):
                     keyStyle = (KeyStyle)value;
                     break;
                 default:
@@ -223,6 +223,9 @@ internal sealed class ModelBuilder
             "it's a collection; declare the class that contains it",
         _ => null,
     };
+
+    // A range check instead of Enum.IsDefined(Type, object), which boxes; netstandard2.0 has no generic overload. KeyStyle is contiguous.
+    private static bool IsDefinedKeyStyle(int value) => value is >= (int)KeyStyle.Undefined and <= (int)KeyStyle.Underscore;
 
     /// <summary>Unbound type parameters anywhere in the type or the types it's nested in.</summary>
     private static bool IsOpenGeneric(INamedTypeSymbol type)

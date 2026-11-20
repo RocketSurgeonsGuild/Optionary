@@ -122,7 +122,12 @@ internal static class ConfigurationSchemaDocument
         foreach (var section in sections)
         {
             IReadOnlyList<string> sectionPath = [.. path, section.Name];
-            var parts = section.Fragments.Select(z => registry.Root(z, sectionPath).DeepClone()).ToList();
+            var parts = new List<JsonNode>(section.Fragments.Count + 1);
+            foreach (var fragment in section.Fragments)
+            {
+                parts.Add(registry.Root(fragment, sectionPath).DeepClone());
+            }
+
             if (section.Children.Count > 0) parts.Add(new JsonObject { ["type"] = "object", ["properties"] = LibraryProperties(sectionPath, section.Children, registry), });
             properties[section.Name] = parts.Count == 1 ? parts[0] : new JsonObject { ["allOf"] = new JsonArray([.. parts]), };
         }

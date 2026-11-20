@@ -65,21 +65,19 @@ internal static class DocumentationReader
                 var text = trivia.ToFullString();
                 if (trivia.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia) || ( trivia.IsKind(SyntaxKind.SingleLineCommentTrivia) && text.StartsWith("///", StringComparison.Ordinal) ))
                 {
-                    lines.AddRange(
-                        text.Split('\n')
-                            .Select(z => z.Trim())
-                            .Where(z => z.StartsWith("///", StringComparison.Ordinal))
-                            .Select(z => z[3..])
-                    );
+                    foreach (var line in text.Split('\n'))
+                    {
+                        var trimmed = line.Trim();
+                        if (trimmed.StartsWith("///", StringComparison.Ordinal)) lines.Add(trimmed[3..]);
+                    }
                 }
                 // "/**/" is an ordinary empty comment that also starts with "/**": only longer ones have contents.
                 else if (text.Length >= 5 && ( trivia.IsKind(SyntaxKind.MultiLineDocumentationCommentTrivia) || ( trivia.IsKind(SyntaxKind.MultiLineCommentTrivia) && text.StartsWith("/**", StringComparison.Ordinal) ) ))
                 {
-                    lines.AddRange(
-                        text[3..^2]
-                            .Split('\n')
-                            .Select(z => z.Trim().TrimStart('*'))
-                    );
+                    foreach (var line in text[3..^2].Split('\n'))
+                    {
+                        lines.Add(line.Trim().TrimStart('*'));
+                    }
                 }
             }
 
