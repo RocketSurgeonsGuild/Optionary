@@ -39,3 +39,11 @@ resharper_nullable_warning_suppression_is_used_highlighting = none
 
 # for conventions only
 dotnet_diagnostic.CS8620.severity = none
+
+# TUnit assertions (Throw<T>(), BeEquivalentTo) don't carry nullability through their results and constraints;
+# a failed assertion already throws, so these are false positives in tests.
+dotnet_diagnostic.CS8602.severity = none
+dotnet_diagnostic.CS8631.severity = none
+
+# ZeroAlloc boxing hint on test-only rendering helpers; allocation doesn't matter in tests.
+dotnet_diagnostic.ZA0208.severity = none

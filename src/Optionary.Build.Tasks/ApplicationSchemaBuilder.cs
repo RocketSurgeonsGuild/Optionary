@@ -339,19 +339,32 @@ internal sealed class ApplicationSchemaBuilder(bool strict, DefinitionRegistry d
             if (keyword.Key == skip) continue;
             result[keyword.Key] = keyword switch
             {
-                { Key: "properties", Value: JsonObject value, } => new JsonObject(
-                    value.Select(z => new KeyValuePair<string, JsonNode?>(z.Key, z.Value is null ? null : Close(z.Value, Append(path, z.Key))))
-                ),
-                { Key: "patternProperties", Value: JsonObject value, } => new JsonObject(
-                    value.Select(
-                        z => new KeyValuePair<string, JsonNode?>(
-                            z.Key,
-                            z.Value is null ? null : Close(z.Value, Append(path, names.Find(z.Key) ?? AnyKey))
-                        )
-                    )
-                ),
+                { Key: "properties", Value: JsonObject value, } => CloseProperties(value, path),
+                { Key: "patternProperties", Value: JsonObject value, } => ClosePatternProperties(value, path, names),
                 _ => Keyword(keyword.Key, keyword.Value, path),
             };
+        }
+
+        return result;
+    }
+
+    private JsonObject CloseProperties(JsonObject properties, IReadOnlyList<string> path)
+    {
+        var result = new JsonObject();
+        foreach (var property in properties)
+        {
+            result[property.Key] = property.Value is null ? null : Close(property.Value, Append(path, property.Key));
+        }
+
+        return result;
+    }
+
+    private JsonObject ClosePatternProperties(JsonObject patternProperties, IReadOnlyList<string> path, CaseInsensitivePattern.NameLookup names)
+    {
+        var result = new JsonObject();
+        foreach (var property in patternProperties)
+        {
+            result[property.Key] = property.Value is null ? null : Close(property.Value, Append(path, names.Find(property.Key) ?? AnyKey));
         }
 
         return result;
