@@ -248,7 +248,7 @@ internal static class VsCodeSettingsEditor
             var missing = new List<string>();
             foreach (var key in new[] { EditorSettingsMappings.JsonSchemasKey, EditorSettingsMappings.YamlSchemasKey, EditorSettingsMappings.TomlAssociationsKey })
             {
-                var found = root.Members.Where(z => z.Name == key).ToArray();
+                var found = MembersNamed(root.Members, key);
                 if (found.Length > 1) return $"\"{key}\" appears more than once";
 
                 if (found.Length == 0)
@@ -295,13 +295,13 @@ internal static class VsCodeSettingsEditor
             foreach (var item in array.Items)
             {
                 if (item is not JsoncObject entry
-                 || entry.Members.FirstOrDefault(z => z.Name == "url")?.Value is not JsoncString url
+                 || FirstMemberNamed(entry.Members, "url")?.Value is not JsoncString url
                  || EditorSettingsMappings.NormalizePath(url.Value) != EditorSettingsMappings.NormalizePath(mappings.SchemaUrl))
                 {
                     continue;
                 }
 
-                var fileMatch = entry.Members.Where(z => z.Name == "fileMatch").ToArray();
+                var fileMatch = MembersNamed(entry.Members, "fileMatch");
                 if (fileMatch.Length > 1) return "a Optionary entry of \"json.schemas\" has two \"fileMatch\" properties";
 
                 if (fileMatch.Length == 0)
@@ -310,9 +310,9 @@ internal static class VsCodeSettingsEditor
                     return null;
                 }
 
-                if (fileMatch[0].Value is not JsoncArray patterns || patterns.Items.Any(z => z is not JsoncString)) return "a Optionary entry of \"json.schemas\" has an unexpected \"fileMatch\"";
+                if (fileMatch[0].Value is not JsoncArray patterns || !AllStrings(patterns.Items)) return "a Optionary entry of \"json.schemas\" has an unexpected \"fileMatch\"";
 
-                if (patterns.Items.Cast<JsoncString>().All(z => z.Value != mappings.JsonFileMatch))
+                if (!ContainsString(patterns.Items, mappings.JsonFileMatch))
                 {
                     Append(patterns.Start, patterns.End - 1, patterns.Items.Count == 0 ? -1 : patterns.Items[patterns.Items.Count - 1].End, patterns.Items.Count == 0 ? -1 : patterns.Items[patterns.Items.Count - 1].Start, patterns.TrailingCommaEnd, [(_, _) => Renderer.QuoteString(mappings.JsonFileMatch)]);
                 }
@@ -391,6 +391,47 @@ internal static class VsCodeSettingsEditor
         private static int LastEnd(IReadOnlyList<JsoncMember> members) => members.Count == 0 ? -1 : members[members.Count - 1].Value.End;
 
         private static int LastStart(IReadOnlyList<JsoncMember> members) => members.Count == 0 ? -1 : members[members.Count - 1].NameStart;
+
+        private static JsoncMember[] MembersNamed(IReadOnlyList<JsoncMember> members, string name)
+        {
+            var found = new List<JsoncMember>();
+            foreach (var member in members)
+            {
+                if (member.Name == name) found.Add(member);
+            }
+
+            return [.. found];
+        }
+
+        private static JsoncMember? FirstMemberNamed(IReadOnlyList<JsoncMember> members, string name)
+        {
+            foreach (var member in members)
+            {
+                if (member.Name == name) return member;
+            }
+
+            return null;
+        }
+
+        private static bool AllStrings(IReadOnlyList<JsoncNode> items)
+        {
+            foreach (var item in items)
+            {
+                if (item is not JsoncString) return false;
+            }
+
+            return true;
+        }
+
+        private static bool ContainsString(IReadOnlyList<JsoncNode> items, string value)
+        {
+            foreach (var item in items)
+            {
+                if (item is JsoncString text && text.Value == value) return true;
+            }
+
+            return false;
+        }
 
         /// <summary>
         ///     Appends items to the container that opens at <paramref name="open" /> and closes at <paramref name="close" />.

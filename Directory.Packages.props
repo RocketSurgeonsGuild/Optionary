@@ -6,9 +6,7 @@
   <ItemGroup>
     <!-- Public API tracking: each packable project lists its public surface in PublicAPI.Shipped.txt / PublicAPI.Unshipped.txt (RS0016/RS0017 are errors). -->
     <GlobalPackageReference Include="Microsoft.DotNet.ApiCompat.Task" Version="11.0.100" />
-    <GlobalPackageReference Include="ZeroAlloc.Analyzers" Version="1.13.1" />
     <GlobalPackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
-    <GlobalPackageReference Include="JetBrains.ExternalAnnotations" Version="10.2.172" />
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.5" />
@@ -24,23 +22,21 @@
     <PackageVersion Include="Microsoft.Build" Version="18.12.2" />
     <PackageVersion Include="Microsoft.Build.Framework" Version="18.12.2" />
     <PackageVersion Include="Microsoft.Build.Utilities.Core" Version="18.12.2" />
-    <PackageVersion Include="MSBuild.ProjectCreation" Version="20.0.0" />
+    <PackageVersion Include="MSBuild.ProjectCreation" Version="20.0.1" />
     <!-- Reads the binary logs of the scaffolded builds in Optionary.Build.Tests. -->
     <PackageVersion Include="MSBuild.StructuredLogger.Utils" Version="2.3.269" />
     <!-- Validates the merged schemas against the draft-07 meta-schema in the tasks' tests (Apache-2.0). -->
-    <PackageVersion Include="Corvus.Json.JsonSchema.Draft7" Version="5.8.11" />
+    <PackageVersion Include="Corvus.Json.JsonSchema.Draft7" Version="5.8.12" />
     <PackageVersion Include="ZeroAlloc.Validation" Version="2.6.1" />
     <PackageVersion Include="ZeroAlloc.Validation.Options" Version="2.6.1" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
     <PackageVersion Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="11.0.1" />
     <PackageVersion Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" Version="11.0.1" />
-    <PackageVersion Include="TUnit" Version="1.87.0" />
-    <PackageVersion Include="TUnit.Mocks" Version="1.87.0" />
+    <PackageVersion Include="TUnit" Version="1.87.12" />
+    <PackageVersion Include="TUnit.Mocks" Version="1.87.12" />
     <PackageVersion Include="TUnit.Assertions.Should" Version="1.85.0-beta" />
-    <PackageVersion Include="Verify.TUnit" Version="33.7.0" />
+    <PackageVersion Include="Verify.TUnit" Version="33.7.1" />
     <PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.CrashDump" Version="2.5.3" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.HangDump" Version="2.5.3" />
     <!-- The CI pipeline (build/Build.cs, a file-based app). Build tooling only: the libraries don't depend on any of these. -->
     <PackageVersion Include="Microsoft.VisualStudio.SolutionPersistence" Version="1.0.52" />
     <PackageVersion Include="Sourcy.DotNet" Version="1.1.1" />
