@@ -2,10 +2,10 @@
 
 - Kind: `enum`
 - Package: [Optionary](/Optionary/api/optionary.md)
-- Version: `0.1.3-beta.1`
+- Version: `0.1.3-beta.2`
 - Namespace: `Optionary`
 - Target framework: `net10.0`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.592c01caa8b522a16952f85abbada7b8481c4227/src/Optionary/ConfigurationKeyStyle.cs)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.5ec89e9fb7723cab52a7487ecd7afa785420bcf3/src/Optionary/ConfigurationKeyStyle.cs)
 
 How [OptionaryAttribute](/Optionary/api/optionary/optionaryattribute.md) spells the configuration keys of an options type and of every object type nested in it.
 

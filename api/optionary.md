@@ -1,9 +1,9 @@
 # Optionary
 
 - Package: `Optionary`
-- Version: `0.1.3-beta.1`
+- Version: `0.1.3-beta.2`
 - Target framework: `net10.0`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/tree/Branch.main.Sha.592c01caa8b522a16952f85abbada7b8481c4227/src/Optionary)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/tree/Branch.main.Sha.5ec89e9fb7723cab52a7487ecd7afa785420bcf3/src/Optionary)
 - NuGet: [Optionary](https://www.nuget.org/packages/Optionary)
 
 ## Namespaces
