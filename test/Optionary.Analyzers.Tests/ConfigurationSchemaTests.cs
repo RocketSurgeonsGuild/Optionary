@@ -990,6 +990,322 @@ public class ConfigurationSchemaTests() : GeneratorTest()
         await Fragments(result).Keys.Should().BeEquivalentTo(["A", "B", "C"]);
     }
 
+    /// <summary>
+    ///     Each ZeroAlloc.Validation rule JSON Schema has a keyword for, next to the data annotation that says the same. The two
+    ///     types get the same keywords, apart from <c>pattern</c>: <c>[RegularExpression]</c> matches the whole value and
+    ///     <c>[Matches]</c> searches it, as <c>pattern</c> does.
+    /// </summary>
+    [Test]
+    public async Task Describes_ZeroAlloc_Validation_rules_like_data_annotations()
+    {
+        var result = await WithAnnotations()
+                          .AddSources(
+                               ZeroAllocValidation,
+                               Usings
+                             + """
+                               using ZeroAlloc.Validation;
+
+                               namespace Sample;
+
+                               public enum LogLevel { Quiet, Normal, Loud }
+
+                               [Optionary, Validate]
+                               public class ZeroAllocOptions
+                               {
+                                   [InclusiveBetween(1, 65535)]
+                                   public int? Port { get; set; }
+
+                                   [ExclusiveBetween(0, 1)]
+                                   public double Ratio { get; set; }
+
+                                   [GreaterThan(0)]
+                                   public int Workers { get; set; }
+
+                                   [GreaterThanOrEqualTo(0.5)]
+                                   public decimal Weight { get; set; }
+
+                                   [LessThan(100)]
+                                   public int Percent { get; set; }
+
+                                   [LessThanOrEqualTo(10)]
+                                   public long Retries { get; set; }
+
+                                   [ZeroAlloc.Validation.MinLength(2)]
+                                   public string Name { get; set; } = "";
+
+                                   [ZeroAlloc.Validation.MaxLength(3)]
+                                   public string[] Tags { get; set; } = [];
+
+                                   [ZeroAlloc.Validation.Length(2, 8)]
+                                   public string Code { get; set; } = "";
+
+                                   [NotEmpty]
+                                   public string Title { get; set; } = "";
+
+                                   [NotEmpty]
+                                   public List<string> Hosts { get; set; } = [];
+
+                                   [Matches("^[a-z]{2}-[A-Z]{2}$")]
+                                   public string Culture { get; set; } = "en-US";
+
+                                   [ZeroAlloc.Validation.EmailAddress]
+                                   public string? ReplyTo { get; set; }
+
+                                   [IsInEnum]
+                                   public LogLevel Level { get; set; }
+
+                                   [IsEnumName(typeof(LogLevel))]
+                                   public string LevelName { get; set; } = "Normal";
+                               }
+
+                               [Optionary]
+                               public class AnnotatedOptions
+                               {
+                                   [Range(1, 65535)]
+                                   public int? Port { get; set; }
+
+                                   [Range(0d, 1d, MinimumIsExclusive = true, MaximumIsExclusive = true)]
+                                   public double Ratio { get; set; }
+
+                                   [System.ComponentModel.DataAnnotations.MinLength(2)]
+                                   public string Name { get; set; } = "";
+
+                                   [System.ComponentModel.DataAnnotations.MaxLength(3)]
+                                   public string[] Tags { get; set; } = [];
+
+                                   [System.ComponentModel.DataAnnotations.Length(2, 8)]
+                                   public string Code { get; set; } = "";
+
+                                   [RegularExpression("[a-z]{2}-[A-Z]{2}")]
+                                   public string Culture { get; set; } = "en-US";
+
+                                   [System.ComponentModel.DataAnnotations.EmailAddress]
+                                   public string? ReplyTo { get; set; }
+
+                                   public LogLevel Level { get; set; }
+                               }
+                               """
+                           )
+                          .Build()
+                          .GenerateAsync(TestContext.CancellationToken);
+
+        await Verify(Describe(result));
+    }
+
+    /// <summary>
+    ///     A member that states a rule with both libraries gets each keyword once, whatever the order of the attributes. Where the
+    ///     two disagree, both run, so the schema takes the tighter bound. The type's own bounds (a byte's 0 to 255) count too.
+    /// </summary>
+    [Test]
+    public async Task Merges_ZeroAlloc_Validation_rules_with_data_annotations()
+    {
+        var result = await WithAnnotations()
+                          .AddSources(
+                               ZeroAllocValidation,
+                               Usings
+                             + """
+                               using ZeroAlloc.Validation;
+
+                               namespace Sample;
+
+                               [Optionary, Validate]
+                               public class MergedOptions
+                               {
+                                   [InclusiveBetween(1, 65535), Range(1, 65535)]
+                                   public int? Port { get; set; }
+
+                                   [Range(1, 10), InclusiveBetween(5, 20)]
+                                   public int RangeFirst { get; set; }
+
+                                   [InclusiveBetween(5, 20), Range(1, 10)]
+                                   public int RuleFirst { get; set; }
+
+                                   [GreaterThan(0), LessThanOrEqualTo(100)]
+                                   public int TwoRules { get; set; }
+
+                                   [GreaterThan(1), Range(1, 10)]
+                                   public int ExclusiveAtTheSameBound { get; set; }
+
+                                   [GreaterThanOrEqualTo(-5), LessThan(1000)]
+                                   public byte InsideItsType { get; set; }
+
+                                   [NotEmpty, StringLength(20, MinimumLength = 3)]
+                                   public string Name { get; set; } = "";
+
+                                   [ZeroAlloc.Validation.MaxLength(5), System.ComponentModel.DataAnnotations.MaxLength(3), NotEmpty]
+                                   public string[] Tags { get; set; } = [];
+
+                                   [Matches("^[a-z]+$"), RegularExpression("[a-z]+")]
+                                   public string SamePattern { get; set; } = "";
+
+                                   [ZeroAlloc.Validation.EmailAddress, System.ComponentModel.DataAnnotations.EmailAddress]
+                                   public string? ReplyTo { get; set; }
+                               }
+                               """
+                           )
+                          .Build()
+                          .GenerateAsync(TestContext.CancellationToken);
+
+        await Verify(Describe(result));
+    }
+
+    /// <summary>
+    ///     Rules without a keyword, and rules that don't always fail the options (conditional ones, and warnings), are left out of
+    ///     the schema without a word. A rule that has a keyword but can't use it here is reported with OPT0008, like a data
+    ///     annotation.
+    /// </summary>
+    [Test]
+    public async Task Leaves_out_the_ZeroAlloc_Validation_rules_a_schema_cannot_state()
+    {
+        var result = await WithAnnotations()
+                          .AddSources(
+                               ZeroAllocValidation,
+                               Usings
+                             + """
+                               using ZeroAlloc.Validation;
+
+                               namespace Sample;
+
+                               [Optionary, Validate]
+                               public class UnstatedOptions
+                               {
+                                   [Must(nameof(IsEven))]
+                                   public int Even { get; set; }
+
+                                   [NotEqual(0)]
+                                   public int NotZero { get; set; }
+
+                                   [Equal("yes")]
+                                   public string Answer { get; set; } = "yes";
+
+                                   [PrecisionScale(5, 2)]
+                                   public decimal Price { get; set; }
+
+                                   [NotEmpty]
+                                   public Guid Id { get; set; }
+
+                                   [NotNull, Null, Empty]
+                                   public string? Nothing { get; set; }
+
+                                   [GreaterThan(0, When = nameof(Enabled))]
+                                   public int WhenEnabled { get; set; }
+
+                                   [GreaterThan(0, Unless = nameof(Enabled))]
+                                   public int UnlessEnabled { get; set; }
+
+                                   [GreaterThan(0, Severity = Severity.Warning)]
+                                   public int OnlyAWarning { get; set; }
+
+                                   [GreaterThan(0, Severity = Severity.Error, Message = "Has to be positive.", ErrorCode = "E1")]
+                                   public int AnError { get; set; }
+
+                                   public bool Enabled { get; set; }
+
+                                   private static bool IsEven(int value) => value % 2 == 0;
+                               }
+
+                               [Optionary, Validate, SkipWhen(nameof(Disabled))]
+                               public class SkippedOptions
+                               {
+                                   [GreaterThan(0)]
+                                   public int Count { get; set; }
+
+                                   public bool Disabled { get; set; }
+                               }
+
+                               [Optionary, Validate]
+                               public class ReportedOptions
+                               {
+                                   [GreaterThan(0)]
+                                   public string NotANumber { get; set; } = "";
+
+                                   [ZeroAlloc.Validation.MinLength(1)]
+                                   public Dictionary<string, string> NotACollection { get; set; } = [];
+
+                                   [Matches("[a-z]+")]
+                                   public int NotAString { get; set; }
+
+                                   [Matches(@"\p{L}+")]
+                                   public string NetOnlySyntax { get; set; } = "";
+
+                                   [Matches("[0-9]+"), RegularExpression("[a-z]+")]
+                                   public string TwoPatterns { get; set; } = "";
+                               }
+                               """
+                           )
+                          .Build()
+                          .GenerateAsync(TestContext.CancellationToken);
+
+        await Verify(Describe(result));
+    }
+
+    /// <summary>ZeroAlloc.Validation's attributes, with the constructors and properties of its 2.6 package.</summary>
+    private const string ZeroAllocValidation = """
+        namespace ZeroAlloc.Validation
+        {
+            using System;
+
+            public enum Severity { Error, Warning, Info }
+
+            public enum TextLengthUnit { CodeUnits, CodePoints }
+
+            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+            public sealed class ValidateAttribute : Attribute;
+
+            [AttributeUsage(AttributeTargets.Class)]
+            public sealed class SkipWhenAttribute(string methodName) : Attribute
+            {
+                public string MethodName { get; } = methodName;
+            }
+
+            [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+            public abstract class ValidationAttribute : Attribute
+            {
+                public string? Message { get; set; }
+                public string? When { get; set; }
+                public string? Unless { get; set; }
+                public string? ErrorCode { get; set; }
+                public Severity Severity { get; set; }
+            }
+
+            public sealed class InclusiveBetweenAttribute(double min, double max) : ValidationAttribute { public double Min { get; } = min; public double Max { get; } = max; }
+            public sealed class ExclusiveBetweenAttribute(double min, double max) : ValidationAttribute { public double Min { get; } = min; public double Max { get; } = max; }
+            public sealed class GreaterThanAttribute(double value) : ValidationAttribute { public double Value { get; } = value; }
+            public sealed class GreaterThanOrEqualToAttribute(double value) : ValidationAttribute { public double Value { get; } = value; }
+            public sealed class LessThanAttribute(double value) : ValidationAttribute { public double Value { get; } = value; }
+            public sealed class LessThanOrEqualToAttribute(double value) : ValidationAttribute { public double Value { get; } = value; }
+            public sealed class MinLengthAttribute(int min) : ValidationAttribute { public int Min { get; } = min; public TextLengthUnit Unit { get; set; } }
+            public sealed class MaxLengthAttribute(int max) : ValidationAttribute { public int Max { get; } = max; public TextLengthUnit Unit { get; set; } }
+            public sealed class LengthAttribute(int min, int max) : ValidationAttribute { public int Min { get; } = min; public int Max { get; } = max; public TextLengthUnit Unit { get; set; } }
+            public sealed class MatchesAttribute(string pattern) : ValidationAttribute { public string Pattern { get; } = pattern; }
+            public sealed class IsEnumNameAttribute(Type enumType) : ValidationAttribute { public Type EnumType { get; } = enumType; }
+            public sealed class MustAttribute(string methodName) : ValidationAttribute { public string MethodName { get; } = methodName; }
+            public sealed class PrecisionScaleAttribute(int precision, int scale) : ValidationAttribute { public int Precision { get; } = precision; public int Scale { get; } = scale; }
+            public sealed class EmailAddressAttribute : ValidationAttribute;
+            public sealed class NotEmptyAttribute : ValidationAttribute;
+            public sealed class EmptyAttribute : ValidationAttribute;
+            public sealed class NotNullAttribute : ValidationAttribute;
+            public sealed class NullAttribute : ValidationAttribute;
+            public sealed class IsInEnumAttribute : ValidationAttribute;
+
+            public sealed class EqualAttribute : ValidationAttribute
+            {
+                public EqualAttribute(double value) => NumericValue = value;
+                public EqualAttribute(string value) => StringValue = value;
+                public double NumericValue { get; }
+                public string? StringValue { get; }
+            }
+
+            public sealed class NotEqualAttribute : ValidationAttribute
+            {
+                public NotEqualAttribute(double value) => NumericValue = value;
+                public NotEqualAttribute(string value) => StringValue = value;
+                public double NumericValue { get; }
+                public string? StringValue { get; }
+            }
+        }
+        """;
+
     /// <summary>The raw schema fragments in the compilation, by section.</summary>
     private static Dictionary<string, string> Fragments(GeneratorTestResults result)
     {

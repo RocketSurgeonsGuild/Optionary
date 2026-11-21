@@ -1,0 +1,165 @@
+﻿## Reported
+{
+  "type": "object",
+  "title": "Reported",
+  "properties": {
+    "NotANumber": {
+      "type": "string"
+    },
+    "NotACollection": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "NotAString": {
+      "type": "integer"
+    },
+    "NetOnlySyntax": {
+      "type": "string"
+    },
+    "TwoPatterns": {
+      "type": "string",
+      "pattern": "^(?:[a-z]+)$"
+    }
+  },
+  "patternProperties": {
+    "^(?:[Nn][Oo][Tt][Aa][Nn][Uu][Mm][Bb][Ee][Rr])$": {
+      "type": "string"
+    },
+    "^(?:[Nn][Oo][Tt][Aa][Cc][Oo][Ll][Ll][Ee][Cc][Tt][Ii][Oo][Nn])$": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "^(?:[Nn][Oo][Tt][Aa][Ss][Tt][Rr][Ii][Nn][Gg])$": {
+      "type": "integer"
+    },
+    "^(?:[Nn][Ee][Tt][Oo][Nn][Ll][Yy][Ss][Yy][Nn][Tt][Aa][Xx])$": {
+      "type": "string"
+    },
+    "^(?:[Tt][Ww][Oo][Pp][Aa][Tt][Tt][Ee][Rr][Nn][Ss])$": {
+      "type": "string",
+      "pattern": "^(?:[a-z]+)$"
+    }
+  }
+}
+## Skipped
+{
+  "type": "object",
+  "title": "Skipped",
+  "properties": {
+    "Count": {
+      "type": "integer"
+    },
+    "Disabled": {
+      "type": "boolean"
+    }
+  },
+  "patternProperties": {
+    "^(?:[Cc][Oo][Uu][Nn][Tt])$": {
+      "type": "integer"
+    },
+    "^(?:[Dd][Ii][Ss][Aa][Bb][Ll][Ee][Dd])$": {
+      "type": "boolean"
+    }
+  }
+}
+## Unstated
+{
+  "type": "object",
+  "title": "Unstated",
+  "properties": {
+    "Even": {
+      "type": "integer"
+    },
+    "NotZero": {
+      "type": "integer"
+    },
+    "Answer": {
+      "type": "string",
+      "description": "Default: yes.",
+      "default": "yes"
+    },
+    "Price": {
+      "type": "number"
+    },
+    "Id": {
+      "type": "string",
+      "pattern": "^[{(]?[0-9A-Fa-f]{8}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{12}[)}]?$"
+    },
+    "Nothing": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "WhenEnabled": {
+      "type": "integer"
+    },
+    "UnlessEnabled": {
+      "type": "integer"
+    },
+    "OnlyAWarning": {
+      "type": "integer"
+    },
+    "AnError": {
+      "type": "integer",
+      "description": "Greater than 0.",
+      "exclusiveMinimum": 0
+    },
+    "Enabled": {
+      "type": "boolean"
+    }
+  },
+  "patternProperties": {
+    "^(?:[Ee][Vv][Ee][Nn])$": {
+      "type": "integer"
+    },
+    "^(?:[Nn][Oo][Tt][Zz][Ee][Rr][Oo])$": {
+      "type": "integer"
+    },
+    "^(?:[Aa][Nn][Ss][Ww][Ee][Rr])$": {
+      "type": "string",
+      "description": "Default: yes.",
+      "default": "yes"
+    },
+    "^(?:[Pp][Rr][Ii][Cc][Ee])$": {
+      "type": "number"
+    },
+    "^(?:[Ii][Dd])$": {
+      "type": "string",
+      "pattern": "^[{(]?[0-9A-Fa-f]{8}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{12}[)}]?$"
+    },
+    "^(?:[Nn][Oo][Tt][Hh][Ii][Nn][Gg])$": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "^(?:[Ww][Hh][Ee][Nn][Ee][Nn][Aa][Bb][Ll][Ee][Dd])$": {
+      "type": "integer"
+    },
+    "^(?:[Uu][Nn][Ll][Ee][Ss][Ss][Ee][Nn][Aa][Bb][Ll][Ee][Dd])$": {
+      "type": "integer"
+    },
+    "^(?:[Oo][Nn][Ll][Yy][Aa][Ww][Aa][Rr][Nn][Ii][Nn][Gg])$": {
+      "type": "integer"
+    },
+    "^(?:[Aa][Nn][Ee][Rr][Rr][Oo][Rr])$": {
+      "type": "integer",
+      "description": "Greater than 0.",
+      "exclusiveMinimum": 0
+    },
+    "^(?:[Ee][Nn][Aa][Bb][Ll][Ee][Dd])$": {
+      "type": "boolean"
+    }
+  }
+}
+## Diagnostics
+OPT0008 Warning line 61: '[GreaterThan]' on 'ReportedOptions.NotANumber' is left out of the schema because ranges only apply to numbers
+OPT0008 Warning line 64: '[MinLength]' on 'ReportedOptions.NotACollection' is left out of the schema because lengths only apply to strings and collections
+OPT0008 Warning line 67: '[Matches]' on 'ReportedOptions.NotAString' is left out of the schema because patterns only apply to strings
+OPT0008 Warning line 70: '[Matches]' on 'ReportedOptions.NetOnlySyntax' is left out of the schema because it uses regular expression syntax that JSON Schema (ECMA-262) doesn't support
+OPT0008 Warning line 73: '[Matches]' on 'ReportedOptions.TwoPatterns' is left out of the schema because the value already has a pattern

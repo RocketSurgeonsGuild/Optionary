@@ -1,0 +1,367 @@
+﻿## Annotated
+{
+  "type": "object",
+  "title": "Annotated",
+  "properties": {
+    "Port": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Range: 1 to 65535.",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "Ratio": {
+      "type": "number",
+      "description": "Greater than 0 and less than 1.",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "Name": {
+      "type": "string",
+      "description": "At least 2 characters.",
+      "minLength": 2
+    },
+    "Tags": {
+      "type": "array",
+      "description": "At most 3 items.",
+      "maxItems": 3,
+      "items": {
+        "type": "string"
+      }
+    },
+    "Code": {
+      "type": "string",
+      "description": "2 to 8 characters.",
+      "minLength": 2,
+      "maxLength": 8
+    },
+    "Culture": {
+      "type": "string",
+      "description": "Default: en-US.",
+      "default": "en-US",
+      "pattern": "^(?:[a-z]{2}-[A-Z]{2})$"
+    },
+    "ReplyTo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "email"
+    },
+    "Level": {
+      "type": "string",
+      "anyOf": [
+        {
+          "enum": [
+            "Quiet",
+            "Normal",
+            "Loud"
+          ]
+        },
+        {
+          "pattern": "^\\s*(?:[Qq][Uu][Ii][Ee][Tt]|[Nn][Oo][Rr][Mm][Aa][Ll]|[Ll][Oo][Uu][Dd])\\s*$"
+        }
+      ]
+    }
+  },
+  "patternProperties": {
+    "^(?:[Pp][Oo][Rr][Tt])$": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Range: 1 to 65535.",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "^(?:[Rr][Aa][Tt][Ii][Oo])$": {
+      "type": "number",
+      "description": "Greater than 0 and less than 1.",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "^(?:[Nn][Aa][Mm][Ee])$": {
+      "type": "string",
+      "description": "At least 2 characters.",
+      "minLength": 2
+    },
+    "^(?:[Tt][Aa][Gg][Ss])$": {
+      "type": "array",
+      "description": "At most 3 items.",
+      "maxItems": 3,
+      "items": {
+        "type": "string"
+      }
+    },
+    "^(?:[Cc][Oo][Dd][Ee])$": {
+      "type": "string",
+      "description": "2 to 8 characters.",
+      "minLength": 2,
+      "maxLength": 8
+    },
+    "^(?:[Cc][Uu][Ll][Tt][Uu][Rr][Ee])$": {
+      "type": "string",
+      "description": "Default: en-US.",
+      "default": "en-US",
+      "pattern": "^(?:[a-z]{2}-[A-Z]{2})$"
+    },
+    "^(?:[Rr][Ee][Pp][Ll][Yy][Tt][Oo])$": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "email"
+    },
+    "^(?:[Ll][Ee][Vv][Ee][Ll])$": {
+      "type": "string",
+      "anyOf": [
+        {
+          "enum": [
+            "Quiet",
+            "Normal",
+            "Loud"
+          ]
+        },
+        {
+          "pattern": "^\\s*(?:[Qq][Uu][Ii][Ee][Tt]|[Nn][Oo][Rr][Mm][Aa][Ll]|[Ll][Oo][Uu][Dd])\\s*$"
+        }
+      ]
+    }
+  }
+}
+## ZeroAlloc
+{
+  "type": "object",
+  "title": "ZeroAlloc",
+  "properties": {
+    "Port": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Range: 1 to 65535.",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "Ratio": {
+      "type": "number",
+      "description": "Greater than 0 and less than 1.",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "Workers": {
+      "type": "integer",
+      "description": "Greater than 0.",
+      "exclusiveMinimum": 0
+    },
+    "Weight": {
+      "type": "number",
+      "description": "At least 0.5.",
+      "minimum": 0.5
+    },
+    "Percent": {
+      "type": "integer",
+      "description": "Less than 100.",
+      "exclusiveMaximum": 100
+    },
+    "Retries": {
+      "type": "integer",
+      "description": "At most 10.",
+      "maximum": 10
+    },
+    "Name": {
+      "type": "string",
+      "description": "At least 2 characters.",
+      "minLength": 2
+    },
+    "Tags": {
+      "type": "array",
+      "description": "At most 3 items.",
+      "maxItems": 3,
+      "items": {
+        "type": "string"
+      }
+    },
+    "Code": {
+      "type": "string",
+      "description": "2 to 8 characters.",
+      "minLength": 2,
+      "maxLength": 8
+    },
+    "Title": {
+      "type": "string",
+      "description": "At least 1 character.",
+      "minLength": 1
+    },
+    "Hosts": {
+      "type": "array",
+      "description": "At least 1 item.",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "Culture": {
+      "type": "string",
+      "description": "Default: en-US.",
+      "default": "en-US",
+      "pattern": "^[a-z]{2}-[A-Z]{2}$"
+    },
+    "ReplyTo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "email"
+    },
+    "Level": {
+      "type": "string",
+      "anyOf": [
+        {
+          "enum": [
+            "Quiet",
+            "Normal",
+            "Loud"
+          ]
+        },
+        {
+          "pattern": "^\\s*(?:[Qq][Uu][Ii][Ee][Tt]|[Nn][Oo][Rr][Mm][Aa][Ll]|[Ll][Oo][Uu][Dd])\\s*$"
+        }
+      ]
+    },
+    "LevelName": {
+      "type": "string",
+      "description": "Default: Normal.",
+      "default": "Normal",
+      "anyOf": [
+        {
+          "enum": [
+            "Quiet",
+            "Normal",
+            "Loud"
+          ]
+        },
+        {
+          "pattern": "^\\s*(?:[Qq][Uu][Ii][Ee][Tt]|[Nn][Oo][Rr][Mm][Aa][Ll]|[Ll][Oo][Uu][Dd])\\s*$"
+        }
+      ]
+    }
+  },
+  "patternProperties": {
+    "^(?:[Pp][Oo][Rr][Tt])$": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Range: 1 to 65535.",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "^(?:[Rr][Aa][Tt][Ii][Oo])$": {
+      "type": "number",
+      "description": "Greater than 0 and less than 1.",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "^(?:[Ww][Oo][Rr][Kk][Ee][Rr][Ss])$": {
+      "type": "integer",
+      "description": "Greater than 0.",
+      "exclusiveMinimum": 0
+    },
+    "^(?:[Ww][Ee][Ii][Gg][Hh][Tt])$": {
+      "type": "number",
+      "description": "At least 0.5.",
+      "minimum": 0.5
+    },
+    "^(?:[Pp][Ee][Rr][Cc][Ee][Nn][Tt])$": {
+      "type": "integer",
+      "description": "Less than 100.",
+      "exclusiveMaximum": 100
+    },
+    "^(?:[Rr][Ee][Tt][Rr][Ii][Ee][Ss])$": {
+      "type": "integer",
+      "description": "At most 10.",
+      "maximum": 10
+    },
+    "^(?:[Nn][Aa][Mm][Ee])$": {
+      "type": "string",
+      "description": "At least 2 characters.",
+      "minLength": 2
+    },
+    "^(?:[Tt][Aa][Gg][Ss])$": {
+      "type": "array",
+      "description": "At most 3 items.",
+      "maxItems": 3,
+      "items": {
+        "type": "string"
+      }
+    },
+    "^(?:[Cc][Oo][Dd][Ee])$": {
+      "type": "string",
+      "description": "2 to 8 characters.",
+      "minLength": 2,
+      "maxLength": 8
+    },
+    "^(?:[Tt][Ii][Tt][Ll][Ee])$": {
+      "type": "string",
+      "description": "At least 1 character.",
+      "minLength": 1
+    },
+    "^(?:[Hh][Oo][Ss][Tt][Ss])$": {
+      "type": "array",
+      "description": "At least 1 item.",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "^(?:[Cc][Uu][Ll][Tt][Uu][Rr][Ee])$": {
+      "type": "string",
+      "description": "Default: en-US.",
+      "default": "en-US",
+      "pattern": "^[a-z]{2}-[A-Z]{2}$"
+    },
+    "^(?:[Rr][Ee][Pp][Ll][Yy][Tt][Oo])$": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "email"
+    },
+    "^(?:[Ll][Ee][Vv][Ee][Ll])$": {
+      "type": "string",
+      "anyOf": [
+        {
+          "enum": [
+            "Quiet",
+            "Normal",
+            "Loud"
+          ]
+        },
+        {
+          "pattern": "^\\s*(?:[Qq][Uu][Ii][Ee][Tt]|[Nn][Oo][Rr][Mm][Aa][Ll]|[Ll][Oo][Uu][Dd])\\s*$"
+        }
+      ]
+    },
+    "^(?:[Ll][Ee][Vv][Ee][Ll][Nn][Aa][Mm][Ee])$": {
+      "type": "string",
+      "description": "Default: Normal.",
+      "default": "Normal",
+      "anyOf": [
+        {
+          "enum": [
+            "Quiet",
+            "Normal",
+            "Loud"
+          ]
+        },
+        {
+          "pattern": "^\\s*(?:[Qq][Uu][Ii][Ee][Tt]|[Nn][Oo][Rr][Mm][Aa][Ll]|[Ll][Oo][Uu][Dd])\\s*$"
+        }
+      ]
+    }
+  }
+}
+## Diagnostics

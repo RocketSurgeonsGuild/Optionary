@@ -102,6 +102,33 @@ This doesn't work for a class your generator writes: Optionary's generator doesn
 - Fragments are permissive: nothing is `required` unless `OptionarySchemaRequired` is `true`, which marks `required`
   members, `[Required]` properties and value-type constructor parameters without defaults.
 
+### ZeroAlloc.Validation rules
+
+The rules of [ZeroAlloc.Validation](../binding/#zeroallocvalidation) reach the schema the same way, so a `[Validate]` options
+type states each rule once:
+
+| Rule                                            | Schema                                                                       |
+| ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| `[InclusiveBetween(a, b)]`                      | `minimum: a`, `maximum: b`                                                   |
+| `[ExclusiveBetween(a, b)]`                      | `exclusiveMinimum: a`, `exclusiveMaximum: b`                                 |
+| `[GreaterThan(a)]`, `[GreaterThanOrEqualTo(a)]` | `exclusiveMinimum: a`, `minimum: a`                                          |
+| `[LessThan(a)]`, `[LessThanOrEqualTo(a)]`       | `exclusiveMaximum: a`, `maximum: a`                                          |
+| `[MinLength(n)]`, `[MaxLength(n)]`, `[Length]`  | `minLength`/`maxLength` for a string, `minItems`/`maxItems` for a collection |
+| `[NotEmpty]`                                    | `minLength: 1` for a string, `minItems: 1` for a collection                  |
+| `[Matches(pattern)]`                            | `pattern`, as written: both search the value                                 |
+| `[EmailAddress]`                                | `format: email`                                                              |
+| `[IsEnumName(typeof(T))]`                       | `enum`, the names of `T`                                                     |
+
+- An enum property already lists its names, so `[IsInEnum]` adds nothing.
+- A member with a rule and a data annotation gets each keyword once. Where the two disagree, the schema takes the tighter
+  bound, since both would have to pass.
+- Rules with no keyword are left out: `[Must]`, `[Equal]`, `[NotEqual]`, `[PrecisionScale]`, `[NotNull]`, `[Null]`, `[Empty]`,
+  `[ValidateWith]`, custom rules, and `[NotEmpty]` on anything but a string or a collection.
+- So are rules that don't always fail the options: one with `When` or `Unless`, any rule of a type with `[SkipWhen]`, and one
+  whose `Severity` is `Warning` or `Info`.
+- A rule that has a keyword but can't use it (a range on a string, a pattern in .NET-only syntax, a second pattern for one
+  value) is reported with [`OPT0008`](../../reference/diagnostics/#opt0008).
+
 ## The library schema
 
 Every project that isn't a host (a library) writes its own fragments to `$(IntermediateOutputPath)ConfigurationSchema.json`

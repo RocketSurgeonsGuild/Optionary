@@ -287,12 +287,15 @@ internal static class JsonSchemaWriter
 
     private static string? Lengths(int? minimum, int? maximum, string unit) => (minimum, maximum) switch
     {
-        ({ } low, { } high) when low == high => $"Exactly {low} {unit}.",
-        ({ } low, { } high) => $"{low} to {high} {unit}.",
-        ({ } low, null) => $"At least {low} {unit}.",
-        (null, { } high) => $"At most {high} {unit}.",
+        ({ } low, { } high) when low == high => $"Exactly {low} {Counted(low, unit)}.",
+        ({ } low, { } high) => $"{low} to {high} {Counted(high, unit)}.",
+        ({ } low, null) => $"At least {low} {Counted(low, unit)}.",
+        (null, { } high) => $"At most {high} {Counted(high, unit)}.",
         _ => null,
     };
+
+    /// <summary>The plural <paramref name="unit" />, or its singular for a count of one.</summary>
+    private static string Counted(int count, string unit) => count == 1 ? unit[..^1] : unit;
 
     private static void Number(ObjectWriter json, string name, int? value)
     {

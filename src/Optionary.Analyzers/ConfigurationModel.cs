@@ -34,7 +34,7 @@ internal sealed record SchemaNode
 
     public string? Format { get; init; }
 
-    /// <summary>An ECMA-262 pattern, already anchored.</summary>
+    /// <summary>An ECMA-262 pattern, anchored unless the annotation it comes from searches the value (<c>[Matches]</c>).</summary>
     public string? Pattern { get; init; }
 
     public string? ContentEncoding { get; init; }
