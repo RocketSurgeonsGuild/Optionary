@@ -12,7 +12,7 @@ Declares the configuration section of an options type `T` from the assembly, for
 ## OptionaryAttribute
 
 - Name: `Constructor`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.5080a1fa5b54d15673013999f6fc92dc54a04d87/src/Optionary/OptionaryAttribute.cs#L39-L56)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.592c01caa8b522a16952f85abbada7b8481c4227/src/Optionary/OptionaryAttribute.cs#L39-L56)
 
 Declares `T` under the section derived from its name.
 
@@ -31,7 +31,7 @@ public sealed class OptionaryAttribute<T>
 ## OptionaryAttribute(string)
 
 - Name: `Constructor(string)`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.5080a1fa5b54d15673013999f6fc92dc54a04d87/src/Optionary/OptionaryAttribute.cs#L45-L56)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.592c01caa8b522a16952f85abbada7b8481c4227/src/Optionary/OptionaryAttribute.cs#L45-L56)
 
 Declares `T` under `section`.
 
