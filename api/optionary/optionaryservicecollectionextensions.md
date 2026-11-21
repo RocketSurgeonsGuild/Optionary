@@ -2,10 +2,10 @@
 
 - Kind: `class`
 - Package: [Optionary](/Optionary/api/optionary.md)
-- Version: `0.1.3-beta.5`
+- Version: `0.1.3-beta.7`
 - Namespace: `Optionary`
 - Target framework: `net10.0`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.e0a43e5cd42ff17c725ec70e9f354ff9811b0cf4/src/Optionary/OptionaryServiceCollectionExtensions.cs)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.0c19f9e0449f98bdd5d823505b36d51dc8728ea5/src/Optionary/OptionaryServiceCollectionExtensions.cs)
 
 Registers strongly-typed configuration classes with the standard `Extensions.Options` pipeline.
 

@@ -290,6 +290,7 @@ With [ZeroAlloc.Validation](https://validation.zeroalloc.net/docs/options) and `
 * It applies to `[Validate]` classes of the same assembly that aren’t private or protected (nor nested in a type that is). `ZeroAllocGeneratedAccessibility=Internal` is honoured.
 * A type with an asynchronous rule isn’t validated this way, because options validation is synchronous; it is reported with [`OPT0012`](../../reference/diagnostics/#opt0012).
 * Set `OptionaryZeroAllocValidation` to `false` to leave ZeroAlloc.Validation’s registrations to the project.
+* The rules are also written into the [schema](../schema-and-editors/#zeroallocvalidation-rules), whether or not the type is validated this way, so editors flag a bad value before the application starts.
 
 # Declarations
 
@@ -602,6 +603,30 @@ This doesn’t work for a class your generator writes: Optionary’s generator d
 * The XML summary is read from source whether or not `GenerateDocumentationFile` is on. `<inheritdoc />` and `<include>` produce no description.
 * Annotations JSON Schema can’t express are dropped with [`OPT0008`](../../reference/diagnostics/#opt0008).
 * Fragments are permissive: nothing is `required` unless `OptionarySchemaRequired` is `true`, which marks `required` members, `[Required]` properties and value-type constructor parameters without defaults.
+
+### ZeroAlloc.Validation rules
+
+[Section titled “ZeroAlloc.Validation rules”](#zeroallocvalidation-rules)
+
+The rules of [ZeroAlloc.Validation](../binding/#zeroallocvalidation) reach the schema the same way, so a `[Validate]` options type states each rule once:
+
+| Rule                                            | Schema                                                                       |
+| ----------------------------------------------- | ---------------------------------------------------------------------------- |
+| `[InclusiveBetween(a, b)]`                      | `minimum: a`, `maximum: b`                                                   |
+| `[ExclusiveBetween(a, b)]`                      | `exclusiveMinimum: a`, `exclusiveMaximum: b`                                 |
+| `[GreaterThan(a)]`, `[GreaterThanOrEqualTo(a)]` | `exclusiveMinimum: a`, `minimum: a`                                          |
+| `[LessThan(a)]`, `[LessThanOrEqualTo(a)]`       | `exclusiveMaximum: a`, `maximum: a`                                          |
+| `[MinLength(n)]`, `[MaxLength(n)]`, `[Length]`  | `minLength`/`maxLength` for a string, `minItems`/`maxItems` for a collection |
+| `[NotEmpty]`                                    | `minLength: 1` for a string, `minItems: 1` for a collection                  |
+| `[Matches(pattern)]`                            | `pattern`, as written: both search the value                                 |
+| `[EmailAddress]`                                | `format: email`                                                              |
+| `[IsEnumName(typeof(T))]`                       | `enum`, the names of `T`                                                     |
+
+* An enum property already lists its names, so `[IsInEnum]` adds nothing.
+* A member with a rule and a data annotation gets each keyword once. Where the two disagree, the schema takes the tighter bound, since both would have to pass.
+* Rules with no keyword are left out: `[Must]`, `[Equal]`, `[NotEqual]`, `[PrecisionScale]`, `[NotNull]`, `[Null]`, `[Empty]`, `[ValidateWith]`, custom rules, and `[NotEmpty]` on anything but a string or a collection.
+* So are rules that don’t always fail the options: one with `When` or `Unless`, any rule of a type with `[SkipWhen]`, and one whose `Severity` is `Warning` or `Info`.
+* A rule that has a keyword but can’t use it (a range on a string, a pattern in .NET-only syntax, a second pattern for one value) is reported with [`OPT0008`](../../reference/diagnostics/#opt0008).
 
 ## The library schema
 
@@ -936,20 +961,21 @@ These properties and items are Optionary’s public MSBuild API. They change onl
 
 [Section titled “Item metadata”](#item-metadata)
 
-| Item              | Metadata                                 | Effect                                                                                                                                                                                                       |
-| ----------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `AdditionalFiles` | `OptionaryReferenceDocumentation="true"` | Marks an XML documentation file the generator reads descriptions from, for types declared with `[assembly: Optionary<T>]`. Optionary adds these itself for package references; add your own for other files. |
+| Item              | Metadata                                 | Effect                                                                                                                                                                                                                                                                                                                                     |
+| ----------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `AdditionalFiles` | `OptionaryReferenceDocumentation="true"` | Marks an XML documentation file the generator reads descriptions from, for types declared with `[assembly: Optionary<T>]`. The file is named after the assembly it documents, with any extension. Optionary adds these itself for package references, as `<assembly name>.xmldoc` links or copies in `obj/`; add your own for other files. |
 
 ## Files
 
 [Section titled “Files”](#files)
 
-| File                                                             | Written by                                    | What it is                                                                                                                                                              |
-| ---------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `$(BaseIntermediateOutputPath)appsettings.schema.json`           | hosts                                         | The application schema, at a stable path (normally `obj/appsettings.schema.json`). Copied to `$(OutDir)` and published unless `OptionarySchemaCopyToOutput` is `false`. |
-| `$(IntermediateOutputPath)appsettings.schema.json`               | multi-target hosts                            | The application schema for each target framework after the first.                                                                                                       |
-| `$(IntermediateOutputPath)ConfigurationSchema.json`              | libraries                                     | The library schema, packed at the package root.                                                                                                                         |
-| `$(IntermediateOutputPath)<project>.OptionarySchemaFragments.cs` | projects with `OptionarySchemaFragment` items | The fragments’ attributes, when `GenerateAssemblyInfo` or `GenerateAssemblyMetadataAttributes` is `false`; otherwise they are in the SDK’s `AssemblyInfo.cs`.           |
+| File                                                             | Written by                                    | What it is                                                                                                                                                                                                                                                                      |
+| ---------------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `$(BaseIntermediateOutputPath)appsettings.schema.json`           | hosts                                         | The application schema, at a stable path (normally `obj/appsettings.schema.json`). Copied to `$(OutDir)` and published unless `OptionarySchemaCopyToOutput` is `false`.                                                                                                         |
+| `$(IntermediateOutputPath)appsettings.schema.json`               | multi-target hosts                            | The application schema for each target framework after the first.                                                                                                                                                                                                               |
+| `$(IntermediateOutputPath)ConfigurationSchema.json`              | libraries                                     | The library schema, packed at the package root.                                                                                                                                                                                                                                 |
+| `$(IntermediateOutputPath)<project>.OptionarySchemaFragments.cs` | projects with `OptionarySchemaFragment` items | The fragments’ attributes, when `GenerateAssemblyInfo` or `GenerateAssemblyMetadataAttributes` is `false`; otherwise they are in the SDK’s `AssemblyInfo.cs`.                                                                                                                   |
+| `$(IntermediateOutputPath)OptionaryReferenceDocumentation/`      | projects with package references              | Each referenced package’s XML documentation as `<assembly name>.xmldoc` (a hard link, or a copy), unless `OptionaryReferenceDocumentation` is `false`. The generator reads these, and tools that pick up every `.xml` additional file (ASP.NET Core’s OpenAPI generator) don’t. |
 
 ## For host frameworks
 
