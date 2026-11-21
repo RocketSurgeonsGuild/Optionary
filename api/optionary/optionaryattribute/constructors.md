@@ -12,7 +12,7 @@ Declares the configuration section of an options class. Optionary's source gener
 ## OptionaryAttribute
 
 - Name: `Constructor`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.e9cb00d36dc8572544be11195811781233805299/src/Optionary/OptionaryAttribute.cs#L39-L56)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.e0a43e5cd42ff17c725ec70e9f354ff9811b0cf4/src/Optionary/OptionaryAttribute.cs#L39-L56)
 
 Declares the attributed class under the section derived from its name.
 
@@ -31,7 +31,7 @@ public sealed class OptionaryAttribute
 ## OptionaryAttribute(string)
 
 - Name: `Constructor(string)`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.e9cb00d36dc8572544be11195811781233805299/src/Optionary/OptionaryAttribute.cs#L45-L56)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.e0a43e5cd42ff17c725ec70e9f354ff9811b0cf4/src/Optionary/OptionaryAttribute.cs#L45-L56)
 
 Declares the attributed class under `section`.
 
