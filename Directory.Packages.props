@@ -9,7 +9,7 @@
     <GlobalPackageReference Include="Spectre.Console.Analyzer" Version="1.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.2" />
+    <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.5" />
     <PackageVersion Include="Polyfill" Version="11.4.5" />
     <!-- The generator (src/Optionary.Analyzers); the roslyn5.x slices override this version. -->
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0" />
@@ -34,7 +34,7 @@
     <PackageVersion Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" Version="11.0.1" />
     <PackageVersion Include="TUnit" Version="1.87.12" />
     <PackageVersion Include="TUnit.Mocks" Version="1.87.12" />
-    <PackageVersion Include="TUnit.Assertions.Should" Version="1.85.0-beta" />
+    <PackageVersion Include="TUnit.Assertions.Should" Version="1.87.12-beta" />
     <PackageVersion Include="Verify.TUnit" Version="33.7.1" />
     <PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
     <!-- The CI pipeline (build/Build.cs, a file-based app). Build tooling only: the libraries don't depend on any of these. -->
@@ -42,7 +42,7 @@
     <PackageVersion Include="Sourcy.DotNet" Version="1.1.1" />
     <PackageVersion Include="Sourcy.Git" Version="1.1.1" />
     <PackageVersion Include="Rocket.Surgery.ModularPipelines.Extensions" Version="0.2.4" />
-    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.7.1" />
+    <PackageVersion Include="Joinery.Dovetail.ModularPipelines" Version="0.8.0" />
     <PackageVersion Include="ModularPipelines" Version="4.0.0" />
     <PackageVersion Include="Specular" Version="0.4.1" />
   </ItemGroup>
