@@ -55,6 +55,11 @@
       "matchCategories": ["js"],
       "automerge": true,
       "labels": [":truck: private-dependencies"]
+    },
+    {
+      "description": "Only the tests and their scaffolds use these: consumers of this repository's packages never get them",
+      "matchDepNames": ["ZeroAlloc.Validation", "ZeroAlloc.Validation.Options", "Corvus.*"],
+      "labels": [":truck: private-dependencies"]
     }
   ]
 }
