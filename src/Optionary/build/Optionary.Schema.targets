@@ -292,6 +292,10 @@
       packages' XML documentation files: the compiler loads no docs for references, and analyzers can't read files. Pass the doc
       file next to each package reference to the generator, which reads only the ones for the types it describes. Targeting
       packs are left out (framework types aren't configuration types, and their docs run to tens of megabytes).
+      The generator gets each file under another name, <assembly name>.xmldoc in obj/ (a hard link where the file system
+      allows one, a copy otherwise), never the .xml file itself: other generators take every .xml additional file for their
+      own input. ASP.NET Core's OpenAPI generator writes the comments of each one into the compilation as string literals,
+      which fails with CS8103 once a project references enough documented packages.
       This has to run before GenerateMSBuildEditorConfigFileCore writes the AdditionalFiles metadata into the generated
       editorconfig (GenerateMSBuildEditorConfigFile itself is empty; its DependsOnTargets run before any BeforeTargets hook).
       Opt out with OptionaryReferenceDocumentation=false.
@@ -300,9 +304,24 @@
           BeforeTargets="GenerateMSBuildEditorConfigFileCore"
           DependsOnTargets="ResolveAssemblyReferences"
           Condition="'$(OptionaryReferenceDocumentation)' != 'false'">
+    <PropertyGroup>
+      <_OptionaryReferenceDocumentationDirectory>$([MSBuild]::NormalizeDirectory('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', 'OptionaryReferenceDocumentation'))</_OptionaryReferenceDocumentationDirectory>
+    </PropertyGroup>
     <ItemGroup>
-      <_OptionaryReferenceDocumentationFile Include="@(ReferencePath->'%(RootDir)%(Directory)%(Filename).xml')" Condition="'%(ReferencePath.NuGetPackageId)' != '' and '%(ReferencePath.FrameworkReferenceName)' == ''" />
-      <AdditionalFiles Include="@(_OptionaryReferenceDocumentationFile)" Condition="Exists('%(_OptionaryReferenceDocumentationFile.Identity)')" OptionaryReferenceDocumentation="true" />
+      <_OptionaryReferenceDocumentationCandidate Include="@(ReferencePath->'%(RootDir)%(Directory)%(Filename).xml')" Condition="'%(ReferencePath.NuGetPackageId)' != '' and '%(ReferencePath.FrameworkReferenceName)' == ''" />
+      <_OptionaryReferenceDocumentationSource Include="@(_OptionaryReferenceDocumentationCandidate)" Condition="Exists('%(_OptionaryReferenceDocumentationCandidate.Identity)')" />
+      <_OptionaryReferenceDocumentationFile Include="@(_OptionaryReferenceDocumentationSource->'$(_OptionaryReferenceDocumentationDirectory)%(Filename).xmldoc')" />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(_OptionaryReferenceDocumentationSource)"
+      DestinationFiles="@(_OptionaryReferenceDocumentationFile)"
+      SkipUnchangedFiles="true"
+      UseHardlinksIfPossible="true"
+      Retries="$(CopyRetryCount)"
+      RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)" />
+    <ItemGroup>
+      <AdditionalFiles Include="@(_OptionaryReferenceDocumentationFile)" OptionaryReferenceDocumentation="true" />
+      <FileWrites Include="@(_OptionaryReferenceDocumentationFile)" />
     </ItemGroup>
   </Target>
 
