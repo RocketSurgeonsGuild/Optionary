@@ -17,6 +17,7 @@ internal sealed class ModelBuilder
     private const int MaxDefinitions = 200;
 
     private const string DataAnnotations = "System.ComponentModel.DataAnnotations.";
+    private const string ZeroAllocValidation = "ZeroAlloc.Validation.";
     private static readonly string[] SectionSuffixes = ["Configuration", "Settings", "Options", "Config"];
 
     // A lookup rather than a switch: SpecialType has dozens of members, and the scalars are a handful of them.
@@ -623,11 +624,15 @@ internal sealed class ModelBuilder
     private SchemaNode ApplyAnnotations(SchemaNode node, Member member)
     {
         string? description = null;
+        List<AttributeData>? zeroAllocRules = null;
         foreach (var attribute in member.Property.GetAttributes().Concat(member.Parameter?.GetAttributes() ?? []))
         {
             var name = attribute.AttributeClass?.ToDisplayString();
             switch (name)
             {
+                case not null when name.StartsWith(ZeroAllocValidation, StringComparison.Ordinal):
+                    ( zeroAllocRules ??= [] ).Add(attribute);
+                    break;
                 case "System.ComponentModel.DescriptionAttribute" when attribute.ConstructorArguments is [{ Value: string text }]:
                     description = text;
                     break;
@@ -670,7 +675,117 @@ internal sealed class ModelBuilder
             }
         }
 
+        // After the data annotations, whatever the order they are written in: ZeroAlloc.Validation's rules only narrow what is
+        // already there, so a member that states a rule both ways gets each keyword once.
+        if (zeroAllocRules is not null && !HasAttribute(member.Property.ContainingType, ZeroAllocValidation + "SkipWhenAttribute"))
+        {
+            foreach (var rule in zeroAllocRules)
+            {
+                node = ApplyZeroAllocRule(node, rule, member);
+            }
+        }
+
         return Describe(node, member.Property, description);
+    }
+
+    /// <summary>
+    ///     Adds what a ZeroAlloc.Validation rule says about a value, for the rules JSON Schema has a keyword for. The others
+    ///     (<c>[Must]</c>, <c>[NotEqual]</c>, <c>[PrecisionScale]</c>, …) are left out, and so is a rule that doesn't always fail
+    ///     the options: one with <c>When</c> or <c>Unless</c>, on a type with <c>[SkipWhen]</c>, or with a severity below error.
+    /// </summary>
+    private SchemaNode ApplyZeroAllocRule(SchemaNode node, AttributeData attribute, Member member)
+    {
+        if (attribute.NamedArguments.Any(z => z is { Key: "When" or "Unless", Value.Value: string } or { Key: "Severity", Value.Value: not 0 }))
+        {
+            return node;
+        }
+
+        var arguments = attribute.ConstructorArguments;
+        return attribute.AttributeClass?.ToDisplayString()[ZeroAllocValidation.Length..] switch
+        {
+            "InclusiveBetweenAttribute" when arguments is [{ Value: double minimum }, { Value: double maximum }] =>
+                NarrowRange(node, attribute, member, minimum, false, maximum, false),
+            "ExclusiveBetweenAttribute" when arguments is [{ Value: double minimum }, { Value: double maximum }] =>
+                NarrowRange(node, attribute, member, minimum, true, maximum, true),
+            "GreaterThanAttribute" when arguments is [{ Value: double minimum }] => NarrowRange(node, attribute, member, minimum, true, null, false),
+            "GreaterThanOrEqualToAttribute" when arguments is [{ Value: double minimum }] => NarrowRange(node, attribute, member, minimum, false, null, false),
+            "LessThanAttribute" when arguments is [{ Value: double maximum }] => NarrowRange(node, attribute, member, null, false, maximum, true),
+            "LessThanOrEqualToAttribute" when arguments is [{ Value: double maximum }] => NarrowRange(node, attribute, member, null, false, maximum, false),
+            "MinLengthAttribute" when arguments is [{ Value: int minimum }] => NarrowLength(node, attribute, member, minimum, null),
+            "MaxLengthAttribute" when arguments is [{ Value: int maximum }] => NarrowLength(node, attribute, member, null, maximum),
+            "LengthAttribute" when arguments is [{ Value: int minimum }, { Value: int maximum }] => NarrowLength(node, attribute, member, minimum, maximum),
+            // On anything else (a number, a Guid) the rule is "not the default value", which has no keyword.
+            "NotEmptyAttribute" when node.Kind == SchemaKind.Array || member.Property.Type.SpecialType == SpecialType.System_String =>
+                NarrowLength(node, attribute, member, 1, null),
+            "MatchesAttribute" when arguments is [{ Value: string pattern }] => ApplyMatches(node, attribute, member, pattern),
+            "EmailAddressAttribute" when node is { Kind: SchemaKind.String, Format: null } => node with { Format = "email" },
+            // The names of another enum, for a string. An enum's own names are already there, so [IsInEnum] adds nothing.
+            "IsEnumNameAttribute" when arguments is [{ Value: INamedTypeSymbol { TypeKind: TypeKind.Enum } enumType }] && node is { Kind: SchemaKind.String, EnumValues.IsEmpty: true } =>
+                node with { EnumValues = EnumNames(enumType).ToEquatableArray() },
+            _ => node,
+        };
+    }
+
+    /// <summary>Keeps the tighter of each bound: the one already on the node (from the type, or <c>[Range]</c>) or the rule's.</summary>
+    private SchemaNode NarrowRange(SchemaNode node, AttributeData attribute, Member member, double? minimum, bool exclusiveMinimum, double? maximum, bool exclusiveMaximum)
+    {
+        if (node.Kind is not ( SchemaKind.Integer or SchemaKind.Number ))
+        {
+            return Inexpressible(node, attribute, member, "ranges only apply to numbers");
+        }
+
+        if (minimum is { } low && NumberText(low) is { } lowText && ( Number(node.Minimum) is not { } floor || low > floor || ( low == floor && exclusiveMinimum ) ))
+        {
+            node = node with { Minimum = lowText, ExclusiveMinimum = exclusiveMinimum };
+        }
+
+        if (maximum is { } high && NumberText(high) is { } highText && ( Number(node.Maximum) is not { } ceiling || high < ceiling || ( high == ceiling && exclusiveMaximum ) ))
+        {
+            node = node with { Maximum = highText, ExclusiveMaximum = exclusiveMaximum };
+        }
+
+        return node;
+
+        static double? Number(string? text) => double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var value) ? value : null;
+    }
+
+    /// <summary>Keeps the tighter of each length: the one already on the node or the rule's.</summary>
+    private SchemaNode NarrowLength(SchemaNode node, AttributeData attribute, Member member, int? minimum, int? maximum) =>
+        node.Kind == SchemaKind.String
+            ? node with { MinLength = Larger(node.MinLength, minimum), MaxLength = Smaller(node.MaxLength, maximum) }
+            : node.Kind == SchemaKind.Array
+                ? node with { MinItems = Larger(node.MinItems, minimum), MaxItems = Smaller(node.MaxItems, maximum) }
+                : Inexpressible(node, attribute, member, "lengths only apply to strings and collections");
+
+    private static int? Larger(int? current, int? rule) => current is { } a && rule is { } b ? Math.Max(a, b) : current ?? rule;
+
+    private static int? Smaller(int? current, int? rule) => current is { } a && rule is { } b ? Math.Min(a, b) : current ?? rule;
+
+    /// <summary>
+    ///     <c>[Matches]</c> searches the value like JSON Schema's <c>pattern</c>, so the expression is used as written. A value has
+    ///     one pattern: the one already there stays, silently when it is this expression anchored by <c>[RegularExpression]</c>.
+    /// </summary>
+    private SchemaNode ApplyMatches(SchemaNode node, AttributeData attribute, Member member, string pattern)
+    {
+        if (node.Kind != SchemaKind.String)
+        {
+            return Inexpressible(node, attribute, member, "patterns only apply to strings");
+        }
+
+        if (UsesNetOnlyRegexSyntax(pattern))
+        {
+            return Inexpressible(node, attribute, member, "it uses regular expression syntax that JSON Schema (ECMA-262) doesn't support");
+        }
+
+        if (node.Pattern is null && node.EnumValues.IsEmpty)
+        {
+            return node with { Pattern = pattern };
+        }
+
+        var body = pattern.StartsWith("^", StringComparison.Ordinal) && pattern.EndsWith("$", StringComparison.Ordinal) && pattern.Length >= 2 ? pattern[1..^1] : null;
+        return node.Pattern == pattern || ( body is not null && node.Pattern == "^(?:" + body + ")$" )
+            ? node
+            : Inexpressible(node, attribute, member, "the value already has a pattern");
     }
 
     /// <summary>
@@ -829,7 +944,8 @@ internal sealed class ModelBuilder
     {
         // An empty string tells an editor nothing (the description hint would read "Default: ."), so it is not a default.
         string { Length: 0 } => null,
-        string text when node.Kind == SchemaKind.String && node.EnumValues.IsEmpty => JsonSchemaWriter.String(text),
+        // A string restricted to names ([IsEnumName]) can default to one of them; an enum's default is never a string constant.
+        string text when node.Kind == SchemaKind.String && ( node.EnumValues.IsEmpty || node.EnumValues.Items.Contains(text) ) => JsonSchemaWriter.String(text),
         char character when node.Kind == SchemaKind.String => JsonSchemaWriter.String(character.ToString()),
         bool boolean when node.Kind == SchemaKind.Boolean => boolean ? "true" : "false",
         _ when node.Kind is SchemaKind.Integer or SchemaKind.Number => NumberText(value),

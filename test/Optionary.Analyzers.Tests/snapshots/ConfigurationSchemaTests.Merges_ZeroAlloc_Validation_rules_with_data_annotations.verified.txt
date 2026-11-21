@@ -1,0 +1,140 @@
+﻿## Merged
+{
+  "type": "object",
+  "title": "Merged",
+  "properties": {
+    "Port": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Range: 1 to 65535.",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "RangeFirst": {
+      "type": "integer",
+      "description": "Range: 5 to 10.",
+      "minimum": 5,
+      "maximum": 10
+    },
+    "RuleFirst": {
+      "type": "integer",
+      "description": "Range: 5 to 10.",
+      "minimum": 5,
+      "maximum": 10
+    },
+    "TwoRules": {
+      "type": "integer",
+      "description": "Greater than 0 and less than or equal to 100.",
+      "exclusiveMinimum": 0,
+      "maximum": 100
+    },
+    "ExclusiveAtTheSameBound": {
+      "type": "integer",
+      "description": "Greater than 1 and less than or equal to 10.",
+      "exclusiveMinimum": 1,
+      "maximum": 10
+    },
+    "InsideItsType": {
+      "type": "integer",
+      "description": "Range: 0 to 255.",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "Name": {
+      "type": "string",
+      "description": "3 to 20 characters.",
+      "minLength": 3,
+      "maxLength": 20
+    },
+    "Tags": {
+      "type": "array",
+      "description": "1 to 3 items.",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "string"
+      }
+    },
+    "SamePattern": {
+      "type": "string",
+      "pattern": "^(?:[a-z]+)$"
+    },
+    "ReplyTo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "email"
+    }
+  },
+  "patternProperties": {
+    "^(?:[Pp][Oo][Rr][Tt])$": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "description": "Range: 1 to 65535.",
+      "minimum": 1,
+      "maximum": 65535
+    },
+    "^(?:[Rr][Aa][Nn][Gg][Ee][Ff][Ii][Rr][Ss][Tt])$": {
+      "type": "integer",
+      "description": "Range: 5 to 10.",
+      "minimum": 5,
+      "maximum": 10
+    },
+    "^(?:[Rr][Uu][Ll][Ee][Ff][Ii][Rr][Ss][Tt])$": {
+      "type": "integer",
+      "description": "Range: 5 to 10.",
+      "minimum": 5,
+      "maximum": 10
+    },
+    "^(?:[Tt][Ww][Oo][Rr][Uu][Ll][Ee][Ss])$": {
+      "type": "integer",
+      "description": "Greater than 0 and less than or equal to 100.",
+      "exclusiveMinimum": 0,
+      "maximum": 100
+    },
+    "^(?:[Ee][Xx][Cc][Ll][Uu][Ss][Ii][Vv][Ee][Aa][Tt][Tt][Hh][Ee][Ss][Aa][Mm][Ee][Bb][Oo][Uu][Nn][Dd])$": {
+      "type": "integer",
+      "description": "Greater than 1 and less than or equal to 10.",
+      "exclusiveMinimum": 1,
+      "maximum": 10
+    },
+    "^(?:[Ii][Nn][Ss][Ii][Dd][Ee][Ii][Tt][Ss][Tt][Yy][Pp][Ee])$": {
+      "type": "integer",
+      "description": "Range: 0 to 255.",
+      "minimum": 0,
+      "maximum": 255
+    },
+    "^(?:[Nn][Aa][Mm][Ee])$": {
+      "type": "string",
+      "description": "3 to 20 characters.",
+      "minLength": 3,
+      "maxLength": 20
+    },
+    "^(?:[Tt][Aa][Gg][Ss])$": {
+      "type": "array",
+      "description": "1 to 3 items.",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "string"
+      }
+    },
+    "^(?:[Ss][Aa][Mm][Ee][Pp][Aa][Tt][Tt][Ee][Rr][Nn])$": {
+      "type": "string",
+      "pattern": "^(?:[a-z]+)$"
+    },
+    "^(?:[Rr][Ee][Pp][Ll][Yy][Tt][Oo])$": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "email"
+    }
+  }
+}
+## Diagnostics
