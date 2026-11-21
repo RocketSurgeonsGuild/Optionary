@@ -52,7 +52,7 @@
   -->
   <Import Project="$(MSBuildThisFileDirectory)Directory.Packages.MSBuildTasks.props" />
   <ItemGroup Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net11.0'))">
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.15" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="11.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="10.0.15" />
     <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="10.0.15" />
