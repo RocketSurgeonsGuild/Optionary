@@ -2,10 +2,10 @@
 
 - Kind: `class`
 - Package: [Optionary](/Optionary/api/optionary.md)
-- Version: `0.1.3-beta.7`
+- Version: `0.2.1-beta.2`
 - Namespace: `Optionary`
 - Target framework: `net10.0`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.0c19f9e0449f98bdd5d823505b36d51dc8728ea5/src/Optionary/OptionaryAttribute.cs)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.main.Sha.4240d76ef489344e6b7558b43a38938d342ee084/src/Optionary/OptionaryAttribute.cs)
 - Inherits: `Attribute`
 
 Declares the configuration section of an options type `T` from the assembly, for types you don't own.
