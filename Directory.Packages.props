@@ -27,8 +27,8 @@
     <PackageVersion Include="MSBuild.StructuredLogger.Utils" Version="2.3.269" />
     <!-- Validates the merged schemas against the draft-07 meta-schema in the tasks' tests (Apache-2.0). -->
     <PackageVersion Include="Corvus.Json.JsonSchema.Draft7" Version="5.8.12" />
-    <PackageVersion Include="ZeroAlloc.Validation" Version="2.6.1" />
-    <PackageVersion Include="ZeroAlloc.Validation.Options" Version="2.6.1" />
+    <PackageVersion Include="ZeroAlloc.Validation" Version="3.0.1" />
+    <PackageVersion Include="ZeroAlloc.Validation.Options" Version="3.0.1" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
     <PackageVersion Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="11.0.1" />
     <PackageVersion Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" Version="11.0.1" />
