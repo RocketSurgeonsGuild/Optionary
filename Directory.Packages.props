@@ -10,7 +10,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageVersion Include="Rocket.Surgery.AssemblyInfo" Version="2026.11.6" />
-    <PackageVersion Include="Polyfill" Version="11.4.5" />
+    <PackageVersion Include="Polyfill" Version="12.0.0" />
     <!-- The generator (src/Optionary.Analyzers); the roslyn5.x slices override this version. -->
     <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0" />
     <!-- Test-only: the source-generator test helpers bring the Workspaces/Features stack; keep it on the generator's Roslyn. -->
