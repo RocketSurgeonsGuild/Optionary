@@ -189,7 +189,7 @@ in a <code dir="auto">Directory.Build.props</code>:</p>
 <tr>
 <td><code dir="auto">AdditionalFiles</code></td>
 <td><code dir="auto">OptionaryReferenceDocumentation="true"</code></td>
-<td>Marks an XML documentation file the generator reads descriptions from, for types declared with <code dir="auto">[assembly: Optionary&#x3C;T>]</code>. Optionary adds these itself for package references; add your own for other files.</td>
+<td>Marks an XML documentation file the generator reads descriptions from, for types declared with <code dir="auto">[assembly: Optionary&#x3C;T>]</code>. The file is named after the assembly it documents, with any extension. Optionary adds these itself for package references, as <code dir="auto">&#x3C;assembly name>.xmldoc</code> links or copies in <code dir="auto">obj/</code>; add your own for other files.</td>
 </tr>
 </tbody>
 </table>
@@ -222,6 +222,11 @@ in a <code dir="auto">Directory.Build.props</code>:</p>
 <td><code dir="auto">$(IntermediateOutputPath)&#x3C;project>.OptionarySchemaFragments.cs</code></td>
 <td>projects with <code dir="auto">OptionarySchemaFragment</code> items</td>
 <td>The fragments’ attributes, when <code dir="auto">GenerateAssemblyInfo</code> or <code dir="auto">GenerateAssemblyMetadataAttributes</code> is <code dir="auto">false</code>; otherwise they are in the SDK’s <code dir="auto">AssemblyInfo.cs</code>.</td>
+</tr>
+<tr>
+<td><code dir="auto">$(IntermediateOutputPath)OptionaryReferenceDocumentation/</code></td>
+<td>projects with package references</td>
+<td>Each referenced package’s XML documentation as <code dir="auto">&#x3C;assembly name>.xmldoc</code> (a hard link, or a copy), unless <code dir="auto">OptionaryReferenceDocumentation</code> is <code dir="auto">false</code>. The generator reads these, and tools that pick up every <code dir="auto">.xml</code> additional file (ASP.NET Core’s OpenAPI generator) don’t.</td>
 </tr>
 </tbody>
 </table>

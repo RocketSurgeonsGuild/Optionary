@@ -142,3 +142,5 @@ ZeroAlloc.Validation generates for it.
 - A type with an asynchronous rule isn't validated this way, because options validation is synchronous; it is reported
   with [`OPT0012`](../../reference/diagnostics/#opt0012).
 - Set `OptionaryZeroAllocValidation` to `false` to leave ZeroAlloc.Validation's registrations to the project.
+- The rules are also written into the [schema](../schema-and-editors/#zeroallocvalidation-rules), whether or not the type is
+  validated this way, so editors flag a bad value before the application starts.
