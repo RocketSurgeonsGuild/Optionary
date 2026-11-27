@@ -9,5 +9,6 @@ public abstract class GeneratorTest() : LoggerTest<TestRecord>(TestRecord.Create
     protected GeneratorTestContextBuilder ConfigurationBuilder { get; } = GeneratorTestContextBuilder
                                                                          .Create()
                                                                          .AddCommonReferences()
+                                                                         .WithSdkDefaultNoWarn()
                                                                          .WithGenerator<ConfigurationGenerator>();
 }

@@ -37,7 +37,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -45,7 +45,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
     {
         var result = await Options().AddSources(OptionsClass).Build().GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -68,7 +68,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -93,7 +93,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -105,7 +105,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -113,7 +113,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
     {
         var result = await BelowCSharp12();
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -121,7 +121,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
     {
         var result = await BelowCSharp12();
 
-        await Verify(WithoutAssemblyUnificationWarnings(result).FinalDiagnostics);
+        await Verify(result.FinalDiagnostics);
     }
 
     [Test]
@@ -146,7 +146,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -158,7 +158,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -171,7 +171,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -206,7 +206,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     /// <summary>
@@ -224,7 +224,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     [Test]
@@ -236,7 +236,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
                           .Build()
                           .GenerateAsync(TestContext.CancellationToken);
 
-        await Verify(WithoutAssemblyUnificationWarnings(result));
+        await Verify(result);
     }
 
     /// <summary>An assembly named <c>Other</c> that defines an internal <c>Optionary.OptionaryAttribute</c> of its own.</summary>
@@ -276,14 +276,7 @@ public class OptionsRegistrationMethodTests() : GeneratorTest()
     private GeneratorTestContextBuilder Options() => WithOptionsReferences(ConfigurationBuilder);
 
     /// <summary>The same, over a compilation that doesn't reference the Optionary runtime.</summary>
-    private static GeneratorTestContextBuilder WithoutOptionary() => WithOptionsReferences(GeneratorTestContextBuilder.Create().WithGenerator<ConfigurationGenerator>());
-
-    /// <summary>
-    ///     Drops CS1701 and CS1702, which SDK builds always suppress (/nowarn:1701,1702). These tests snapshot warnings, and when the
-    ///     test host runs on a newer runtime than its target framework the referenced assemblies' versions differ and Roslyn reports them.
-    /// </summary>
-    private static GeneratorTestResults WithoutAssemblyUnificationWarnings(GeneratorTestResults result) =>
-        result with { FinalDiagnostics = [.. result.FinalDiagnostics.Where(static diagnostic => diagnostic.Id is not ( "CS1701" or "CS1702" ))], };
+    private static GeneratorTestContextBuilder WithoutOptionary() => WithOptionsReferences(GeneratorTestContextBuilder.Create().WithSdkDefaultNoWarn().WithGenerator<ConfigurationGenerator>());
 
     private static GeneratorTestContextBuilder WithOptionsReferences(GeneratorTestContextBuilder builder) => builder
                                                                                                            .AddConfigurationOptionsReferences()
