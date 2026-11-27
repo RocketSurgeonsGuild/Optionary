@@ -1,7 +1,0 @@
-# C# API Reference
-
-Browse the C# API reference for every package this repository publishes.
-
-## Packages
-
-- [Optionary](/Optionary/pr-preview/pr-92/api/optionary.md) -- v0.2.1-pr.14 - 4 types - 13 members - net10.0
