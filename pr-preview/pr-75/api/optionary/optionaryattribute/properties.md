@@ -14,7 +14,7 @@ Declares the configuration section of an options class. Optionary's source gener
 - Name: `KeyStyle`
 - Modifiers: `get; set`
 - Returns: [ConfigurationKeyStyle](/Optionary/pr-preview/pr-75/api/optionary/configurationkeystyle.md)
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-75-merge.Sha.b6811427b16abec575a9e841dfacb2baf2dec230/src/Optionary/OptionaryAttribute.cs)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-75-merge.Sha.d5c9682c5042b94cfa02d5fce133df4cccf28a98/src/Optionary/OptionaryAttribute.cs)
 
 How the configuration keys are spelled: those of every bound property and constructor parameter of the options type and of the object types nested in it, and the default section path derived from the type name. The default is [ConfigurationKeyStyle.Undefined](/Optionary/pr-preview/pr-75/api/optionary/configurationkeystyle/fields.md), which keeps the declared names. See [ConfigurationKeyStyle](/Optionary/pr-preview/pr-75/api/optionary/configurationkeystyle.md).
 
@@ -29,7 +29,7 @@ public ConfigurationKeyStyle KeyStyle { get; set; }
 - Name: `RegisterOptions`
 - Modifiers: `get; set`
 - Returns: `bool`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-75-merge.Sha.b6811427b16abec575a9e841dfacb2baf2dec230/src/Optionary/OptionaryAttribute.cs)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-75-merge.Sha.d5c9682c5042b94cfa02d5fce133df4cccf28a98/src/Optionary/OptionaryAttribute.cs)
 
 Whether to register `IOptions<T>` for the type. `false` only describes the section in the schema. The default is `true`.
 
@@ -44,7 +44,7 @@ public bool RegisterOptions { get; set; }
 - Name: `Section`
 - Modifiers: `nullable` `get`
 - Returns: `string?`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-75-merge.Sha.b6811427b16abec575a9e841dfacb2baf2dec230/src/Optionary/OptionaryAttribute.cs#L50)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-75-merge.Sha.d5c9682c5042b94cfa02d5fce133df4cccf28a98/src/Optionary/OptionaryAttribute.cs#L50)
 
 The section path, or `null` for the one derived from the type name.
 
@@ -59,7 +59,7 @@ public string? Section { get; }
 - Name: `ValidateOnStart`
 - Modifiers: `get; set`
 - Returns: `bool`
-- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-75-merge.Sha.b6811427b16abec575a9e841dfacb2baf2dec230/src/Optionary/OptionaryAttribute.cs)
+- Source: [GitHub](https://github.com/RocketSurgeonsGuild/Optionary/blob/Branch.pull-75-merge.Sha.d5c9682c5042b94cfa02d5fce133df4cccf28a98/src/Optionary/OptionaryAttribute.cs)
 
 Whether to validate the options when the host starts. The default is `false`.
 
