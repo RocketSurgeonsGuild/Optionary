@@ -47,7 +47,7 @@
     },
     {
       "description": "net10.0 assets stay on the 10.0.x release train; the net11.0 group moves along 11.0.x",
-      "matchPackageNames": ["Microsoft.Extensions.*"],
+      "matchPackageNames": ["Microsoft.Extensions.*", "Microsoft.AspNetCore.*"],
       "matchCurrentVersion": "/^10\\./",
       "allowedVersions": "<11.0.0"
     },
