@@ -30,8 +30,8 @@
     <PackageVersion Include="ZeroAlloc.Validation" Version="2.6.1" />
     <PackageVersion Include="ZeroAlloc.Validation.Options" Version="2.6.1" />
     <PackageVersion Include="Bogus" Version="35.6.5" />
-    <PackageVersion Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="11.0.1" />
-    <PackageVersion Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" Version="11.0.1" />
+    <PackageVersion Include="Rocket.Surgery.Extensions.Testing.TUnit" Version="11.0.2" />
+    <PackageVersion Include="Rocket.Surgery.Extensions.Testing.SourceGenerators" Version="11.0.2" />
     <PackageVersion Include="TUnit" Version="1.87.12" />
     <PackageVersion Include="TUnit.Mocks" Version="1.87.12" />
     <PackageVersion Include="TUnit.Assertions.Should" Version="1.87.12-beta" />
