@@ -563,7 +563,8 @@ public class ConfigurationOptionsTests() : GeneratorTest()
         var result = await WithBinder(11)
                           .AddCompilationReferences(thirdParty)
                           .AddSources(
-                               Usings
+                               "#nullable enable\n"
+                             + Usings
                              + """
                                using ZeroAlloc.Validation;
 
@@ -751,8 +752,7 @@ public class ConfigurationOptionsTests() : GeneratorTest()
                           .GenerateAsync(TestContext.CancellationToken);
 
         await result.FinalDiagnostics.Where(z => z.Severity == DiagnosticSeverity.Error && z.Id.StartsWith("CS", StringComparison.Ordinal)).Should().BeEmpty();
-        // Which assembly versions need unifying (CS1701, CS1702) depends on the runtime the tests run on, so they stay out of the snapshot.
-        await Verify(result with { FinalDiagnostics = result.FinalDiagnostics.RemoveAll(z => z.Id is "CS1701" or "CS1702") });
+        await Verify(result);
     }
 
     /// <summary>Stand-ins for the ZeroAlloc.Validation types the generator looks for.</summary>

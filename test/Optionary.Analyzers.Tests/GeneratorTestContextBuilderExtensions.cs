@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,4 +29,12 @@ internal static class GeneratorTestContextBuilderExtensions
         typeof(IServiceProvider),
         typeof(IConfiguration)
         );
+
+    /// <summary>
+    ///     Suppresses CS1701 and CS1702 the way the SDK's default <c>NoWarn</c> does. The test host can load a newer
+    ///     Microsoft.Extensions assembly than the one Optionary was compiled against, and a real build never reports that.
+    /// </summary>
+    public static GeneratorTestContextBuilder WithSdkDefaultNoWarn(this GeneratorTestContextBuilder builder) => builder
+       .WithDiagnosticOption("CS1701", ReportDiagnostic.Suppress)
+       .WithDiagnosticOption("CS1702", ReportDiagnostic.Suppress);
 }
